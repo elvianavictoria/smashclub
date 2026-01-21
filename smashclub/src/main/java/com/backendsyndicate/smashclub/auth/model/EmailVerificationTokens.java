@@ -27,6 +27,6 @@ public class EmailVerificationTokens {
     private Timestamp createdAt;
 
     @ManyToOne
-    @JoinColumn(name = "UserId", foreignKey = @ForeignKey(name = "fk_to_user"), nullable = false)
+    @JoinColumn(name = "UserId", foreignKey = @ForeignKey(name  = "fk_to_user"), nullable = false)
     private User user;
 }

@@ -11,13 +11,13 @@ public class TransactionLog {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID")
-    private String id;
+    private Long id;
 
     @Column(name = "PreviousStatus", nullable = false)
-    private int previousStatus;
+    private byte previousStatus;
 
     @Column(name = "CurrentStatus", nullable = false)
-    private int currentStatus;
+    private byte currentStatus;
 
     @Column(name = "CreatedAt", nullable = false)
     private Timestamp createdAt;

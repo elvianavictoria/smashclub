@@ -11,10 +11,10 @@ public class RefundRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID")
-    private String id;
+    private Long id;
 
     @Column(name = "RefundStatus", nullable = false, columnDefinition = "default 0")
-    private int refundStatus;
+    private byte refundStatus;
 
     @Column(name = "CreatedAt", nullable = false)
     private Timestamp createdAt;

@@ -27,7 +27,7 @@ public class User {
     private String passwordHash;
 
     @Column(name = "Status", nullable = false)
-    private String status;
+    private byte status;
 
     @Column(name = "FailedLoginAttempt", columnDefinition = "default 0")
     private int failedLoginAttempt;

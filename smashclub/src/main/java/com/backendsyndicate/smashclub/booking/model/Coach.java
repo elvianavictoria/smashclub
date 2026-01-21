@@ -24,7 +24,7 @@ public class Coach {
     private BigDecimal pricePerHour;
 
     @Column(name = "Status", nullable = false)
-    private int status;
+    private byte status;
 
     @Column(name = "CreatedAt", nullable = false)
     private Timestamp createdAt;

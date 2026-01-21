@@ -10,9 +10,6 @@ import java.sql.Timestamp;
 @Entity
 @Data
 public class Wallet {
-    @Id
-    @Column(name = "UserID")
-    private String userId;
 
     @Column(name = "UserBalance", nullable = false, columnDefinition = "DECIMAL(17,2) default 0")
     private BigDecimal userBalance;

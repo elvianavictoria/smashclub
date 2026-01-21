@@ -13,7 +13,7 @@ public class Cart {
     private int id;
 
     @Column(name = "Status", nullable = false)
-    private int status;
+    private byte status;
 
     @OneToOne
     @JoinColumn(name = "UserID", nullable = false)

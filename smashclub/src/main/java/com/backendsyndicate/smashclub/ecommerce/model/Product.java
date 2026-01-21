@@ -24,7 +24,7 @@ public class Product {
     private String category;
 
     @Column(name = "Status", nullable = false)
-    private boolean status;
+    private byte status;
 
     @Column(name = "DefaultImgLink", length = 500, nullable = false)
     private String defaultImgLink;

@@ -13,7 +13,7 @@ public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID")
-    private String id;
+    private Long id;
 
     @Column(name = "TransactionCode", length = 20,unique = true, nullable = false)
     private String transactionCode;
@@ -28,10 +28,10 @@ public class Transaction {
     private String paymentLink;
 
     @Column(name = "Status", nullable = false, columnDefinition = "default 0")
-    private int status;
+    private byte status;
 
     @Column(name = "IsRefunded", nullable = false, columnDefinition = "default 0")
-    private boolean isRefunded;
+    private byte isRefunded;
 
     @Column(name = "ReferenceCode", nullable = false, columnDefinition = "default ''")
     private String referenceCode;
@@ -39,7 +39,7 @@ public class Transaction {
     @Column(name = "CreatedAt", nullable = false)
     private Timestamp createdAt;
 
-    @Column(name = "UpdatedAt")
+    @Column(name = "UpdatedAt   ")
     private Timestamp updatedAt;
 
     @ManyToOne

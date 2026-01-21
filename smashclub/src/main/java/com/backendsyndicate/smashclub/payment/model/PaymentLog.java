@@ -11,7 +11,7 @@ public class PaymentLog {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID")
-    private String id;
+    private Long id;
 
     @Column(name = "PaymentLink", length = 2048, columnDefinition = "default ")
     private String paymentLink;

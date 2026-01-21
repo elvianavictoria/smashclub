@@ -38,7 +38,7 @@ public class Booking {
     private BigDecimal totalPrice;
 
     @Column(name = "Status", nullable = false)
-    private int status;
+    private byte status;
 
     @Column(name = "CreatedAt", nullable = false)
     private Timestamp createdAt;

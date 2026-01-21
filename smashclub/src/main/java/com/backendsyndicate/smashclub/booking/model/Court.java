@@ -27,7 +27,7 @@ public class Court {
     private Time closeTime;
 
     @Column(name = "Status", nullable = false)
-    private int status;
+    private byte status;
 
     @Column(name = "CreatedAt", nullable = false)
     private Timestamp createdAt;

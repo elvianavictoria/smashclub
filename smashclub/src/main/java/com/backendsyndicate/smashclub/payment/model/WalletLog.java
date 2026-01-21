@@ -13,7 +13,7 @@ public class WalletLog {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "LogID")
-    private String id;
+    private Long id;
 
     @Column(name = "PreviousBalance", nullable = false, columnDefinition = "DECIMAL(17,2) default 0")
     private BigDecimal previousBalance;
