@@ -20,8 +20,10 @@ public class Wallet {
     @Column(name = "UpdatedAt")
     private Timestamp updatedAt;
 
+    @Id
     @OneToOne
     @MapsId
-    @JoinColumn(name = "UserID")
+    @JoinColumn(name = "UserId")
     private User user;
 }
+

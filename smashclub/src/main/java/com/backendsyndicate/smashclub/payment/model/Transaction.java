@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 @Entity
+@Table(name="Transactions")
 @Data
 public class Transaction {
     @Id

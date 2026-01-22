@@ -33,8 +33,4 @@ public class WalletLog {
     @Column(name = "CreatedAt", nullable = false)
     private Timestamp createdAt;
 
-    @ManyToOne
-    @JoinColumn(name = "UserID")
-    private User user;
-
 }

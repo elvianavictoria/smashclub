@@ -19,6 +19,12 @@
 
     <properties>
         <java.version>17</java.version>
+        <bouncy.version>1.70</bouncy.version>
+        <bcrypt.version>0.4</bcrypt.version>
+        <jsonsimple.version>1.1.1</jsonsimple.version>
+        <jdbc.sqlserver.version>
+            9.2.1.jre11
+        </jdbc.sqlserver.version>
     </properties>
 
     <dependencies>
@@ -73,7 +79,33 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- SQL Server -->
+        <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+            <version>${jdbc.sqlserver.version}</version>
+        </dependency>
 
+        <!-- Crypto -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15to18</artifactId>
+            <version>${bouncy.version}</version>
+        </dependency>
+
+        <!-- Bcrypt -->
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>${bcrypt.version}</version>
+        </dependency>
+
+        <!-- JSON Simple -->
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>${jsonsimple.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

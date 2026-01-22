@@ -1,5 +1,6 @@
 package com.backendsyndicate.smashclub.common.util;
 
+import com.backendsyndicate.smashclub.common.config.MainConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import org.json.simple.JSONObject;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -20,7 +21,7 @@ public class RequestCapture {
     }
 
     public static String allRequest(HttpServletRequest requestx) {
-        ContentCachingRequestWrapper request = new ContentCachingRequestWrapper(requestx);
+        ContentCachingRequestWrapper request = new ContentCachingRequestWrapper(requestx, MainConfig.getCacheLimit());
         Map<String, Object> requestData = processingData(request);
         String strValue = new JSONObject(requestData).toString();
         return strValue;

@@ -1,6 +1,6 @@
 package com.backendsyndicate.smashclub.common.util;
 
-import com.juaracoding.decespringboot29.config.LogConfig;
+import com.backendsyndicate.smashclub.common.config.LogConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
