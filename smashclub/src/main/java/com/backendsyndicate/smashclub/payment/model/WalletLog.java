@@ -27,8 +27,8 @@ public class WalletLog {
     @Column(name = "UsageType", nullable = false)
     private boolean usageType;
 
-    @Column(name = "RefID", nullable = false, columnDefinition = "default  ")
-    private String refID;
+    @Column(name = "RefID", nullable = false)
+    private String refID = " ";
 
     @Column(name = "CreatedAt", nullable = false)
     private Timestamp createdAt;

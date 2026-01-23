@@ -3,6 +3,7 @@ package com.backendsyndicate.smashclub.booking.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 @Entity
@@ -19,8 +20,14 @@ public class Equipment {
     @Column(name = "Brand", length = 50)
     private String brand;
 
-    @Column(name = "Type")
+    @Column(name = "Type", length = 30)
     private String type;
+
+    @Column(name = "Price", precision = 17, scale = 2, nullable = false)
+    private BigDecimal price;
+
+    @Column(name = "Stock", nullable = false)
+    private int stock = 0;
 
     @Column(name = "Description")
     private String description;
