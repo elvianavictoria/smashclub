@@ -69,6 +69,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     public ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatus status, HttpServletRequest request) {
         Logging.handleException("GlobalExceptionHandler","handleExceptionInternal ", 0, "Request: " + RequestCapture.allRequest(request) + "; Message: " + ex.getMessage());
-        return GlobalResponse.internalServerError("X05999", request);
+        return GlobalResponse.internalServerError("TERJADI KESALAHAN!", "X05999", request);
     }
 }
