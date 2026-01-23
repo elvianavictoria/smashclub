@@ -15,14 +15,14 @@ public class WalletLog {
     @Column(name = "LogID")
     private Long id;
 
-    @Column(name = "PreviousBalance", nullable = false, columnDefinition = "DECIMAL(17,2) default 0")
-    private BigDecimal previousBalance;
+    @Column(name = "PreviousBalance", precision = 17, scale = 2, nullable = false)
+    private BigDecimal previousBalance =  BigDecimal.ZERO;
 
-    @Column(name = "CurrentBalance", nullable = false, columnDefinition = "DECIMAL(17,2), default 0")
-    private BigDecimal currentBalance;
+    @Column(name = "CurrentBalance", precision = 17, scale = 2, nullable = false)
+    private BigDecimal currentBalance = BigDecimal.ZERO;
 
-    @Column(name = "UsageValue", nullable = false, columnDefinition = "DECIMAL(17,2) default 0")
-    private BigDecimal usageValue;
+    @Column(name = "UsageValue", precision = 17, scale = 2, nullable = false)
+    private BigDecimal usageValue = BigDecimal.ZERO;
 
     @Column(name = "UsageType", nullable = false)
     private boolean usageType;

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @Data
@@ -22,5 +23,7 @@ public class TransactionLog {
     @Column(name = "CreatedAt", nullable = false)
     private Timestamp createdAt;
 
-    /* TransactionLog to Transaction? */
+    @OneToMany
+    @JoinColumn(name = "TransactionID", nullable = false)
+    private List<Transaction> transactions;
 }

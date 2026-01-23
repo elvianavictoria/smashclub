@@ -34,5 +34,7 @@ public class EquipmentDetail {
     @JoinColumn(name = "BookingID", nullable = false)
     private Booking booking;
 
-//    Equipment to EquipmentDetail?
+    @ManyToOne
+    @JoinColumn(name = "Equipment", nullable = false)
+    private Equipment equipment;
 }

@@ -22,11 +22,11 @@ public class ProductVariant {
     @Column(name = "Sku", length = 100, nullable = false, unique = true)
     private String sku;
 
-    @Column(name = "Price", nullable = false, columnDefinition = "DECIMAL(17,2)")
+    @Column(name = "Price", precision = 17, scale = 2,nullable = false)
     private BigDecimal price;
 
-    @Column(name = "Stock", nullable = false, columnDefinition = "default 0")
-    private int stock;
+    @Column(name = "Stock", nullable = false)
+    private int stock = 0;
 
     @ManyToOne
     @JoinColumn(name = "ProductID", nullable = false)

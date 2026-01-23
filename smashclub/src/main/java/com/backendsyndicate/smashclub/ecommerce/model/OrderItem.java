@@ -16,7 +16,7 @@ public class OrderItem {
     @Column(name = "Quantity", nullable = false)
     private int quantity;
 
-    @Column(name = "Price", nullable = false, columnDefinition = "DECIMAL(17,2)")
+    @Column(name = "Price", precision = 17, scale = 2,nullable = false)
     private BigDecimal price;
 
     @ManyToOne

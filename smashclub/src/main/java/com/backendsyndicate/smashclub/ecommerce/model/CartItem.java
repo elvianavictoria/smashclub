@@ -16,7 +16,7 @@ public class CartItem {
     @Column(name = "Quantity", nullable = false)
     private int quantity;
 
-    @Column(name = "PriceSnapshot", nullable = false, columnDefinition = "DECIMAL(17,2)")
+    @Column(name = "PriceSnapshot", precision = 17, scale = 2, nullable = false)
     private BigDecimal priceSnapshot;
 
     @ManyToOne

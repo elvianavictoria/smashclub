@@ -13,8 +13,8 @@ public class PaymentLog {
     @Column(name = "ID")
     private Long id;
 
-    @Column(name = "PaymentLink", length = 2048, columnDefinition = "default ")
-    private String paymentLink;
+    @Column(name = "PaymentLink", length = 2048)
+    private String paymentLink = "";
 
     @Column(name = "CreatedAt", nullable = false)
     private Timestamp createdAt;

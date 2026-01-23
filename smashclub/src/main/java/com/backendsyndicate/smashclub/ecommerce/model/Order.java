@@ -1,11 +1,13 @@
 package com.backendsyndicate.smashclub.ecommerce.model;
 
 import com.backendsyndicate.smashclub.auth.model.User;
+import com.backendsyndicate.smashclub.payment.model.Transaction;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @Data
@@ -15,7 +17,7 @@ public class Order {
     @Column(name = "ID")
     private Long id;
 
-    @Column(name = "TotalAmount", nullable = false, columnDefinition = "DECIMAL(17,2)")
+    @Column(name = "TotalAmount", precision = 17, scale = 2,nullable = false)
     private BigDecimal totalAmount;
 
     @Column(name = "Status", nullable = false)
@@ -28,5 +30,7 @@ public class Order {
     @JoinColumn(name = "UserId", nullable = false)
     private User userId;
 
-//    TransactionID
+    @OneToMany
+    @JoinColumn(name = "TransactionID", nullable = false)
+    private List<Transaction> transactions;
 }

@@ -11,8 +11,8 @@ import java.sql.Timestamp;
 @Data
 public class Wallet {
 
-    @Column(name = "UserBalance", nullable = false, columnDefinition = "DECIMAL(17,2) default 0")
-    private BigDecimal userBalance;
+    @Column(name = "UserBalance", precision = 17, scale = 2, nullable = false)
+    private BigDecimal userBalance = BigDecimal.ZERO;
 
     @Column(name = "CreatedAt", nullable = false)
     private Timestamp createdAt;
