@@ -14,7 +14,7 @@ public class LoginOtpTokens {
     @Column(name = "LoginOtpTokenId")
     private String id;
 
-    @Column(name = "OtpCode", length =10, nullable = false)
+    @Column(name = "OtpCode", length = 10, nullable = false)
     private String otpCode;
 
     @Column(name = "ExpiresAt", nullable = false)

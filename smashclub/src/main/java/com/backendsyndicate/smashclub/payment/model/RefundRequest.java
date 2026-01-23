@@ -13,8 +13,8 @@ public class RefundRequest {
     @Column(name = "ID")
     private Long id;
 
-    @Column(name = "RefundStatus", nullable = false, columnDefinition = "default 0")
-    private byte refundStatus;
+    @Column(name = "RefundStatus", nullable = false)
+    private byte refundStatus = 0;
 
     @Column(name = "CreatedAt", nullable = false)
     private Timestamp createdAt;

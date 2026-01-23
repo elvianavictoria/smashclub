@@ -22,25 +22,25 @@ public class Transaction {
     @Column(name = "TransactionLabel", nullable = false)
     private String transactionLabel;
 
-    @Column(name = "TotalPrice", nullable = false, columnDefinition = "DECIMAL(17,2)")
+    @Column(name = "TotalPrice", precision = 17, scale = 2, nullable = false)
     private BigDecimal totalPrice;
 
-    @Column(name = "PaymentLink", length = 2048, columnDefinition = "default ")
-    private String paymentLink;
+    @Column(name = "PaymentLink", length = 2048)
+    private String paymentLink = " ";
 
-    @Column(name = "Status", nullable = false, columnDefinition = "default 0")
-    private byte status;
+    @Column(name = "Status", nullable = false)
+    private byte status = 0;
 
-    @Column(name = "IsRefunded", nullable = false, columnDefinition = "default 0")
-    private byte isRefunded;
+    @Column(name = "IsRefunded", nullable = false)
+    private byte isRefunded = 0;
 
-    @Column(name = "ReferenceCode", nullable = false, columnDefinition = "default ''")
-    private String referenceCode;
+    @Column(name = "ReferenceCode", nullable = false)
+    private String referenceCode = " ";
 
     @Column(name = "CreatedAt", nullable = false)
     private Timestamp createdAt;
 
-    @Column(name = "UpdatedAt   ")
+    @Column(name = "UpdatedAt")
     private Timestamp updatedAt;
 
     @ManyToOne

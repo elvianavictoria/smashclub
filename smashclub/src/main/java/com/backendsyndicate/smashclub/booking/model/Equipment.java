@@ -16,15 +16,22 @@ public class Equipment {
     @Column(name = "EquipmentName", length = 50, nullable = false)
     private String equipmentName;
 
-//    @Column(name = "EquipmentCategory", nullable = false)
-//    private enum ganti?
+    @Column(name = "Brand", length = 50)
+    private String brand;
 
-//    @Column(name = "Type", nullable = false)
-//    private String type; ganti?
+    @Column(name = "Type")
+    private String type;
+
+    @Column(name = "Description")
+    private String description;
 
     @Column(name = "Status", nullable = false)
     private int status;
 
     @Column(name = "CreatedAt", nullable = false)
     private Timestamp createdAt;
+
+    @ManyToOne
+    @JoinColumn(name = "EquipmentCategoryID", nullable = false)
+    private EquipmentCategory equipmentCategory;
 }

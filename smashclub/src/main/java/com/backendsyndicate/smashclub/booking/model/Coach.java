@@ -20,7 +20,7 @@ public class Coach {
     @Column(name = "CoachName", length = 100, nullable = false)
     private String coachName;
 
-    @Column(name = "PricePerHour", nullable = false, columnDefinition = "DECIMAL(17,2)")
+    @Column(name = "PricePerHour", precision = 17, scale = 2,nullable = false)
     private BigDecimal pricePerHour;
 
     @Column(name = "Status", nullable = false)

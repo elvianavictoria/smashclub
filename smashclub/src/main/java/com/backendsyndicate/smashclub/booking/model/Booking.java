@@ -7,6 +7,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @Data
@@ -31,10 +32,10 @@ public class Booking {
     @Column(name = "DurationHour", nullable = false)
     private int durationHour;
 
-    @Column(name = "BasePrice", nullable = false, columnDefinition = "DECIMAL(17,2)")
+    @Column(name = "BasePrice", precision = 17, scale = 2, nullable = false)
     private BigDecimal basePrice;
 
-    @Column(name = "TotalPrice", nullable = false, columnDefinition = "DECIMAL(17,2)")
+    @Column(name = "TotalPrice", precision = 17, scale = 2,nullable = false)
     private BigDecimal totalPrice;
 
     @Column(name = "Status", nullable = false)
@@ -50,5 +51,7 @@ public class Booking {
     @JoinColumn(name = "UserID")
     private User user;
 
-    /* Booking to Court? */
+    @OneToMany
+    @JoinColumn(name = "CourtID", nullable = false)
+    private List<Court> courts;
 }

@@ -28,7 +28,7 @@ public class CoachDetail {
     @Column(name = "EndTime", nullable = false)
     private Time endTime;
 
-    @Column(name = "CoachPrice", nullable = false, columnDefinition = "DECIMAL(17,2)")
+    @Column(name = "CoachPrice", precision = 17, scale = 2, nullable = false)
     private BigDecimal coachPrice;
 
     @Column(name = "CreatedAt", nullable = false)
@@ -38,5 +38,7 @@ public class CoachDetail {
     @JoinColumn(name = "CoachID", nullable = false)
     private Coach coach;
 
-//    @OneToOne?? BookingID
+    @ManyToOne
+    @JoinColumn(name = "BookingID", nullable = false)
+    private Booking booking;
 }
