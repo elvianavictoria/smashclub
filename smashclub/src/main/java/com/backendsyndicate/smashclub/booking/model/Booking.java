@@ -2,32 +2,38 @@ package com.backendsyndicate.smashclub.booking.model;
 
 import com.backendsyndicate.smashclub.auth.model.User;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.math.BigDecimal;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = {"user", "court"})
+
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "BookingCode", length = 50, nullable = false, unique = true)
     private String bookingCode;
 
     @Column(name = "BookingDate", nullable = false)
-    private Timestamp bookingDate;
+    private LocalDate bookingDate;
 
     @Column(name = "StartTime", nullable = false)
-    private Time startTime;
+    private LocalTime startTime;
 
     @Column(name = "EndTime", nullable = false)
-    private Time endTime;
+    private LocalTime endTime;
 
     @Column(name = "DurationHour", nullable = false)
     private int durationHour;
@@ -39,19 +45,19 @@ public class Booking {
     private BigDecimal totalPrice;
 
     @Column(name = "Status", nullable = false)
-    private byte status;
+    private byte status = 0;
 
-    @Column(name = "CreatedAt", nullable = false)
-    private Timestamp createdAt;
+    @Column(name = "CreatedAt", updatable = false, nullable = false)
+    private LocalDateTime createdAt;
 
-    @Column(name = "UpdatedAt", nullable = false)
-    private Timestamp updatedAt;
+    @Column(name = "UpdatedAt", insertable = false)
+    private LocalDateTime updatedAt;
 
-    @ManyToOne
-    @JoinColumn(name = "UserID")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "UserID", foreignKey = @ForeignKey(name = "fk_to_user"), nullable = false)
     private User user;
 
-    @OneToMany
-    @JoinColumn(name = "CourtID", nullable = false)
-    private List<Court> courts;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "CourtID", foreignKey = @ForeignKey (name = "fk_to_court"), nullable = false)
+    private Court court;
 }

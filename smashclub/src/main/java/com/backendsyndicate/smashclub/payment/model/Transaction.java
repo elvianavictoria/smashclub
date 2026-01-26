@@ -1,19 +1,27 @@
 package com.backendsyndicate.smashclub.payment.model;
 
 import com.backendsyndicate.smashclub.auth.model.User;
+import com.backendsyndicate.smashclub.ecommerce.model.Order;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @Table(name="Transactions")
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = {"user", "orders"})
+
 public class Transaction {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "TransactionCode", length = 20,unique = true, nullable = false)
@@ -37,13 +45,16 @@ public class Transaction {
     @Column(name = "ReferenceCode", nullable = false)
     private String referenceCode = " ";
 
-    @Column(name = "CreatedAt", nullable = false)
+    @Column(name = "CreatedAt", updatable = false, nullable = false)
     private Timestamp createdAt;
 
-    @Column(name = "UpdatedAt")
+    @Column(name = "UpdatedAt", insertable = false)
     private Timestamp updatedAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "UserId", foreignKey = @ForeignKey(name = "fk_to_user"), nullable = false)
     private User user;
+
+    @OneToMany(mappedBy = "transaction", fetch = FetchType.LAZY)
+    private List<Order> orders;
 }

@@ -1,44 +1,50 @@
 package com.backendsyndicate.smashclub.booking.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.math.BigDecimal;
-import java.sql.Date;
-import java.sql.Time;
-import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = {"coach", "booking"})
+
 public class CoachDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "CoachHour", nullable = false)
     private int coachHour;
 
     @Column(name = "BookingDate", nullable = false)
-    private Date bookingDate;
+    private LocalDate bookingDate;
 
     @Column(name = "StartTime", nullable = false)
-    private Time startTime;
+    private LocalTime startTime;
 
     @Column(name = "EndTime", nullable = false)
-    private Time endTime;
+    private LocalTime endTime;
 
     @Column(name = "CoachPrice", precision = 17, scale = 2, nullable = false)
     private BigDecimal coachPrice;
 
-    @Column(name = "CreatedAt", nullable = false)
-    private Timestamp createdAt;
+    @Column(name = "CreatedAt", updatable = false, nullable = false)
+    private LocalDateTime createdAt;
 
-    @ManyToOne
-    @JoinColumn(name = "CoachID", nullable = false)
+    @ManyToOne(fetch =  FetchType.LAZY, optional = false)
+    @JoinColumn(name = "CoachID", foreignKey = @ForeignKey(name = "fk_to_coach"), nullable = false)
     private Coach coach;
 
-    @ManyToOne
-    @JoinColumn(name = "BookingID", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "BookingID", foreignKey = @ForeignKey(name = "fk_to_booking"), nullable = false)
     private Booking booking;
 }

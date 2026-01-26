@@ -2,17 +2,22 @@ package com.backendsyndicate.smashclub.payment.model;
 
 import com.backendsyndicate.smashclub.auth.model.User;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString
 public class WalletLog {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "LogID")
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "PreviousBalance", precision = 17, scale = 2, nullable = false)
@@ -30,7 +35,7 @@ public class WalletLog {
     @Column(name = "RefID", nullable = false)
     private String refID = " ";
 
-    @Column(name = "CreatedAt", nullable = false)
+    @Column(name = "CreatedAt", updatable = false, nullable = false)
     private Timestamp createdAt;
 
 }

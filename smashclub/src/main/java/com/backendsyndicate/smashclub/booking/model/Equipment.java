@@ -1,17 +1,23 @@
 package com.backendsyndicate.smashclub.booking.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = "equipmentCategory")
+
 public class Equipment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "EquipmentName", length = 50, nullable = false)
@@ -33,12 +39,12 @@ public class Equipment {
     private String description;
 
     @Column(name = "Status", nullable = false)
-    private int status;
+    private int status = 0;
 
-    @Column(name = "CreatedAt", nullable = false)
-    private Timestamp createdAt;
+    @Column(name = "CreatedAt", updatable = false, nullable = false)
+    private LocalDateTime createdAt;
 
-    @ManyToOne
-    @JoinColumn(name = "EquipmentCategoryID", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "EquipmentCategoryID", foreignKey = @ForeignKey(name = "fk_to_equipCat"), nullable = false)
     private EquipmentCategory equipmentCategory;
 }

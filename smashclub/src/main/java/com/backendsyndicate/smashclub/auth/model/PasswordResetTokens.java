@@ -1,32 +1,38 @@
 package com.backendsyndicate.smashclub.auth.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
-import java.sql.Timestamp;
-//import java.time.LocalDateTime;
+import java.time.LocalDateTime;
+
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = {"user"})
+
 public class PasswordResetTokens {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name ="PasswordResetTokenId")
+    @EqualsAndHashCode.Include
     private String id;
 
     @Column(name = "Token", nullable = false, unique = true)
     private String token;
 
     @Column(name = "ExpiresAt", nullable = false)
-    private Timestamp expiresAt;
+    private LocalDateTime expiresAt;
 
     @Column(name = "UsedAt")
-    private Timestamp usedAt;
+    private LocalDateTime usedAt;
 
-    @Column(name = "CreatedAt", nullable = false)
-    private Timestamp createdAt;
+    @Column(name = "CreatedAt", updatable = false, nullable = false)
+    private LocalDateTime createdAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "UserId", foreignKey = @ForeignKey(name = "fk_to_user"), nullable = false)
     private User user;
 }

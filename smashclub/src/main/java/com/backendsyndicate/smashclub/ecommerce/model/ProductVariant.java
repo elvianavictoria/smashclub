@@ -1,16 +1,22 @@
 package com.backendsyndicate.smashclub.ecommerce.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 
 import java.math.BigDecimal;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = "product")
+
 public class ProductVariant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "Name", length = 100, nullable = false)
@@ -28,7 +34,7 @@ public class ProductVariant {
     @Column(name = "Stock", nullable = false)
     private int stock = 0;
 
-    @ManyToOne
-    @JoinColumn(name = "ProductID", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "ProductID", foreignKey = @ForeignKey(name = "fk_to_product"), nullable = false)
     private Product product;
 }

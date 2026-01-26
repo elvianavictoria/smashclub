@@ -2,20 +2,26 @@ package com.backendsyndicate.smashclub.ecommerce.model;
 
 import com.backendsyndicate.smashclub.auth.model.User;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = "user")
+
 public class Cart {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
-    private int id;
+    @EqualsAndHashCode.Include
+    private Long id;
 
     @Column(name = "Status", nullable = false)
-    private byte status;
+    private byte status = 0;
 
-    @OneToOne
-    @JoinColumn(name = "UserID", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "UserID", foreignKey = @ForeignKey(name = "fk_to_user"), nullable = false)
     private User user;
 }

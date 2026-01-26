@@ -3,14 +3,18 @@ package com.backendsyndicate.smashclub.ecommerce.model;
 import com.backendsyndicate.smashclub.auth.model.User;
 import com.backendsyndicate.smashclub.payment.model.Transaction;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = {"user", "transaction"})
+
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,16 +25,16 @@ public class Order {
     private BigDecimal totalAmount;
 
     @Column(name = "Status", nullable = false)
-    private byte status;
+    private byte status = 0;
 
     @Column(name = "CreatedAt", nullable = false)
-    private Timestamp createdAt;
+    private LocalDateTime createdAt;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "UserId", foreignKey = @ForeignKey(name = "fk_to_user"), nullable = false)
+    private User user;
 
     @ManyToOne
-    @JoinColumn(name = "UserId", nullable = false)
-    private User userId;
-
-    @OneToMany
-    @JoinColumn(name = "TransactionID", nullable = false)
-    private List<Transaction> transactions;
+    @JoinColumn(name = "TransactionID", foreignKey = @ForeignKey(name = "fk_to_trans"), nullable = false)
+    private Transaction transaction;
 }

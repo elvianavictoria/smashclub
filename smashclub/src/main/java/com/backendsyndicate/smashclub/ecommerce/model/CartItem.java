@@ -1,16 +1,22 @@
 package com.backendsyndicate.smashclub.ecommerce.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.math.BigDecimal;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = {"cart", "variant"})
+
 public class CartItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "Quantity", nullable = false)
@@ -19,11 +25,11 @@ public class CartItem {
     @Column(name = "PriceSnapshot", precision = 17, scale = 2, nullable = false)
     private BigDecimal priceSnapshot;
 
-    @ManyToOne
-    @JoinColumn(name = "CartID", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "CartID", foreignKey = @ForeignKey(name = "fk_to_cart"), nullable = false)
     private Cart cart;
 
-    @ManyToOne
-    @JoinColumn(name = "VariantID", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "VariantID", foreignKey = @ForeignKey(name = "fk_to_var"), nullable = false)
     private ProductVariant variant;
 }

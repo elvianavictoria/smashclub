@@ -1,17 +1,23 @@
 package com.backendsyndicate.smashclub.booking.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
-import java.sql.Time;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString
+
 public class Court {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "CourtCode", length = 50, unique = true, nullable = false)
@@ -21,18 +27,17 @@ public class Court {
     private String courtName;
 
     @Column(name = "OpenTime", nullable = false)
-    private Time openTime;
+    private LocalTime openTime;
 
     @Column(name = "CloseTime", nullable = false)
-    private Time closeTime;
+    private LocalTime closeTime;
 
     @Column(name = "Status", nullable = false)
-    private byte status;
+    private byte status = 0;
 
-    @Column(name = "CreatedAt", nullable = false)
-    private Timestamp createdAt;
+    @Column(name = "CreatedAt", updatable = false, nullable = false)
+    private LocalDateTime createdAt;
 
-    @Column(name = "UpdatedAt", nullable = false)
-    private Timestamp updatedAt;
-
+    @Column(name = "UpdatedAt", insertable = false, nullable = false)
+    private LocalDateTime updatedAt;
 }

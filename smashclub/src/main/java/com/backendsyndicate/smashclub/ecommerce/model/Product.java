@@ -1,17 +1,20 @@
 package com.backendsyndicate.smashclub.ecommerce.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import lombok.Data;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString
+
 public class Product {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "ProductName", nullable = false)
@@ -24,7 +27,7 @@ public class Product {
     private String category;
 
     @Column(name = "Status", nullable = false)
-    private byte status;
+    private byte status = 0;
 
     @Column(name = "DefaultImgLink", length = 500, nullable = false)
     private String defaultImgLink;

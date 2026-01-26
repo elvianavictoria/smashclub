@@ -1,18 +1,26 @@
 package com.backendsyndicate.smashclub.auth.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-
-import java.sql.Timestamp;
-//import java.time.LocalDateTime;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "Users")
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString
+
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "UserId")
+    @EqualsAndHashCode.Include
     private String id;
 
     @Column(name = "FullName", length = 150, nullable = false)
@@ -25,30 +33,17 @@ public class User {
     private String passwordHash;
 
     @Column(name = "Status", nullable = false)
-    private byte status;
+    private byte status = 0;
 
     @Column(name = "FailedLoginAttempt")
     private int failedLoginAttempt = 0;
 
     @Column(name = "CreatedDate", updatable = false, nullable = false)
-    private Timestamp createdDate;
+    private LocalDateTime createdDate;
 
     @Column(name = "LockedUntil")
-    private Timestamp lockedUntil;
+    private LocalDateTime lockedUntil;
 
-    @Column(name = "UpdatedDate")
-    private Timestamp updatedDate;
-
-//    @OneToMany(mappedBy = "user")
-//    private List<EmailVerificationTokens> emailVerifyTokens;
-//
-//    @OneToMany(mappedBy = "user")
-//    private List<Sessions> sessions;
-//
-//    @OneToMany(mappedBy = "user")
-//    private List<PasswordResetTokens> passwordResetTokens ;
-//
-//    @OneToOne(mappedBy = "user")
-//    @PrimaryKeyJoinColumn
-//    private Wallet wallet;
+    @Column(name = "UpdatedDate", insertable = false)
+    private LocalDateTime updatedDate;
 }

@@ -2,23 +2,27 @@ package com.backendsyndicate.smashclub.payment.model;
 
 import com.backendsyndicate.smashclub.auth.model.User;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = "user")
 public class Wallet {
 
     @Column(name = "UserBalance", precision = 17, scale = 2, nullable = false)
     private BigDecimal userBalance = BigDecimal.ZERO;
 
-    @Column(name = "CreatedAt", nullable = false)
-    private Timestamp createdAt;
+    @Column(name = "CreatedAt", updatable = false, nullable = false)
+    private LocalDateTime createdAt;
 
-    @Column(name = "UpdatedAt")
-    private Timestamp updatedAt;
+    @Column(name = "UpdatedAt", insertable = false)
+    private LocalDateTime updatedAt;
 
     @Id
     @OneToOne
