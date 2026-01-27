@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -29,5 +30,8 @@ public class Wallet {
     @MapsId
     @JoinColumn(name = "UserId")
     private User user;
+
+    @OneToMany(mappedBy = "wallet")
+    private List<WalletLog> walletLog;
 }
 
