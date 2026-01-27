@@ -1,6 +1,6 @@
 package com.backendsyndicate.smashclub.payment.controller;
 
-import com.backendsyndicate.smashclub.payment.dto.CreateTransactionDTO;
+import com.backendsyndicate.smashclub.payment.dto.request.CreateTransactionDTO;
 import com.backendsyndicate.smashclub.payment.service.PaymentService;
 import com.backendsyndicate.smashclub.payment.service.TransactionService;
 import jakarta.servlet.http.HttpServletRequest;

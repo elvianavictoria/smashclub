@@ -1,9 +1,11 @@
-package com.backendsyndicate.smashclub.payment.dto;
+package com.backendsyndicate.smashclub.payment.dto.request;
 
+
+import java.math.BigDecimal;
 
 public class CreateTransactionDTO {
     private long customerId;
-    private double totalPrice;
+    private BigDecimal totalPrice;
     private String referenceCode;
     private byte transactionType;
     private byte paymentMethodId;
@@ -16,11 +18,11 @@ public class CreateTransactionDTO {
         this.customerId = customerId;
     }
 
-    public double getTotalPrice() {
+    public BigDecimal getTotalPrice() {
         return totalPrice;
     }
 
-    public void setTotalPrice(double totalPrice) {
+    public void setTotalPrice(BigDecimal totalPrice) {
         this.totalPrice = totalPrice;
     }
 
