@@ -4,14 +4,13 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(exclude = "transactions")
+@ToString(exclude = "transaction")
 
 public class TransactionLog {
     @Id
@@ -29,7 +28,7 @@ public class TransactionLog {
     @Column(name = "CreatedAt", updatable = false, nullable = false)
     private LocalDateTime createdAt;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "TransactionID", nullable = false)
-    private List<Transaction> transactions;
+    private Transaction transaction;
 }

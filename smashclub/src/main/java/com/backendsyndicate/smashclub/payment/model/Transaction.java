@@ -45,6 +45,15 @@ public class Transaction {
     @Column(name = "ReferenceCode", nullable = false)
     private String referenceCode = " ";
 
+    @Column(name = "Notes")
+    private String notes;
+
+    @Column(name = "TransactionType")
+    private int transactionType;
+
+    @Column(name = "PaymentMethodID")
+    private int paymentMethodID;
+
     @Column(name = "CreatedAt", updatable = false, nullable = false)
     private Timestamp createdAt;
 
