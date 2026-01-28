@@ -7,14 +7,15 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
+@Table(name="Orders")
 @Getter
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(exclude = {"user", "transaction"})
-
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,10 +32,13 @@ public class Order {
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "UserId", foreignKey = @ForeignKey(name = "fk_to_user"), nullable = false)
+    @JoinColumn(name = "UserId", foreignKey = @ForeignKey(name = "fk_order_to_user"), nullable = false)
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "TransactionID", foreignKey = @ForeignKey(name = "fk_to_trans"), nullable = false)
+    @JoinColumn(name = "TransactionID", foreignKey = @ForeignKey(name = "fk_order_to_trans"), nullable = false)
     private Transaction transaction;
+
+    @OneToMany(mappedBy = "order")
+    private List<OrderItem> orderItem;
 }

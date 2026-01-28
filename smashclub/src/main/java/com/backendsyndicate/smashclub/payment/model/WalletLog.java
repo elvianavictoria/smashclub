@@ -38,4 +38,7 @@ public class WalletLog {
     @Column(name = "CreatedAt", updatable = false, nullable = false)
     private Timestamp createdAt;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "UserId", nullable = false)
+    private Wallet wallet;
 }

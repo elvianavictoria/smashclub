@@ -12,7 +12,7 @@ public interface IPayment {
     * Refund => Refund Transaction -> Perubahan status
     * */
 
-    public ResponseEntity<Object> createTransaction(Long customerId, BigDecimal totalPrice, String referenceCode, int transactionType, HttpServletRequest request);
+    public ResponseEntity<Object> createTransaction(String customerId, BigDecimal totalPrice, String referenceCode, int transactionType, HttpServletRequest request);
     public ResponseEntity<Object> paymentTransaction(String transactionCode, int paymentMethodId, HttpServletRequest request);
     public ResponseEntity<Object> refundTransaction(String transactionCode, String notes, HttpServletRequest request);
 

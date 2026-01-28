@@ -32,7 +32,7 @@ public class EmailVerificationTokens {
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "UserId", foreignKey = @ForeignKey(name  = "fk_to_user"), nullable = false)
+    @JoinColumn(name = "UserId", foreignKey = @ForeignKey(name  = "fk_email_verification_to_user"), nullable = false)
     private User user;
 }
 

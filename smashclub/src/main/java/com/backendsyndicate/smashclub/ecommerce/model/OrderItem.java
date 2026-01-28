@@ -26,10 +26,10 @@ public class OrderItem {
     private BigDecimal price;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "OrderID", foreignKey = @ForeignKey(name = "fk_to_order"), nullable = false)
+    @JoinColumn(name = "OrderID", foreignKey = @ForeignKey(name = "fk_orderItem_to_order"), nullable = false)
     private Order order;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "VariantID", foreignKey = @ForeignKey(name = "fk_to_var"), nullable = false)
+    @JoinColumn(name = "VariantID", foreignKey = @ForeignKey(name = "fk_orderItem_to_var"), nullable = false)
     private ProductVariant variant;
 }

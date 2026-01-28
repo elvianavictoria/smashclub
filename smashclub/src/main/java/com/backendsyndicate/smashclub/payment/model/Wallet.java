@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -14,6 +15,8 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(exclude = "user")
 public class Wallet {
+    @Id
+    private String userId;
 
     @Column(name = "UserBalance", precision = 17, scale = 2, nullable = false)
     private BigDecimal userBalance = BigDecimal.ZERO;
@@ -24,10 +27,13 @@ public class Wallet {
     @Column(name = "UpdatedAt", insertable = false)
     private LocalDateTime updatedAt;
 
-    @Id
+//    @Id
     @OneToOne
     @MapsId
     @JoinColumn(name = "UserId")
     private User user;
+
+    @OneToMany(mappedBy = "wallet")
+    private List<WalletLog> walletLog;
 }
 

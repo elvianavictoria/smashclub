@@ -32,6 +32,6 @@ public class LoginOtpTokens {
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "UserId", foreignKey = @ForeignKey(name = "fk_to_user"), nullable = false)
+    @JoinColumn(name = "UserId", foreignKey = @ForeignKey(name = "fk_login_otp_to_user"), nullable = false)
     private User user;
 }

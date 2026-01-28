@@ -3,18 +3,18 @@ package com.backendsyndicate.smashclub.payment.dto.request;
 
 import java.math.BigDecimal;
 
-public class CreateTransactionDTO {
-    private long customerId;
+public class ReqCreateTransactionDTO {
+    private String customerId;
     private BigDecimal totalPrice;
     private String referenceCode;
     private byte transactionType;
     private byte paymentMethodId;
 
-    public long getCustomerId() {
+    public String getCustomerId() {
         return customerId;
     }
 
-    public void setCustomerId(long customerId) {
+    public void setCustomerId(String customerId) {
         this.customerId = customerId;
     }
 

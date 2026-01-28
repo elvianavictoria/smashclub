@@ -22,6 +22,6 @@ public class Cart {
     private byte status = 0;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "UserID", foreignKey = @ForeignKey(name = "fk_to_user"), nullable = false)
+    @JoinColumn(name = "UserID", foreignKey = @ForeignKey(name = "fk_cart_to_user"), nullable = false)
     private User user;
 }

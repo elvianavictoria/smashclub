@@ -8,8 +8,10 @@ import com.backendsyndicate.smashclub.payment.constant.TransactionConstant;
 import com.backendsyndicate.smashclub.payment.constant.TransactionTypeConstant;
 import com.backendsyndicate.smashclub.payment.core.IPayment;
 import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransactionDTO;
+import com.backendsyndicate.smashclub.payment.dto.response.RespPaymentTransactionDTO;
 import com.backendsyndicate.smashclub.payment.model.Transaction;
 import com.backendsyndicate.smashclub.payment.model.TransactionLog;
+import com.backendsyndicate.smashclub.payment.repo.TransactionLogRepo;
 import com.backendsyndicate.smashclub.payment.repo.TransactionRepo;
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
@@ -22,6 +24,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Module Code: PYMT
@@ -30,6 +33,7 @@ import java.util.Map;
 @Transactional
 public class PaymentService implements IPayment {
     private TransactionRepo transactionRepo;
+    private TransactionLogRepo transactionLogRepo;
     private ModelMapper modelMapper = new ModelMapper();
 
     private String generateErrorCode(String methodNo, String errorNo) {
@@ -52,7 +56,7 @@ public class PaymentService implements IPayment {
      * @return
      */
     @Override
-    public ResponseEntity<Object> createTransaction(Long customerId, BigDecimal totalPrice, String referenceCode, int transactionType, HttpServletRequest request) {
+    public ResponseEntity<Object> createTransaction(String customerId, BigDecimal totalPrice, String referenceCode, int transactionType, HttpServletRequest request) {
         try {
             String trxCode = generateTransactionCode();
             String trxLabel = "Transaksi " + trxCode + ": " + TransactionTypeConstant.getTransactionType(transactionType);
@@ -89,7 +93,31 @@ public class PaymentService implements IPayment {
      */
     @Override
     public ResponseEntity<Object> paymentTransaction(String transactionCode, int paymentMethodId, HttpServletRequest request) {
-        return null;
+        if( transactionCode == null ) {
+            return GlobalResponse.failed("Transaction code is required!", generateErrorCode("02", "001"), null, request);
+        }
+
+        Transaction trx = null;
+        RespPaymentTransactionDTO response = null;
+
+        try {
+            Optional<Transaction> optionalTrx = transactionRepo.findByTransactionCode(transactionCode);
+            if( optionalTrx.isEmpty() ) {
+                return GlobalResponse.failed("Transaction not found!", generateErrorCode("02", "002"), null, request);
+            }
+
+            trx = optionalTrx.get();
+            byte previousStatus = trx.getStatus();
+            trx.setStatus((byte) TransactionConstant.getStatus("Sudah Dibayar"));
+
+            logTransactionUpdate(trx, previousStatus);
+
+            response = modelMapper.map(trx, RespPaymentTransactionDTO.class);
+        } catch(Exception e) {
+            return GlobalResponse.failed("Failed to process payment transaction!", generateErrorCode("02", "010"), null, request);
+        }
+
+        return GlobalResponse.success("Successfully paid the transaction!", response, request);
     }
 
     /**
@@ -130,8 +158,10 @@ public class PaymentService implements IPayment {
 
     private void logTransactionUpdate(Transaction transaction, int previousStatus) {
         TransactionLog trxLog = new TransactionLog();
-        trxLog.setPreviousStatus(previousStatus);
+        trxLog.setPreviousStatus((byte) previousStatus);
         trxLog.setCurrentStatus(transaction.getStatus());
         trxLog.setTransaction(transaction);
+
+        transactionLogRepo.save(trxLog);
     }
 }

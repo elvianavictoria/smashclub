@@ -35,6 +35,6 @@ public class ProductVariant {
     private int stock = 0;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "ProductID", foreignKey = @ForeignKey(name = "fk_to_product"), nullable = false)
+    @JoinColumn(name = "ProductID", foreignKey = @ForeignKey(name = "fk_productVar_to_product"), nullable = false)
     private Product product;
 }

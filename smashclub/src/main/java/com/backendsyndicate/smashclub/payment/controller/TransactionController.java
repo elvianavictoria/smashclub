@@ -1,6 +1,6 @@
 package com.backendsyndicate.smashclub.payment.controller;
 
-import com.backendsyndicate.smashclub.payment.dto.request.CreateTransactionDTO;
+import com.backendsyndicate.smashclub.payment.dto.request.ReqCreateTransactionDTO;
 import com.backendsyndicate.smashclub.payment.service.PaymentService;
 import com.backendsyndicate.smashclub.payment.service.TransactionService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,7 +40,7 @@ public class TransactionController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Object> transactionOrder(@Valid @RequestBody CreateTransactionDTO dto, HttpServletRequest request) {
+    public ResponseEntity<Object> transactionOrder(@Valid @RequestBody ReqCreateTransactionDTO dto, HttpServletRequest request) {
         return paymentService.createTransaction(dto.getCustomerId(), dto.getTotalPrice(), dto.getReferenceCode(), dto.getTransactionType(), request);
     }
 
