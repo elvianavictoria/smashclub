@@ -38,6 +38,6 @@ public class AdminSession {
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "UserID", foreignKey = @ForeignKey(name = "fk_to_user"), nullable = false)
+    @JoinColumn(name = "UserID", foreignKey = @ForeignKey(name = "fk_session_to_user"), nullable = false)
     private AdminUser adminUser;
 }

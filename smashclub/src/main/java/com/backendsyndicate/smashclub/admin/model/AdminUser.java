@@ -35,6 +35,6 @@ public class AdminUser {
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "RoleID", foreignKey = @ForeignKey(name = "fk_to_role"), nullable = false)
+    @JoinColumn(name = "RoleID", foreignKey = @ForeignKey(name = "fk_user_to_role"), nullable = false)
     private AdminRole adminRole;
 }

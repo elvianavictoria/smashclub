@@ -26,7 +26,7 @@ public class AdminPermission {
     private int status = 0;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "MenuID", foreignKey = @ForeignKey(name = "fk_to_menu"), nullable = false)
+    @JoinColumn(name = "MenuID", foreignKey = @ForeignKey(name = "fk_permission_to_menu"), nullable = false)
     private AdminMenu menu;
 
     @ManyToMany(mappedBy = "permissionSet")
