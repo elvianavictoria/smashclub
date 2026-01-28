@@ -10,5 +10,5 @@ import java.util.List;
 import java.util.Optional;
 
 public interface WalletLogRepo extends JpaRepository<WalletLog, Long> {
-    Page<WalletLog> findByUserIdAndCreatedAtBetween(String userId, LocalDate startDate, LocalDate endDate, Pageable page);
+    Page<WalletLog> findByWallet_UserIdAndCreatedAtBetween(String userId, LocalDate startDate, LocalDate endDate, Pageable page);
 }

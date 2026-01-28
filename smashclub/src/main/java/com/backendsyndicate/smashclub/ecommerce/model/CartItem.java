@@ -26,10 +26,10 @@ public class CartItem {
     private BigDecimal priceSnapshot;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "CartID", foreignKey = @ForeignKey(name = "fk_to_cart"), nullable = false)
+    @JoinColumn(name = "CartID", foreignKey = @ForeignKey(name = "fk_cartItem_to_cart"), nullable = false)
     private Cart cart;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "VariantID", foreignKey = @ForeignKey(name = "fk_to_var"), nullable = false)
+    @JoinColumn(name = "VariantID", foreignKey = @ForeignKey(name = "fk_cartItem_to_var"), nullable = false)
     private ProductVariant variant;
 }

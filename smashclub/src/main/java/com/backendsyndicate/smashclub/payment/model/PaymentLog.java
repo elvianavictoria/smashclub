@@ -29,6 +29,6 @@ public class PaymentLog {
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "TransactionID", foreignKey = @ForeignKey(name = "fk_to_trans"), nullable = false)
+    @JoinColumn(name = "TransactionID", foreignKey = @ForeignKey(name = "fk_paymentLog_to_trans"), nullable = false)
     private Transaction transaction;
 }

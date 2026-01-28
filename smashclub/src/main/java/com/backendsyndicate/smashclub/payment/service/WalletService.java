@@ -79,7 +79,7 @@ public class WalletService implements IWallet {
         Page page = null;
 
         try {
-            page = walletLogRepo.findByUserIdAndCreatedAtBetween(userId, startDate, endDate, pageable);
+            page = walletLogRepo.findByWallet_UserIdAndCreatedAtBetween(userId, startDate, endDate, pageable);
             if( page.isEmpty() ) {
                 return GlobalResponse.failed("Wallet log not found!", generateErrorCode("02", "001"), null, request);
             }

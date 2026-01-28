@@ -15,6 +15,8 @@ import java.util.List;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(exclude = "user")
 public class Wallet {
+    @Id
+    private String userId;
 
     @Column(name = "UserBalance", precision = 17, scale = 2, nullable = false)
     private BigDecimal userBalance = BigDecimal.ZERO;
@@ -25,7 +27,7 @@ public class Wallet {
     @Column(name = "UpdatedAt", insertable = false)
     private LocalDateTime updatedAt;
 
-    @Id
+//    @Id
     @OneToOne
     @MapsId
     @JoinColumn(name = "UserId")

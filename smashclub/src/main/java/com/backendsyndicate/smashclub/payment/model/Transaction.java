@@ -61,7 +61,7 @@ public class Transaction {
     private Timestamp updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "UserId", foreignKey = @ForeignKey(name = "fk_to_user"), nullable = false)
+    @JoinColumn(name = "UserId", foreignKey = @ForeignKey(name = "fk_transaction_to_user"), nullable = false)
     private User user;
 
     @OneToMany(mappedBy = "transaction", fetch = FetchType.LAZY)

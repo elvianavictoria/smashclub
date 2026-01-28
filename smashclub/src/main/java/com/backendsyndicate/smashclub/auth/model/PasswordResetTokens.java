@@ -33,6 +33,6 @@ public class PasswordResetTokens {
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "UserId", foreignKey = @ForeignKey(name = "fk_to_user"), nullable = false)
+    @JoinColumn(name = "UserId", foreignKey = @ForeignKey(name = "fk_password_reset_to_user"), nullable = false)
     private User user;
 }
