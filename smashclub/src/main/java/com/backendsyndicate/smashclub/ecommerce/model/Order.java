@@ -34,7 +34,7 @@ public class Order {
     @JoinColumn(name = "UserId", foreignKey = @ForeignKey(name = "fk_to_user"), nullable = false)
     private User user;
 
-    @ManyToOne
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "TransactionID", foreignKey = @ForeignKey(name = "fk_to_trans"), nullable = false)
     private Transaction transaction;
 }
