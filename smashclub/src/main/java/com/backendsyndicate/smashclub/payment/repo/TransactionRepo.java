@@ -10,7 +10,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 public interface TransactionRepo extends JpaRepository<Transaction, Long> {
-    @Query(value="SELECT COUNT(t) FROM Transactions t WHERE cast(t.createdAt as string) LIKE CONCAT(CURRENT_DATE, '%')")
+    @Query(value="SELECT COUNT(t) FROM Transaction t WHERE cast(t.createdAt as string) LIKE CONCAT(CURRENT_DATE, '%')")
     Long countTodayTransaction();
 
     Page<Transaction> findByCreatedAtBetween(LocalDate startDate, LocalDate endDate, Pageable pageable);

@@ -37,10 +37,10 @@ public class EquipmentDetail {
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY,  optional = false)
-    @JoinColumn(name = "BookingID", foreignKey = @ForeignKey(name = "fk_to_booking"), nullable = false)
+    @JoinColumn(name = "BookingID", foreignKey = @ForeignKey(name = "fk_equipDetail_to_booking"), nullable = false)
     private Booking booking;
 
     @ManyToOne(fetch = FetchType.LAZY,  optional = false)
-    @JoinColumn(name = "Equipment", foreignKey = @ForeignKey(name = "fk_to_equip"), nullable = false)
+    @JoinColumn(name = "Equipment", foreignKey = @ForeignKey(name = "fk_equipDetail_to_equip"), nullable = false)
     private Equipment equipment;
 }

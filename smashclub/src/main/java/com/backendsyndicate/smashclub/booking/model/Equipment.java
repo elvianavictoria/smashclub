@@ -45,6 +45,6 @@ public class Equipment {
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "EquipmentCategoryID", foreignKey = @ForeignKey(name = "fk_to_equipCat"), nullable = false)
+    @JoinColumn(name = "EquipmentCategoryID", foreignKey = @ForeignKey(name = "fk_equip_to_equipCat"), nullable = false)
     private EquipmentCategory equipmentCategory;
 }

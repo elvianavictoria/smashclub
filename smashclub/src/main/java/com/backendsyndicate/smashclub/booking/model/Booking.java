@@ -54,10 +54,10 @@ public class Booking {
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "UserID", foreignKey = @ForeignKey(name = "fk_to_user"), nullable = false)
+    @JoinColumn(name = "UserID", foreignKey = @ForeignKey(name = "fk_booking_to_user"), nullable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "CourtID", foreignKey = @ForeignKey (name = "fk_to_court"), nullable = false)
+    @JoinColumn(name = "CourtID", foreignKey = @ForeignKey(name = "fk_booking_to_court"), nullable = false)
     private Court court;
 }
