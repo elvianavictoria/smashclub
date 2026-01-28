@@ -2,7 +2,6 @@ package com.backendsyndicate.smashclub.admin.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CollectionId;
 
 import java.util.Set;
 
