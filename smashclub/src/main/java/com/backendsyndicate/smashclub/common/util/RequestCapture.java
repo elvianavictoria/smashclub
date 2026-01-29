@@ -66,7 +66,7 @@ public class RequestCapture {
                 requestData.put("requestBody", request.toString());
             }
         } catch(Exception e) {
-            Logging.handleException("RequestCapture", "processingData", 25, e.getMessage());
+            Logging.handleException("RequestCapture", "processingData", 25, "", e.getMessage());
         }
 
         return requestData;

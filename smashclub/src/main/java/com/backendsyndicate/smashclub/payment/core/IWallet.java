@@ -5,10 +5,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public interface IWallet {
     public ResponseEntity<Object> getBalance(String userId, HttpServletRequest request);
     public ResponseEntity<Object> getBalanceLog(String userId, LocalDate startDate, LocalDate endDate, Pageable pageable, HttpServletRequest request);
-    public ResponseEntity<Object> updateBalance(String userId, ReqUpdateBalanceDTO reqUpdateBalanceDTO, HttpServletRequest request);
+    public ResponseEntity<Object> topupBalance(String userId, BigDecimal balance, HttpServletRequest request);
+    public boolean updateBalance(String userId, ReqUpdateBalanceDTO reqUpdateBalanceDTO);
 }

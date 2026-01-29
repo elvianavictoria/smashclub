@@ -39,20 +39,20 @@ public class TransactionController {
         return transactionService.findByCode(transactionCode, request);
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<Object> transactionOrder(@Valid @RequestBody ReqCreateTransactionDTO dto, HttpServletRequest request) {
-        return paymentService.createTransaction(dto.getCustomerId(), dto.getTotalPrice(), dto.getReferenceCode(), dto.getTransactionType(), request);
-    }
+//    @PostMapping("/create")
+//    public ResponseEntity<Object> transactionOrder(@Valid @RequestBody ReqCreateTransactionDTO dto, HttpServletRequest request) {
+//        return paymentService.createTransaction(dto.getCustomerId(), dto.getTotalPrice(), dto.getReferenceCode(), dto.getTransactionType());
+//    }
 
     @PostMapping("/payment/{transactionCode}")
     public ResponseEntity<Object> transactionPayment(@PathVariable String transactionCode, @RequestBody byte paymentMethodId, HttpServletRequest request) {
         return paymentService.paymentTransaction(transactionCode, paymentMethodId, request);
     }
 
-    @PostMapping("/refund/{transactionCode}")
-    public ResponseEntity<Object> transactionRefund(@PathVariable String transactionCode, @RequestBody String notes, HttpServletRequest request) {
-        return paymentService.refundTransaction(transactionCode, notes, request);
-    }
+//    @PostMapping("/refund/{transactionCode}")
+//    public ResponseEntity<Object> transactionRefund(@PathVariable String transactionCode, @RequestBody String notes, HttpServletRequest request) {
+//        return paymentService.refundTransaction(transactionCode, notes);
+//    }
 
     @GetMapping("/payment-method")
     public ResponseEntity<Object> paymentMethodList(HttpServletRequest request) {

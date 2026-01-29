@@ -1,5 +1,6 @@
 package com.backendsyndicate.smashclub.payment.core;
 
+import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransactionDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 
@@ -12,9 +13,9 @@ public interface IPayment {
     * Refund => Refund Transaction -> Perubahan status
     * */
 
-    public ResponseEntity<Object> createTransaction(String customerId, BigDecimal totalPrice, String referenceCode, int transactionType, HttpServletRequest request);
+    public RespCreateTransactionDTO createTransaction(String customerId, BigDecimal totalPrice, String referenceCode, int transactionType);
     public ResponseEntity<Object> paymentTransaction(String transactionCode, int paymentMethodId, HttpServletRequest request);
-    public ResponseEntity<Object> refundTransaction(String transactionCode, String notes, HttpServletRequest request);
+    public boolean refundTransaction(String transactionCode, String notes);
 
     public ResponseEntity<Object> paymentMethodList(HttpServletRequest request);
 }

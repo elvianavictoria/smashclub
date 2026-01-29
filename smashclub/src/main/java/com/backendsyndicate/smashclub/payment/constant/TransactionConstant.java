@@ -9,6 +9,17 @@ public class TransactionConstant {
     private static final Map<Integer, String> refundStatus = new HashMap<>();
     private static final Map<Integer, List<Integer>> statusWorkflow = new HashMap<>();
 
+    public static final int PAYMENT_UNPAID = 0;
+    public static final int PAYMENT_PAID = 1;
+    public static final int PAYMENT_COMPLETED = 2;
+    public static final int PAYMENT_CANCELLED = 3;
+    public static final int PAYMENT_REFUNDED = 4;
+    public static final int PAYMENT_EXPIRED = 5;
+
+    public static final int REFUND_REQUESTED = 0;
+    public static final int REFUND_APPROVED = 1;
+    public static final int REFUND_REJECTED = 2;
+
     public static void initLoad() {
         loadStatus();
         loadRefundStatus();
@@ -16,27 +27,27 @@ public class TransactionConstant {
     }
 
     private static void loadStatus() {
-        status.put(0, "Menunggu Pembayaran");
-        status.put(1, "Sudah Dibayar");
-        status.put(2, "Selesai");
-        status.put(3, "Cancel");
-        status.put(4, "Sudah Direfund");
-        status.put(5, "Expired");
+        status.put(PAYMENT_UNPAID, "Menunggu Pembayaran");
+        status.put(PAYMENT_PAID, "Sudah Dibayar");
+        status.put(PAYMENT_COMPLETED, "Selesai");
+        status.put(PAYMENT_CANCELLED, "Cancel");
+        status.put(PAYMENT_REFUNDED, "Sudah Direfund");
+        status.put(PAYMENT_EXPIRED, "Expired");
     }
 
     private static void loadRefundStatus() {
-        refundStatus.put(0, "Dalam Pengajuan");
-        refundStatus.put(1, "Disetujui");
-        refundStatus.put(2, "Ditolak");
+        refundStatus.put(REFUND_REQUESTED, "Dalam Pengajuan");
+        refundStatus.put(REFUND_APPROVED, "Disetujui");
+        refundStatus.put(REFUND_REJECTED, "Ditolak");
     }
 
     private static void loadStatusWorkflow() {
-        statusWorkflow.put(0, List.of(1, 5));
-        statusWorkflow.put(1, List.of(2, 3));
-        statusWorkflow.put(2, List.of());
-        statusWorkflow.put(3, List.of(4));
-        statusWorkflow.put(4, List.of());
-        statusWorkflow.put(5, List.of());
+        statusWorkflow.put(PAYMENT_UNPAID, List.of(PAYMENT_PAID, PAYMENT_EXPIRED));
+        statusWorkflow.put(PAYMENT_PAID, List.of(PAYMENT_COMPLETED, PAYMENT_CANCELLED));
+        statusWorkflow.put(PAYMENT_COMPLETED, List.of());
+        statusWorkflow.put(PAYMENT_CANCELLED, List.of(PAYMENT_REFUNDED));
+        statusWorkflow.put(PAYMENT_REFUNDED, List.of());
+        statusWorkflow.put(PAYMENT_EXPIRED, List.of());
     }
 
     public static Map<Integer, String> getStatuses () {
@@ -47,15 +58,6 @@ public class TransactionConstant {
         return status.getOrDefault(value, "Unknown");
     }
 
-    public static int getStatus(String statusName) {
-        int result = -1;
-        for( Map.Entry<Integer, String> entry : status.entrySet() ) {
-            if( entry.getValue().equalsIgnoreCase(statusName) ) result = entry.getKey();
-        }
-
-        return result;
-    }
-
     public static Map<Integer, String> getRefundStatuses () {
         return refundStatus;
     }
@@ -64,24 +66,11 @@ public class TransactionConstant {
         return status.getOrDefault(value, "Unknown");
     }
 
-    public static int getRefundStatus(String statusName) {
-        int result = -1;
-        for( Map.Entry<Integer, String> entry : refundStatus.entrySet() ) {
-            if( entry.getValue().equalsIgnoreCase(statusName) ) result = entry.getKey();
-        }
-
-        return result;
-    }
-
     public static Map<Integer, List<Integer>> getTransactionWorkflows () {
         return statusWorkflow;
     }
 
-    public static boolean isStatusAllowed(int value) {
-        return statusWorkflow.containsKey(value);
-    }
-
-    public static boolean isStatusAllowed(String statusName) {
-        return statusWorkflow.containsValue(statusName);
+    public static boolean isStatusAllowed(int previousValue, int currentValue) {
+        return statusWorkflow.containsKey(previousValue) && statusWorkflow.get(previousValue).contains(currentValue);
     }
 }
