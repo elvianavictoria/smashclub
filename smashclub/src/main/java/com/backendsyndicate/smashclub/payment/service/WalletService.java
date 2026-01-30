@@ -13,6 +13,7 @@ import com.backendsyndicate.smashclub.payment.repo.WalletLogRepo;
 import com.backendsyndicate.smashclub.payment.repo.WalletRepo;
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -29,10 +30,14 @@ import java.util.Optional;
 @Service
 @Transactional
 public class WalletService implements IWallet {
+    @Autowired
     private WalletRepo walletRepo;
+    @Autowired
     private WalletLogRepo walletLogRepo;
-    private ModelMapper modelMapper = new ModelMapper();
+    @Autowired
     private PaymentService paymentService;
+
+    private ModelMapper modelMapper = new ModelMapper();
 
     private String generateErrorCode(String methodNo, String errorNo) {
         return "WLLT-" + methodNo + "E" + errorNo;

@@ -1,0 +1,44 @@
+2026-01-30 16:00:05 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerStatement - SQLServerStatement:9 created by (ConnectionID:6 ClientConnectionId: 73562bad-01ce-411d-b0d1-21d18256ebfa)
+2026-01-30 16:00:05 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerStatement - SQLServerStatement:9 Executing (not server cursor) SELECT 1
+2026-01-30 16:00:05 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerResultSet - SQLServerResultSet:6 created by (SQLServerStatement:9)
+2026-01-30 16:00:05 [HikariPool-1:housekeeper] DEBUG com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - keepalive: connection ConnectionID:6 ClientConnectionId: 73562bad-01ce-411d-b0d1-21d18256ebfa is alive
+2026-01-30 16:00:11 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerStatement - SQLServerStatement:10 created by (ConnectionID:7 ClientConnectionId: fb26bd9a-c8cf-4b3d-a6bb-f046964222f2)
+2026-01-30 16:00:11 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerStatement - SQLServerStatement:10 Executing (not server cursor) SELECT 1
+2026-01-30 16:00:11 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerResultSet - SQLServerResultSet:7 created by (SQLServerStatement:10)
+2026-01-30 16:00:11 [HikariPool-1:housekeeper] DEBUG com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - keepalive: connection ConnectionID:7 ClientConnectionId: fb26bd9a-c8cf-4b3d-a6bb-f046964222f2 is alive
+2026-01-30 16:00:11 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerStatement - SQLServerStatement:11 created by (ConnectionID:9 ClientConnectionId: 7337c591-8269-48cb-bbc4-02f68e467726)
+2026-01-30 16:00:11 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerStatement - SQLServerStatement:11 Executing (not server cursor) SELECT 1
+2026-01-30 16:00:11 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerResultSet - SQLServerResultSet:8 created by (SQLServerStatement:11)
+2026-01-30 16:00:11 [HikariPool-1:housekeeper] DEBUG com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - keepalive: connection ConnectionID:9 ClientConnectionId: 7337c591-8269-48cb-bbc4-02f68e467726 is alive
+2026-01-30 16:00:12 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerStatement - SQLServerStatement:12 created by (ConnectionID:2 ClientConnectionId: 3e634f05-9f9c-44dc-930e-85d86982f5c9)
+2026-01-30 16:00:12 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerStatement - SQLServerStatement:12 Executing (not server cursor) SELECT 1
+2026-01-30 16:00:12 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerResultSet - SQLServerResultSet:9 created by (SQLServerStatement:12)
+2026-01-30 16:00:12 [HikariPool-1:housekeeper] DEBUG com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - keepalive: connection ConnectionID:2 ClientConnectionId: 3e634f05-9f9c-44dc-930e-85d86982f5c9 is alive
+2026-01-30 16:00:14 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerStatement - SQLServerStatement:13 created by (ConnectionID:8 ClientConnectionId: 7b82241b-8085-4d35-b804-662766bcfec4)
+2026-01-30 16:00:14 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerStatement - SQLServerStatement:13 Executing (not server cursor) SELECT 1
+2026-01-30 16:00:14 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerResultSet - SQLServerResultSet:10 created by (SQLServerStatement:13)
+2026-01-30 16:00:14 [HikariPool-1:housekeeper] DEBUG com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - keepalive: connection ConnectionID:8 ClientConnectionId: 7b82241b-8085-4d35-b804-662766bcfec4 is alive
+2026-01-30 16:00:17 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerStatement - SQLServerStatement:14 created by (ConnectionID:5 ClientConnectionId: 79566dbf-b525-4669-8153-806cbb323178)
+2026-01-30 16:00:17 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerStatement - SQLServerStatement:14 Executing (not server cursor) SELECT 1
+2026-01-30 16:00:17 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerResultSet - SQLServerResultSet:11 created by (SQLServerStatement:14)
+2026-01-30 16:00:17 [HikariPool-1:housekeeper] DEBUG com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - keepalive: connection ConnectionID:5 ClientConnectionId: 79566dbf-b525-4669-8153-806cbb323178 is alive
+2026-01-30 16:00:18 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerStatement - SQLServerStatement:15 created by (ConnectionID:10 ClientConnectionId: 5512cdcf-673d-4b9e-b5f9-027d9fb5a503)
+2026-01-30 16:00:18 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerStatement - SQLServerStatement:15 Executing (not server cursor) SELECT 1
+2026-01-30 16:00:18 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerResultSet - SQLServerResultSet:12 created by (SQLServerStatement:15)
+2026-01-30 16:00:18 [HikariPool-1:housekeeper] DEBUG com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - keepalive: connection ConnectionID:10 ClientConnectionId: 5512cdcf-673d-4b9e-b5f9-027d9fb5a503 is alive
+2026-01-30 16:00:20 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerStatement - SQLServerStatement:16 created by (ConnectionID:1 ClientConnectionId: 424c8a9f-19ff-4a1a-b858-6f0a35f596a3)
+2026-01-30 16:00:20 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerStatement - SQLServerStatement:16 Executing (not server cursor) SELECT 1
+2026-01-30 16:00:20 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerResultSet - SQLServerResultSet:13 created by (SQLServerStatement:16)
+2026-01-30 16:00:20 [HikariPool-1:housekeeper] DEBUG com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - keepalive: connection ConnectionID:1 ClientConnectionId: 424c8a9f-19ff-4a1a-b858-6f0a35f596a3 is alive
+2026-01-30 16:00:21 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerStatement - SQLServerStatement:17 created by (ConnectionID:4 ClientConnectionId: a26d2f72-674a-4a3a-bb97-2adf40216a47)
+2026-01-30 16:00:21 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerStatement - SQLServerStatement:17 Executing (not server cursor) SELECT 1
+2026-01-30 16:00:21 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerResultSet - SQLServerResultSet:14 created by (SQLServerStatement:17)
+2026-01-30 16:00:21 [HikariPool-1:housekeeper] DEBUG com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - keepalive: connection ConnectionID:4 ClientConnectionId: a26d2f72-674a-4a3a-bb97-2adf40216a47 is alive
+2026-01-30 16:00:21 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerStatement - SQLServerStatement:18 created by (ConnectionID:3 ClientConnectionId: 7bb451b5-f95b-4377-bacb-085ea5f5a803)
+2026-01-30 16:00:21 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerStatement - SQLServerStatement:18 Executing (not server cursor) SELECT 1
+2026-01-30 16:00:21 [HikariPool-1:housekeeper] DEBUG com.microsoft.sqlserver.jdbc.internals.SQLServerResultSet - SQLServerResultSet:15 created by (SQLServerStatement:18)
+2026-01-30 16:00:21 [HikariPool-1:housekeeper] DEBUG com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - keepalive: connection ConnectionID:3 ClientConnectionId: 7bb451b5-f95b-4377-bacb-085ea5f5a803 is alive
+2026-01-30 16:00:22 [HikariPool-1:housekeeper] DEBUG com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Pool stats (total=10/10, idle=10/10, active=0, waiting=0)
+2026-01-30 16:00:22 [HikariPool-1:housekeeper] DEBUG com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Fill pool skipped, pool has sufficient level or currently being filled.
+2026-01-30 16:00:52 [HikariPool-1:housekeeper] DEBUG com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Pool stats (total=10/10, idle=10/10, active=0, waiting=0)
+2026-01-30 16:00:52 [HikariPool-1:housekeeper] DEBUG com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Fill pool skipped, pool has sufficient level or currently being filled.

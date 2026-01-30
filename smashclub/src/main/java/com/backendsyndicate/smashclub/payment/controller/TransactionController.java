@@ -1,10 +1,9 @@
 package com.backendsyndicate.smashclub.payment.controller;
 
-import com.backendsyndicate.smashclub.payment.dto.request.ReqCreateTransactionDTO;
+import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.payment.service.PaymentService;
 import com.backendsyndicate.smashclub.payment.service.TransactionService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 
 @RestController
-@RequestMapping(name="transaction")
+@RequestMapping("transaction")
 public class TransactionController {
     @Autowired
     private PaymentService paymentService;
@@ -30,12 +29,13 @@ public class TransactionController {
             @RequestParam Integer size,
             HttpServletRequest request
     ) {
+        Logging.printConsole("Test Call Trx List!");
         Pageable pageable = PageRequest.of(page, size, Sort.by("CreatedAt").descending());
         return transactionService.findAll(pageable, startDate, endDate, request);
     }
 
     @GetMapping("/{transactionCode}")
-    public ResponseEntity<Object> transactionDetail(String transactionCode, HttpServletRequest request) {
+    public ResponseEntity<Object> transactionDetail(@PathVariable String transactionCode, HttpServletRequest request) {
         return transactionService.findByCode(transactionCode, request);
     }
 

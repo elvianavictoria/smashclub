@@ -16,7 +16,7 @@ public class DataGenerator {
         try {
             return faker.name().fullName();
         } catch(Exception e) {
-            Logging.handleException("DataGenerator", "getFullName()", 17, e.getMessage());
+            Logging.handleException("DataGenerator", "getFullName", 17, "TEST-FAKER-001", e.getMessage());
             return "";
         }
     }
@@ -25,7 +25,7 @@ public class DataGenerator {
         try {
             return String.format("%s@gmail.com", String.join(" ", this.getFullname()));
         } catch(Exception e) {
-            Logging.handleException("DataGenerator", "getEmail()", 17, e.getMessage());
+            Logging.handleException("DataGenerator", "getEmail()", 17, "TEST-FAKER-002", e.getMessage());
             return "";
         }
     }
