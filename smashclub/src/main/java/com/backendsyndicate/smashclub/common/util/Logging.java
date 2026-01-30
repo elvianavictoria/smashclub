@@ -10,7 +10,7 @@ public class Logging {
     private static StringBuilder sBuild = new StringBuilder();
     private static Logger logger = LogManager.getLogger(Logging.class);
 
-    public static void handleException(String strClass, String strMethod, int line, String message) {
+    public static void handleException(String strClass, String strMethod, int line, String errorCode, String message) {
         if(LogConfig.isEnableLog()) {
             Timestamp now = new Timestamp(System.currentTimeMillis());
 
@@ -23,7 +23,7 @@ public class Logging {
 //                    .append("Error: ").append(e.getMessage())
                     sBuild.append(System.getProperty("line.separator"))
                             .append(String.format("%tY-%<tm-%<td %<tH:%<tM:%<tS ", now))
-                            .append(String.format("[APPLICATION] ERROR on %s@%s Line %d: %s", strClass, strMethod, line, message))
+                            .append(String.format("[APPLICATION] ERROR on %s@%s Line %d [%s]: %s", strClass, strMethod, line, errorCode, message))
             );
         }
     }

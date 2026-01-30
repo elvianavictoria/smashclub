@@ -6,6 +6,20 @@ import java.util.Map;
 public class PaymentMethodConstant {
     private static final Map<Integer, Map<String, Object>> paymentMethodCategories = new HashMap<>();
     private static final Map<Integer, Map<String, Object>> paymentMethod = new HashMap<>();
+    
+    public static final int CATEGORY_VIRTUAL_ACCOUNT = 1;
+    public static final int CATEGORY_EWALLET = 2;
+    public static final int CATEGORY_QRIS = 3;
+    
+    public static final int VA_BCA = 1;
+    public static final int VA_MANDIRI = 2;
+    public static final int VA_BRI = 3;
+    public static final int VA_BNI = 4;
+    public static final int EW_DANA = 5;
+    public static final int EW_SHOPEEPAY = 6;
+    public static final int EW_OVO = 7;
+    public static final int QRIS_DANA = 8;
+    public static final int QRIS_SHOPEEPAY = 9;
 
     public static void initLoad() {
         loadPaymentMethodCategories();
@@ -13,64 +27,64 @@ public class PaymentMethodConstant {
     }
 
     private static void loadPaymentMethodCategories() {
-        paymentMethodCategories.put(1, Map.of("name", "Virtual Account"));
-        paymentMethodCategories.put(2, Map.of("name", "E-wallet"));
-        paymentMethodCategories.put(3, Map.of("name", "QRIS"));
+        paymentMethodCategories.put(CATEGORY_VIRTUAL_ACCOUNT, Map.of("name", "Virtual Account"));
+        paymentMethodCategories.put(CATEGORY_EWALLET, Map.of("name", "E-wallet"));
+        paymentMethodCategories.put(CATEGORY_QRIS, Map.of("name", "QRIS"));
     }
 
     private static void loadPaymentMethods() {
-        paymentMethod.put(1, Map.of(
+        paymentMethod.put(VA_BCA, Map.of(
                 "name", "BCA Virtual Account",
                 "img", "",
-                "categoryId", 1
+                "categoryId", CATEGORY_VIRTUAL_ACCOUNT
         ));
 
-        paymentMethod.put(2, Map.of(
+        paymentMethod.put(VA_MANDIRI, Map.of(
             "name", "Mandiri Virtual Account",
                 "img", "",
-                "categoryId", 1
+                "categoryId", CATEGORY_VIRTUAL_ACCOUNT
         ));
 
-        paymentMethod.put(3, Map.of(
+        paymentMethod.put(VA_BRI, Map.of(
                 "name", "BRI Virtual Account",
                 "img", "",
-                "categoryId", 1
+                "categoryId", CATEGORY_VIRTUAL_ACCOUNT
         ));
 
-        paymentMethod.put(4, Map.of(
+        paymentMethod.put(VA_BNI, Map.of(
                 "name", "BNI Virtual Account",
                 "img", "",
-                "categoryId", 1
+                "categoryId", CATEGORY_VIRTUAL_ACCOUNT
         ));
 
-        paymentMethod.put(5, Map.of(
+        paymentMethod.put(EW_DANA, Map.of(
                 "name", "DANA",
                 "img", "",
-                "categoryId", 2
+                "categoryId", CATEGORY_EWALLET
         ));
 
-        paymentMethod.put(6, Map.of(
+        paymentMethod.put(EW_SHOPEEPAY, Map.of(
                 "name", "Shopeepay",
                 "img", "",
-                "categoryId", 2
+                "categoryId", CATEGORY_EWALLET
         ));
 
-        paymentMethod.put(7, Map.of(
+        paymentMethod.put(EW_OVO, Map.of(
                 "name", "OVO",
                 "img", "",
-                "categoryId", 2
+                "categoryId", CATEGORY_EWALLET
         ));
 
-        paymentMethod.put(8, Map.of(
+        paymentMethod.put(QRIS_DANA, Map.of(
                 "name", "QRIS DANA",
                 "img", "",
-                "categoryId", 3
+                "categoryId", CATEGORY_QRIS
         ));
 
-        paymentMethod.put(9, Map.of(
+        paymentMethod.put(QRIS_SHOPEEPAY, Map.of(
                 "name", "QRIS Shopeepay",
                 "img", "",
-                "categoryId", 3
+                "categoryId", CATEGORY_QRIS
         ));
     }
 
@@ -90,31 +104,11 @@ public class PaymentMethodConstant {
         return paymentMethodCategories.get(payMethodCategoryId).get(attr);
     }
 
-    public static int getPaymentMethodCategory(String name) {
-        int result = -1;
-        for( Map.Entry<Integer, Map<String, Object>> entry : paymentMethodCategories.entrySet() ) {
-            String categoryName = (String) entry.getValue().get("name");
-            if( categoryName.equalsIgnoreCase(name) ) result = entry.getKey();
-        }
-
-        return result;
-    }
-
     public static Object getPaymentMethod(int payMethodId) {
         return paymentMethod.get(payMethodId);
     }
 
     public static Object getPaymentMethod(int payMethodId, String attr) {
         return paymentMethod.get(payMethodId).get(attr);
-    }
-
-    public static int getPaymentMethod(String name) {
-        int result = -1;
-        for( Map.Entry<Integer, Map<String, Object>> entry : paymentMethodCategories.entrySet() ) {
-            String payMethodName = (String) entry.getValue().get("name");
-            if( payMethodName.equalsIgnoreCase(name) ) result = entry.getKey();
-        }
-
-        return result;
     }
 }
