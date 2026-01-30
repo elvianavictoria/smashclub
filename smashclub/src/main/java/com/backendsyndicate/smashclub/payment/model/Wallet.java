@@ -13,9 +13,11 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(exclude = "user")
+@ToString(exclude = {"user", "walletLogs"})
 public class Wallet {
     @Id
+    @EqualsAndHashCode.Include
+    @Column(name = "ID")
     private String userId;
 
     @Column(name = "UserBalance", precision = 17, scale = 2, nullable = false)
@@ -27,13 +29,12 @@ public class Wallet {
     @Column(name = "UpdatedAt", insertable = false)
     private LocalDateTime updatedAt;
 
-//    @Id
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     @MapsId
     @JoinColumn(name = "UserId")
     private User user;
 
-    @OneToMany(mappedBy = "wallet")
-    private List<WalletLog> walletLog;
+    @OneToMany(mappedBy = "wallet", fetch = FetchType.LAZY)
+    private List<WalletLog> walletLogs;
 }
 

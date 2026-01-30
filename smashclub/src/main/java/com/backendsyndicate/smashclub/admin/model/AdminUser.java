@@ -1,5 +1,6 @@
 package com.backendsyndicate.smashclub.admin.model;
 
+import com.backendsyndicate.smashclub.auth.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(exclude = "adminRole")
+@ToString(exclude = {"adminRole", "user"})
 
 public class AdminUser {
     @Id
@@ -37,4 +38,8 @@ public class AdminUser {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "RoleID", foreignKey = @ForeignKey(name = "fk_user_to_role"), nullable = false)
     private AdminRole adminRole;
+
+    @OneToOne
+    @JoinColumn(name = "UserID", foreignKey = @ForeignKey(name = "fk_adminUser_to_user"), nullable = false )
+    private User user;
 }
