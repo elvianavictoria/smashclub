@@ -58,17 +58,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(UnexpectedRollbackException.class)
     public ResponseEntity<Object> unexpectedRollbackException(UnexpectedRollbackException ex, HttpServletRequest request){
-        Logging.handleException("GlobalExceptionHandler","unexpectedRollbackException "+ RequestCapture.allRequest(request), 0, ex.getMessage());
+        Logging.handleException("GlobalExceptionHandler","unexpectedRollbackException "+ RequestCapture.allRequest(request), 0, "X02001", ex.getMessage());
         return GlobalResponse.failed("Rollback untuk Transaksi Telah dilakukan", "X02001", null, request);
     }
     @ExceptionHandler(FileAlreadyExistsException.class)
     public ResponseEntity<Object> fileAlreadyExistsException(FileAlreadyExistsException ex, HttpServletRequest request){
-        Logging.handleException("GlobalExceptionHandler","fileAlreadyExistsException "+ RequestCapture.allRequest(request), 0, ex.getMessage());
+        Logging.handleException("GlobalExceptionHandler","fileAlreadyExistsException "+ RequestCapture.allRequest(request), 0, "X04001", ex.getMessage());
         return GlobalResponse.failed("File telah dibuat sebelumnya!","X04001", null, request);
     }
 
     public ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatus status, HttpServletRequest request) {
-        Logging.handleException("GlobalExceptionHandler","handleExceptionInternal ", 0, "Request: " + RequestCapture.allRequest(request) + "; Message: " + ex.getMessage());
+        Logging.handleException("GlobalExceptionHandler","handleExceptionInternal ", 0, "X05999", "Request: " + RequestCapture.allRequest(request) + "; Message: " + ex.getMessage());
         return GlobalResponse.internalServerError("TERJADI KESALAHAN!", "X05999", request);
     }
 }

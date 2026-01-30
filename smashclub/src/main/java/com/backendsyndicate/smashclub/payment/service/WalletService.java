@@ -1,8 +1,11 @@
 package com.backendsyndicate.smashclub.payment.service;
 
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
+import com.backendsyndicate.smashclub.common.util.Logging;
+import com.backendsyndicate.smashclub.payment.constant.TransactionTypeConstant;
 import com.backendsyndicate.smashclub.payment.core.IWallet;
 import com.backendsyndicate.smashclub.payment.dto.request.ReqUpdateBalanceDTO;
+import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransactionDTO;
 import com.backendsyndicate.smashclub.payment.dto.response.RespUpdateBalanceDTO;
 import com.backendsyndicate.smashclub.payment.model.Wallet;
 import com.backendsyndicate.smashclub.payment.model.WalletLog;
@@ -29,6 +32,7 @@ public class WalletService implements IWallet {
     private WalletRepo walletRepo;
     private WalletLogRepo walletLogRepo;
     private ModelMapper modelMapper = new ModelMapper();
+    private PaymentService paymentService;
 
     private String generateErrorCode(String methodNo, String errorNo) {
         return "WLLT-" + methodNo + "E" + errorNo;
@@ -94,18 +98,45 @@ public class WalletService implements IWallet {
      * Code: 03
      *
      * @param userId
-     * @param reqUpdateBalanceDTO
-     * @param request
+     * @param balance
      * @return
      */
     @Override
-    public ResponseEntity<Object> updateBalance(String userId, ReqUpdateBalanceDTO reqUpdateBalanceDTO, HttpServletRequest request) {
+    public ResponseEntity<Object> topupBalance(String userId, BigDecimal balance, HttpServletRequest request) {
         if( userId == null ) {
             return GlobalResponse.failed("Auth Token is invalid!", generateErrorCode("03", "001"), null, request);
         }
 
+        RespCreateTransactionDTO response = null;
+
+        try {
+            response = paymentService.createTransaction(userId, balance, "", TransactionTypeConstant.WALLET_TOPUP);
+        } catch(Exception e) {
+            return GlobalResponse.failed("Failed to request topup balance!", generateErrorCode("03", "010"), null, request);
+        }
+
+        return GlobalResponse.success("Successfully request topup balance", response, request);
+    }
+
+    /**
+     * Code: 04
+     *
+     * (-) Controller
+     *
+     * @param userId
+     * @param reqUpdateBalanceDTO
+     * @return
+     */
+    @Override
+    public boolean updateBalance(String userId, ReqUpdateBalanceDTO reqUpdateBalanceDTO) {
+        if( userId == null ) {
+            Logging.handleException("WalletService", "updateBalance", 133, generateErrorCode("04", "001"), "User ID is required!");
+            return false;
+        }
+
         if( reqUpdateBalanceDTO == null ) {
-            return GlobalResponse.failed("Invalid request!", generateErrorCode("03", "002"), null, request);
+            Logging.handleException("WalletService", "updateBalance", 138, generateErrorCode("04", "002"), "Update balance DTO is null!");
+            return false;
         }
 
         Wallet wallet = null;
@@ -114,7 +145,8 @@ public class WalletService implements IWallet {
         try {
             Optional<Wallet> optionalWallet = walletRepo.findByUserId(userId);
             if( optionalWallet.isEmpty() ) {
-                return GlobalResponse.failed("Wallet data not found!", generateErrorCode("03", "003"), null, request);
+                Logging.handleException("WalletService", "updateBalance", 148, generateErrorCode("04", "003"), "User ID is required!");
+                return false;
             }
 
             wallet = optionalWallet.get();
@@ -130,10 +162,11 @@ public class WalletService implements IWallet {
             response.setBalanceDiff(reqUpdateBalanceDTO.getValue());
 
         } catch(Exception e) {
-            return GlobalResponse.failed("Failed to update balance!", generateErrorCode("03", "010"), null, request);
+            Logging.handleException("WalletService", "updateBalance", 146, generateErrorCode("04", "010"), e.getMessage());
+            return false;
         }
 
-        return GlobalResponse.success("Successfully updated balance", response, request);
+        return true;
     }
 
     private void logWalletUpdate(Wallet wallet, BigDecimal previousBalance) {

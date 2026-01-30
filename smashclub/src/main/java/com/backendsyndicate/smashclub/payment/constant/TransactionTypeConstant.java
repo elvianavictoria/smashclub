@@ -5,14 +5,18 @@ import java.util.Map;
 
 public class TransactionTypeConstant {
     private static final Map<Integer, String> transactionType = new HashMap<>();
+    public static final int COURT_BOOKING = 1;
+    public static final int ECOMMERCE_SHOPPING = 2;
+    public static final int WALLET_TOPUP = 3;
 
     public static void initLoad() {
         loadTransactionType();
     }
 
     private static void loadTransactionType() {
-        transactionType.put(1, "Court Booking");
-        transactionType.put(2, "E-commerce Shopping");
+        transactionType.put(COURT_BOOKING, "Court Booking");
+        transactionType.put(ECOMMERCE_SHOPPING, "E-commerce Shopping");
+        transactionType.put(WALLET_TOPUP, "Wallet Topup");
     }
 
     public static Map<Integer, String> getTransactionType() {
@@ -21,14 +25,5 @@ public class TransactionTypeConstant {
 
     public static String getTransactionType(int type) {
         return transactionType.getOrDefault(type, "Unknown");
-    }
-
-    public static int getTransactionType(String typeName) {
-        int result = -1;
-        for( Map.Entry<Integer, String> entry : transactionType.entrySet() ) {
-            if( entry.getValue().equalsIgnoreCase(typeName) ) result = entry.getKey();
-        }
-
-        return result;
     }
 }
