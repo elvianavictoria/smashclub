@@ -1,23 +1,31 @@
 package com.backendsyndicate.smashclub.auth.repository;
 
 import com.backendsyndicate.smashclub.auth.model.EmailVerificationTokens;
+import com.backendsyndicate.smashclub.auth.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import java.time.LocalDateTime;
-import java.util.List;
+import org.springframework.stereotype.Repository;
+
 import java.util.Optional;
 
-public interface EmailVerificationTokenRepository extends JpaRepository<EmailVerificationTokens, String> {
-    Optional<EmailVerificationTokens> findByTokenAndUsedAtIsNull(String token);
-    List<EmailVerificationTokens> findByUserId(String userId);
+@Repository
+public interface EmailVerificationTokenRepository extends
+        JpaRepository<EmailVerificationTokens, String>,
+        EmailVerificationTokenRepositoryCustom {
 
-    @Modifying
-    @Query("UPDATE EmailVerificationToken e SET e.usedDate = :usedDate WHERE e.userId = :userId AND e.usedDate IS NULL")
-    void invalidateUserTokens(@Param("userId") String userId, @Param("usedDate") LocalDateTime usedDate);
+    @Query("SELECT t FROM EmailVerificationTokens t WHERE t.token = :token " +
+            "AND t.usedAt IS NULL")
+    Optional<EmailVerificationTokens> findByTokenAndUsedAtIsNull(@Param("token") String token);
 
-    @Modifying
-    @Query("DELETE FROM EmailVerificationToken e WHERE e.expiredDate < :cutoffDate")
-    void cleanupExpiredTokens(@Param("cutoffDate") LocalDateTime cutoffDate);
+    @Query("SELECT t FROM EmailVerificationTokens t WHERE t.token = :token " +
+            "AND t.usedAt IS NOT NULL")
+    Optional<EmailVerificationTokens> findByTokenAndUsedAtIsNotNull(@Param("token") String token);
+
+    Optional<EmailVerificationTokens> findTopByUserOrderByCreatedAtDesc(User user);
+
+    @Query("SELECT t FROM EmailVerificationTokens t WHERE t.user.id = :userId " +
+            "AND t.usedAt IS NULL " +
+            "AND t.expiresAt > CURRENT_TIMESTAMP")
+    Optional<EmailVerificationTokens> findValidByUserId(@Param("userId") String userId);
 }

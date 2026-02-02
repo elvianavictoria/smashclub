@@ -3,12 +3,14 @@ package com.backendsyndicate.smashclub.common.handler;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;  // TAMBAHKAN INI!
 import org.springframework.web.context.request.WebRequest;
 
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
+@Component  // TAMBAHKAN INI! PASTI
 public class ResponseHandler {
     /**
      * Here is where responseFormat is configured
