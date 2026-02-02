@@ -55,9 +55,8 @@ public class SecurityConfiguration {
                                 "/auth/**",
                                     "/transaction/**",
                                     "/booking/**",
-                                    "/e-commerce/**"
-//                                "/swagger-ui/**",
-//                                "/v3/api-docs/**"
+                                    "/e-commerce/**",
+                                    "/admin/**"
                         ).permitAll().anyRequest().authenticated());
 //            headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable())). // Allow H2 console to run in a frame
 //        httpBasic(basic -> basic.authenticationEntryPoint(authenticationEntryPoint)).
