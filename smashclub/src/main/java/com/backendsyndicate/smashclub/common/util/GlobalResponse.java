@@ -22,6 +22,10 @@ public class GlobalResponse {
         return new ResponseHandler().handleResponse(message, HttpStatus.NOT_FOUND, errorCode, null, request);
     }
 
+    public static ResponseEntity<Object> unauthorized(String message, String errorCode, HttpServletRequest request) {
+        return new ResponseHandler().handleResponse(message, HttpStatus.UNAUTHORIZED, errorCode, null, request);
+    }
+
     public static ResponseEntity<Object> mediaTypeNotSupported(String message, String errorCode, HttpServletRequest request) {
         return new ResponseHandler().handleResponse(message, HttpStatus.UNSUPPORTED_MEDIA_TYPE, errorCode, null, request);
     }

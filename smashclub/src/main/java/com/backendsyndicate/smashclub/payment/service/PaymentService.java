@@ -5,7 +5,7 @@ import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.common.util.Util;
 import com.backendsyndicate.smashclub.payment.constant.PaymentMethodConstant;
-import com.backendsyndicate.smashclub.payment.constant.TransactionConstant;
+import com.backendsyndicate.smashclub.payment.constant.TransactionStatusConstant;
 import com.backendsyndicate.smashclub.payment.constant.TransactionTypeConstant;
 import com.backendsyndicate.smashclub.payment.core.IPayment;
 import com.backendsyndicate.smashclub.payment.dto.request.ReqUpdateBalanceDTO;
@@ -19,6 +19,7 @@ import com.backendsyndicate.smashclub.payment.repo.TransactionLogRepo;
 import com.backendsyndicate.smashclub.payment.repo.TransactionRepo;
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.stereotype.Service;
@@ -26,8 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -36,11 +35,13 @@ import java.util.Optional;
 @Service
 @Transactional
 public class PaymentService implements IPayment {
+    @Autowired
     private TransactionRepo transactionRepo;
+    @Autowired
     private TransactionLogRepo transactionLogRepo;
+    @Autowired
     private RefundRequestRepo refundRequestRepo;
 
-    private WalletService walletService;
 
     private ModelMapper modelMapper = new ModelMapper();
 
@@ -78,7 +79,7 @@ public class PaymentService implements IPayment {
 
             trx.setUser(user);
             trx.setTransactionCode(trxCode);
-            trx.setStatus((byte) TransactionConstant.PAYMENT_UNPAID);
+            trx.setStatus((byte) TransactionStatusConstant.PAYMENT_UNPAID);
             trx.setTransactionLabel(trxLabel);
             trx.setTotalPrice(totalPrice);
             trx.setReferenceCode(referenceCode);
@@ -122,30 +123,9 @@ public class PaymentService implements IPayment {
 
             trx = optionalTrx.get();
             byte previousStatus = trx.getStatus();
-            if( TransactionConstant.isStatusAllowed(previousStatus, TransactionConstant.PAYMENT_PAID) ) {
-                trx.setStatus((byte) TransactionConstant.PAYMENT_PAID);
+            if( TransactionStatusConstant.isStatusAllowed(previousStatus, TransactionStatusConstant.PAYMENT_PAID) ) {
+                trx.setStatus((byte) TransactionStatusConstant.PAYMENT_PAID);
                 logTransactionUpdate(trx, previousStatus);
-
-                switch( trx.getTransactionType() ) {
-                    case TransactionTypeConstant.COURT_BOOKING:
-                        // Update booking status
-                        break;
-                    case TransactionTypeConstant.ECOMMERCE_SHOPPING:
-                        // Update order status
-                        break;
-                    case TransactionTypeConstant.WALLET_TOPUP:
-                        // Update balance
-                        ReqUpdateBalanceDTO dto = new ReqUpdateBalanceDTO();
-                        dto.setValue(trx.getTotalPrice());
-                        dto.setAddition(true);
-                        boolean isTopupSuccess = walletService.updateBalance(trx.getUser().getId(), dto);
-
-                        if( !isTopupSuccess ) {
-                            return GlobalResponse.failed("Failed to process transaction!", generateErrorCode("02", "008"), null, request);
-                        }
-
-                        break;
-                }
 
                 response = modelMapper.map(trx, RespPaymentTransactionDTO.class);
             } else {
@@ -186,16 +166,16 @@ public class PaymentService implements IPayment {
             Transaction trx = optionalTrx.get();
             int previousStatus = trx.getStatus();
 
-            if( !TransactionConstant.isStatusAllowed(previousStatus, TransactionConstant.PAYMENT_CANCELLED) ) {
+            if( !TransactionStatusConstant.isStatusAllowed(previousStatus, TransactionStatusConstant.PAYMENT_CANCELLED) ) {
                 Logging.handleException("PaymentService", "refundTransaction", 158, generateErrorCode("03", "002"), "Status update is not allowed!");
             }
 
-            trx.setStatus((byte) TransactionConstant.PAYMENT_CANCELLED);
+            trx.setStatus((byte) TransactionStatusConstant.PAYMENT_CANCELLED);
             logTransactionUpdate(trx, previousStatus);
 
             RefundRequest refundRequest = new RefundRequest();
             refundRequest.setTransaction(trx);
-            refundRequest.setRefundStatus((byte) TransactionConstant.REFUND_REQUESTED);
+            refundRequest.setRefundStatus((byte) TransactionStatusConstant.REFUND_REQUESTED);
 
             refundRequestRepo.save(refundRequest);
 

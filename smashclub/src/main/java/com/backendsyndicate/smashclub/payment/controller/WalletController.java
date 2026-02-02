@@ -1,10 +1,10 @@
 package com.backendsyndicate.smashclub.payment.controller;
 
-import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.payment.dto.request.ReqGetBalanceLogDTO;
 import com.backendsyndicate.smashclub.payment.service.WalletService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 @RestController
 @RequestMapping(name="wallet")
 public class WalletController {
+    @Autowired
     private WalletService walletService;
 
     @GetMapping("/balance")

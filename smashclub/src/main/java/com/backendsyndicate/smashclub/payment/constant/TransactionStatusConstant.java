@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TransactionConstant {
+public class TransactionStatusConstant {
     private static final Map<Integer, String> status = new HashMap<>();
     private static final Map<Integer, String> refundStatus = new HashMap<>();
     private static final Map<Integer, List<Integer>> statusWorkflow = new HashMap<>();
