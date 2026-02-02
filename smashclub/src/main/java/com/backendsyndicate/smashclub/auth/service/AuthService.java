@@ -43,7 +43,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final ResponseHandler responseHandler;
 
-    // Configuration
+    /*// Configuration
     private static final int MAX_FAILED_ATTEMPTS = 5;
     private static final int LOCK_DURATION_MINUTES = 30;
     private static final int OTP_EXPIRY_MINUTES = 10;
@@ -54,7 +54,7 @@ public class AuthService {
 
     // Token Types
     private static final String TOKEN_TYPE_ACCESS = "ACCESS";
-    private static final String TOKEN_TYPE_REFRESH = "REFRESH";
+    private static final String TOKEN_TYPE_REFRESH = "REFRESH";*/
 
     // ============ REGISTRATION ============
     @Transactional
@@ -87,7 +87,7 @@ public class AuthService {
 
         // 3. Create user dengan status PENDING
         User user = new User();
-        user.setId(UUID.randomUUID().toString());
+        //user.setId(UUID.randomUUID().toString());
         user.setFullName(request.getFullName().trim());
         user.setEmail(request.getEmail().toLowerCase().trim());
         user.setPasswordHash(passwordHasher.hash(request.getPassword()));
@@ -95,19 +95,19 @@ public class AuthService {
         user.setFailedLoginAttempt(0);
         user.setCreatedDate(LocalDateTime.now());
 
-        userRepository.save(user);
+        user = userRepository.saveAndFlush(user);
         log.info("User created - userId: {}, email: {}", user.getId(), user.getEmail());
 
         // 4. Generate dan simpan verification token
         String token = UUID.randomUUID().toString();
         EmailVerificationTokens verificationToken = new EmailVerificationTokens();
-        verificationToken.setId(UUID.randomUUID().toString());
+        //verificationToken.setId(UUID.randomUUID().toString());
         verificationToken.setUser(user);
         verificationToken.setToken(token);
-        verificationToken.setExpiresAt(LocalDateTime.now().plusHours(VERIFICATION_TOKEN_EXPIRY_HOURS));
+        verificationToken.setExpiresAt(LocalDateTime.now().plusHours(AuthenticationConstant.VERIFICATION_TOKEN_EXPIRY_HOURS));
         verificationToken.setCreatedAt(LocalDateTime.now());
 
-        emailVerificationTokenRepository.save(verificationToken);
+        emailVerificationTokenRepository.saveAndFlush(verificationToken);
 
         // 5. Kirim email verifikasi
         try {
@@ -191,16 +191,16 @@ public class AuthService {
         user.setFailedLoginAttempt(newFailedAttempts);
 
         // Lock jika >= 5 kali gagal
-        if (newFailedAttempts >= MAX_FAILED_ATTEMPTS) {
+        if (newFailedAttempts >= AuthenticationConstant.MAX_FAILED_ATTEMPTS) {
             user.setStatus(AuthenticationConstant.LOCKED);
-            user.setLockedUntil(LocalDateTime.now().plusMinutes(LOCK_DURATION_MINUTES));
+            user.setLockedUntil(LocalDateTime.now().plusMinutes(AuthenticationConstant.LOCK_DURATION_MINUTES));
             userRepository.save(user);
 
             log.warn("Account locked - userId: {}, email: {}, IP: {}, failedAttempts: {}",
                     user.getId(), user.getEmail(), ipAddress, newFailedAttempts);
 
             return responseHandler.handleResponse(
-                    String.format("Akun terkunci selama %d menit karena terlalu banyak percobaan gagal", LOCK_DURATION_MINUTES),
+                    String.format("Akun terkunci selama %d menit karena terlalu banyak percobaan gagal", AuthenticationConstant.LOCK_DURATION_MINUTES),
                     HttpStatus.BAD_REQUEST,
                     "AUTH_005",
                     null,
@@ -211,7 +211,7 @@ public class AuthService {
         userRepository.save(user);
 
         // Beri hint sisa percobaan
-        int remainingAttempts = MAX_FAILED_ATTEMPTS - newFailedAttempts;
+        int remainingAttempts = AuthenticationConstant.MAX_FAILED_ATTEMPTS - newFailedAttempts;
         String message = "Email atau password salah";
         if (remainingAttempts > 0) {
             message += String.format(". Sisa percobaan: %d", remainingAttempts);
@@ -283,10 +283,10 @@ public class AuthService {
         // 4. Generate OTP untuk 2FA
         String otp = generateSecureOtp();
         LoginOtpTokens otpToken = new LoginOtpTokens();
-        otpToken.setId(UUID.randomUUID().toString());
+        //otpToken.setId(UUID.randomUUID().toString());
         otpToken.setUser(user);
         otpToken.setOtpCode(otp);
-        otpToken.setExpiresAt(LocalDateTime.now().plusMinutes(OTP_EXPIRY_MINUTES));
+        otpToken.setExpiresAt(LocalDateTime.now().plusMinutes(AuthenticationConstant.OTP_EXPIRY_MINUTES));
         otpToken.setCreatedAt(LocalDateTime.now());
 
         // Invalidate existing OTP tokens for this user
@@ -307,7 +307,7 @@ public class AuthService {
         responseData.put("userId", user.getId());
         responseData.put("email", user.getEmail());
         responseData.put("requiresOtp", true);
-        responseData.put("otpExpiresIn", OTP_EXPIRY_MINUTES);
+        responseData.put("otpExpiresIn", AuthenticationConstant.OTP_EXPIRY_MINUTES);
 
         log.info("Login successful (awaiting OTP) - userId: {}, email: {}, IP: {}",
                 user.getId(), user.getEmail(), ipAddress);
@@ -402,17 +402,17 @@ public class AuthService {
         sessionRepository.invalidateUserTokens(user.getId(), LocalDateTime.now());
 
         // Save ACCESS token
-        saveTokenToSession(user, accessToken, TOKEN_TYPE_ACCESS, ACCESS_TOKEN_EXPIRY_HOURS * 60L);
+        saveTokenToSession(user, accessToken, AuthenticationConstant.TOKEN_TYPE_ACCESS, AuthenticationConstant.ACCESS_TOKEN_EXPIRY_HOURS * 60L);
 
         // Save REFRESH token
-        saveTokenToSession(user, refreshToken, TOKEN_TYPE_REFRESH, REFRESH_TOKEN_EXPIRY_DAYS * 24L * 60L);
+        saveTokenToSession(user, refreshToken, AuthenticationConstant.TOKEN_TYPE_REFRESH, AuthenticationConstant.REFRESH_TOKEN_EXPIRY_DAYS * 24L * 60L);
 
         // 7. Buat response
         LoginResponse loginResponse = LoginResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .tokenType("Bearer")
-                .expiresIn(ACCESS_TOKEN_EXPIRY_HOURS * 3600L)
+                .expiresIn(AuthenticationConstant.ACCESS_TOKEN_EXPIRY_HOURS * 3600L)
                 .userId(user.getId())
                 .email(user.getEmail())
                 .fullName(user.getFullName())
@@ -432,7 +432,7 @@ public class AuthService {
 
     private void saveTokenToSession(User user, String token, String tokenType, Long expiryMinutes) {
         Sessions session = new Sessions();
-        session.setId(UUID.randomUUID().toString());
+        //session.setId(UUID.randomUUID().toString());
         session.setUser(user);
         session.setSessionToken(token);
         session.setTokenType(tokenType);
@@ -549,10 +549,10 @@ public class AuthService {
         // 4. Generate new reset token
         String token = UUID.randomUUID().toString();
         PasswordResetTokens resetToken = new PasswordResetTokens();
-        resetToken.setId(UUID.randomUUID().toString());
+        //resetToken.setId(UUID.randomUUID().toString());
         resetToken.setUser(user);
         resetToken.setToken(token);
-        resetToken.setExpiresAt(LocalDateTime.now().plusHours(RESET_TOKEN_EXPIRY_HOURS));
+        resetToken.setExpiresAt(LocalDateTime.now().plusHours(AuthenticationConstant.RESET_TOKEN_EXPIRY_HOURS));
         resetToken.setCreatedAt(LocalDateTime.now());
 
         passwordResetTokenRepository.save(resetToken);
@@ -775,10 +775,10 @@ public class AuthService {
         // Generate new token
         String token = UUID.randomUUID().toString();
         EmailVerificationTokens verificationToken = new EmailVerificationTokens();
-        verificationToken.setId(UUID.randomUUID().toString());
+        //verificationToken.setId(UUID.randomUUID().toString());
         verificationToken.setUser(user);
         verificationToken.setToken(token);
-        verificationToken.setExpiresAt(LocalDateTime.now().plusHours(VERIFICATION_TOKEN_EXPIRY_HOURS));
+        verificationToken.setExpiresAt(LocalDateTime.now().plusHours(AuthenticationConstant.VERIFICATION_TOKEN_EXPIRY_HOURS));
         verificationToken.setCreatedAt(LocalDateTime.now());
 
         emailVerificationTokenRepository.save(verificationToken);
@@ -880,10 +880,10 @@ public class AuthService {
         // Generate new OTP
         String otp = generateSecureOtp();
         LoginOtpTokens otpToken = new LoginOtpTokens();
-        otpToken.setId(UUID.randomUUID().toString());
+        //otpToken.setId(UUID.randomUUID().toString());
         otpToken.setUser(user);
         otpToken.setOtpCode(otp);
-        otpToken.setExpiresAt(LocalDateTime.now().plusMinutes(OTP_EXPIRY_MINUTES));
+        otpToken.setExpiresAt(LocalDateTime.now().plusMinutes(AuthenticationConstant.OTP_EXPIRY_MINUTES));
         otpToken.setCreatedAt(LocalDateTime.now());
 
         loginOtpTokenRepository.save(otpToken);
@@ -907,7 +907,7 @@ public class AuthService {
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("userId", user.getId());
         responseData.put("email", user.getEmail());
-        responseData.put("otpExpiresIn", OTP_EXPIRY_MINUTES);
+        responseData.put("otpExpiresIn", AuthenticationConstant.OTP_EXPIRY_MINUTES);
         responseData.put("nextResendAvailableIn", 60); // Bisa resend setelah 60 detik
 
         return responseHandler.handleResponse(
@@ -939,7 +939,7 @@ public class AuthService {
 
             // 2. Cek di database apakah token belum di-invalidate
             Optional<Sessions> sessionOpt = sessionRepository.findBySessionTokenAndTokenTypeAndExpiresAtAfterAndInvalidatedAtIsNull(
-                    accessToken, TOKEN_TYPE_ACCESS, LocalDateTime.now());
+                    accessToken, AuthenticationConstant.TOKEN_TYPE_ACCESS, LocalDateTime.now());
 
             if (sessionOpt.isEmpty()) {
                 log.warn("Token revoked or expired in database");
@@ -1028,7 +1028,7 @@ public class AuthService {
 
             // 2. Cek di database apakah refresh token masih valid
             Optional<Sessions> sessionOpt = sessionRepository.findBySessionTokenAndTokenTypeAndExpiresAtAfterAndInvalidatedAtIsNull(
-                    refreshToken, TOKEN_TYPE_REFRESH, LocalDateTime.now());
+                    refreshToken, AuthenticationConstant.TOKEN_TYPE_REFRESH, LocalDateTime.now());
 
             if (sessionOpt.isEmpty()) {
                 log.warn("Refresh token not found or revoked");
@@ -1065,15 +1065,15 @@ public class AuthService {
             String newRefreshToken = jwtService.generateRefreshToken(user.getId());
 
             // 6. Save new tokens
-            saveTokenToSession(user, newAccessToken, TOKEN_TYPE_ACCESS, ACCESS_TOKEN_EXPIRY_HOURS * 60L);
-            saveTokenToSession(user, newRefreshToken, TOKEN_TYPE_REFRESH, REFRESH_TOKEN_EXPIRY_DAYS * 24L * 60L);
+            saveTokenToSession(user, newAccessToken, AuthenticationConstant.TOKEN_TYPE_ACCESS, AuthenticationConstant.ACCESS_TOKEN_EXPIRY_HOURS * 60L);
+            saveTokenToSession(user, newRefreshToken, AuthenticationConstant.TOKEN_TYPE_REFRESH, AuthenticationConstant.REFRESH_TOKEN_EXPIRY_DAYS * 24L * 60L);
 
             // 7. Buat response
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("accessToken", newAccessToken);
             responseData.put("refreshToken", newRefreshToken);
             responseData.put("tokenType", "Bearer");
-            responseData.put("expiresIn", ACCESS_TOKEN_EXPIRY_HOURS * 3600L);
+            responseData.put("expiresIn", AuthenticationConstant.ACCESS_TOKEN_EXPIRY_HOURS * 3600L);
 
             log.info("Token refreshed successfully - userId: {}", user.getId());
 

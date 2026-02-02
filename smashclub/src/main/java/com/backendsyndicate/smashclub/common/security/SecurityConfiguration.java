@@ -46,24 +46,34 @@ public class SecurityConfiguration {
 //        return authProvider;
 //    }
 
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        return http
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.disable())
+                .authorizeHttpRequests(authz -> authz.anyRequest().permitAll())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .build();
+    }
+    /*public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.
                 csrf(AbstractHttpConfigurer::disable).
                 authorizeHttpRequests(
                         request->request.requestMatchers(
                                 "/auth/**",
-                                    "/transaction/**",
+                                "/api/v1/auth/**",
+                                "/transaction/**",
                                     "/booking/**",
                                     "/e-commerce/**",
                                     "/admin/**"
-                        ).permitAll().anyRequest().authenticated());
+                        ).permitAll().anyRequest().authenticated());*/
 //            headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable())). // Allow H2 console to run in a frame
 //        httpBasic(basic -> basic.authenticationEntryPoint(authenticationEntryPoint)).
 //                exceptionHandling(Customizer.withDefaults()).
 //                sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).
 //                authenticationProvider(authenticationProvider()).
 //                addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
-        return http.build();
-    }
+        //return http.build();
+    //}
 }
