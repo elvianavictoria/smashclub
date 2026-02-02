@@ -2,7 +2,7 @@ package com.backendsyndicate.smashclub.payment.service.helper;
 
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
-import com.backendsyndicate.smashclub.payment.constant.TransactionTypeConstant;
+import com.backendsyndicate.smashclub.common.constant.TransactionTypeConstant;
 import com.backendsyndicate.smashclub.payment.dto.request.ReqUpdateBalanceDTO;
 import com.backendsyndicate.smashclub.payment.dto.response.RespPaymentTransactionDTO;
 import com.backendsyndicate.smashclub.payment.service.PaymentService;

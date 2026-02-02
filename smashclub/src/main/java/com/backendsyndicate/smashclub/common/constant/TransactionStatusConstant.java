@@ -1,4 +1,4 @@
-package com.backendsyndicate.smashclub.payment.constant;
+package com.backendsyndicate.smashclub.common.constant;
 
 import java.util.HashMap;
 import java.util.List;

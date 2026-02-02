@@ -38,8 +38,4 @@ public class AdminUser {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "RoleID", foreignKey = @ForeignKey(name = "fk_user_to_role"), nullable = false)
     private AdminRole adminRole;
-
-    @OneToOne
-    @JoinColumn(name = "UserID", foreignKey = @ForeignKey(name = "fk_adminUser_to_user"), nullable = false )
-    private User user;
 }

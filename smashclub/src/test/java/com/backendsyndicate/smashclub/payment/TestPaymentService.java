@@ -1,8 +1,8 @@
 package com.backendsyndicate.smashclub.payment;
 
 import com.backendsyndicate.smashclub.common.util.Logging;
-import com.backendsyndicate.smashclub.payment.constant.PaymentMethodConstant;
-import com.backendsyndicate.smashclub.payment.constant.TransactionTypeConstant;
+import com.backendsyndicate.smashclub.common.constant.PaymentMethodConstant;
+import com.backendsyndicate.smashclub.common.constant.TransactionTypeConstant;
 import com.backendsyndicate.smashclub.payment.dto.request.ReqPaymentTransactionDTO;
 import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransactionDTO;
 import com.backendsyndicate.smashclub.payment.service.PaymentService;

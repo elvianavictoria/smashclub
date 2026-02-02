@@ -1,9 +1,7 @@
-package com.backendsyndicate.smashclub.payment.constant;
+package com.backendsyndicate.smashclub.common.constant;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class WalletConstant {
     private static final Map<Integer, String> usageStatus = new HashMap<>();
