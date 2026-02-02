@@ -1,7 +1,7 @@
 package com.backendsyndicate.smashclub.auth.service;
 
 import com.backendsyndicate.smashclub.auth.dto.ForgotPasswordRequest;
-import com.backendsyndicate.smashclub.auth.dto.LoginRequest;
+import com.backendsyndicate.smashclub.auth.dto.request.LoginRequest;
 import com.backendsyndicate.smashclub.auth.dto.RegisterRequest;
 import com.backendsyndicate.smashclub.auth.dto.request.OtpVerificationRequest;
 import com.backendsyndicate.smashclub.auth.dto.request.ResendOtpRequest;
