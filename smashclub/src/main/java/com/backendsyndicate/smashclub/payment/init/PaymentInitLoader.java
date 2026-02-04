@@ -5,7 +5,9 @@ import com.backendsyndicate.smashclub.common.constant.PaymentMethodConstant;
 import com.backendsyndicate.smashclub.common.constant.TransactionStatusConstant;
 import com.backendsyndicate.smashclub.common.constant.TransactionTypeConstant;
 import com.backendsyndicate.smashclub.common.constant.WalletConstant;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PaymentInitLoader {
     public static void load() {
         loadConstant();

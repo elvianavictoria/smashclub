@@ -17,8 +17,8 @@ public class AdminMenuCategory {
     @Id
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
-//    @EqualsAndHashCode.Include
-    private Long id;
+    @EqualsAndHashCode.Include
+    private int id;
 
     @Column(name = "CategoryName", nullable = false)
     private String categoryName;

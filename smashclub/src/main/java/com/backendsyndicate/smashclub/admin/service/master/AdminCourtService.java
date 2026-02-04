@@ -18,7 +18,7 @@ import java.util.Optional;
 
 @Service
 @Transactional
-public class CourtService implements ICRUD<Court> {
+public class AdminCourtService implements ICRUD<Court, Long> {
     @Autowired
     private CourtRepo courtRepo;
     private ModelMapper modelMapper = new ModelMapper();
@@ -28,7 +28,7 @@ public class CourtService implements ICRUD<Court> {
     }
 
     @Override
-    public ResponseEntity<Object> findAll(Pageable pageable, HttpServletRequest request) {
+    public ResponseEntity<Object> findAll(String keyword, Pageable pageable, HttpServletRequest request) {
         Page page = null;
 
         try {

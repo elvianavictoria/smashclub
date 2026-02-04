@@ -26,6 +26,9 @@ public class AdminUser {
     @Column(name = "Full Name", length = 50, nullable = false)
     private String fullName;
 
+    @Column(name = "Password", nullable = false)
+    private String password;
+
     @Column(name = "Status", nullable = false)
     private int status = 0;
 

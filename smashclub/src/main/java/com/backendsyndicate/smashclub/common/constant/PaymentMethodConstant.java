@@ -1,8 +1,11 @@
 package com.backendsyndicate.smashclub.common.constant;
 
+import org.springframework.stereotype.Component;
+
 import java.util.HashMap;
 import java.util.Map;
 
+//@Component
 public class PaymentMethodConstant {
     private static final Map<Integer, Map<String, Object>> paymentMethodCategories = new HashMap<>();
     private static final Map<Integer, Map<String, Object>> paymentMethod = new HashMap<>();

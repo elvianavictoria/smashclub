@@ -1,10 +1,13 @@
 package com.backendsyndicate.smashclub.common.constant;
 
+import org.springframework.stereotype.Component;
+
 import java.util.HashMap;
 import java.util.Map;
 
+@Component
 public class TransactionTypeConstant {
-    private static final Map<Integer, String> transactionType = new HashMap<>();
+    private static Map<Integer, String> transactionType = new HashMap<>();
     public static final int COURT_BOOKING = 1;
     public static final int ECOMMERCE_SHOPPING = 2;
     public static final int WALLET_TOPUP = 3;

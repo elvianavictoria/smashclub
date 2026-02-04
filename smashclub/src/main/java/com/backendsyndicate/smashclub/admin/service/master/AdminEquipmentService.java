@@ -11,10 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-public class EquipmentService implements ICRUD<Equipment> {
+@Service
+@Transactional
+public class AdminEquipmentService implements ICRUD<Equipment, Long> {
     @Autowired
     private EquipmentRepo equipmentRepo;
     private ModelMapper modelMapper = new ModelMapper();
@@ -24,7 +28,7 @@ public class EquipmentService implements ICRUD<Equipment> {
     }
 
     @Override
-    public ResponseEntity<Object> findAll(Pageable pageable, HttpServletRequest request) {
+    public ResponseEntity<Object> findAll(String keyword, Pageable pageable, HttpServletRequest request) {
         Page page = null;
 
         try {

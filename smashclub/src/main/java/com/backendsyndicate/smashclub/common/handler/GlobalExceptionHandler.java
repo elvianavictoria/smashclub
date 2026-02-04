@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -66,6 +67,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         Logging.handleException("GlobalExceptionHandler","fileAlreadyExistsException "+ RequestCapture.allRequest(request), 0, "X04001", ex.getMessage());
         return GlobalResponse.failed("File telah dibuat sebelumnya!","X04001", null, request);
     }
+
+//    @ExceptionHandler(HttpMessageNotWritableException.class)
+//    protected ResponseEntity<Object> handleHttpMessageNotWritableException(Exception ex, Object body, HttpHeaders headers, HttpStatus status, HttpServletRequest request) {
+//        Logging.handleException("GlobalExceptionHandler", "handleHttpMessageNotWritableException ", 0, "X05001", "Request: " + RequestCapture.allRequest(request) + "; Message: " + ex.getMessage());
+//        return GlobalResponse.internalServerError(ex.getMessage(), "X05001", request);
+//    }
 
     protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatus status, HttpServletRequest request) {
         Logging.handleException("GlobalExceptionHandler","handleExceptionInternal ", 0, "X05999", "Request: " + RequestCapture.allRequest(request) + "; Message: " + ex.getMessage());

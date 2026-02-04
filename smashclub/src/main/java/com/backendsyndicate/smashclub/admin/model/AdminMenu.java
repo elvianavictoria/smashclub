@@ -16,8 +16,8 @@ public class AdminMenu {
     @Id
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
-//    @EqualsAndHashCode.Include
-    private Long id;
+    @EqualsAndHashCode.Include
+    private int id;
 
     @Column(name = "MenuCode")
     private String menuCode;
@@ -25,8 +25,8 @@ public class AdminMenu {
     @Column(name = "MenuName", nullable = false)
     private String menuName;
 
-    @Column(name = "MenuRoute", nullable = false)
-    private String menuRoute;
+//    @Column(name = "MenuRoute", nullable = false)
+//    private String menuRoute;
 
     @Column(name = "ParentID", nullable = false)
     private int parentId; //fk?

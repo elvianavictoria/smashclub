@@ -19,7 +19,7 @@ import java.util.Optional;
 
 @Service
 @Transactional
-public class AdminUserService implements ICRUD<AdminUser> {
+public class AdminUserService implements ICRUD<AdminUser, Long> {
     @Autowired
     private AdminUserRepo adminUserRepo;
     private ModelMapper modelMapper = new ModelMapper();
@@ -29,7 +29,7 @@ public class AdminUserService implements ICRUD<AdminUser> {
     }
 
     @Override
-    public ResponseEntity<Object> findAll(Pageable pageable, HttpServletRequest request) {
+    public ResponseEntity<Object> findAll(String keyword, Pageable pageable, HttpServletRequest request) {
         Page page = null;
 
         try {

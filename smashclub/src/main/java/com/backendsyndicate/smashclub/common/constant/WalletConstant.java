@@ -1,10 +1,13 @@
 package com.backendsyndicate.smashclub.common.constant;
 
+import org.springframework.stereotype.Component;
+
 import java.util.HashMap;
 import java.util.Map;
 
+@Component
 public class WalletConstant {
-    private static final Map<Integer, String> usageStatus = new HashMap<>();
+    private static Map<Integer, String> usageStatus = new HashMap<>();
 
     public static void initLoad() {
         loadUsageStatus();
@@ -21,14 +24,5 @@ public class WalletConstant {
 
     public static String getUsageStatus(int status) {
         return usageStatus.getOrDefault(status, "Unknown");
-    }
-
-    public static int getUsageStatus(String statusName) {
-        int result = -1;
-        for( Map.Entry<Integer, String> entry : usageStatus.entrySet() ) {
-            if( entry.getValue().equalsIgnoreCase(statusName) ) result = entry.getKey();
-        }
-
-        return result;
     }
 }

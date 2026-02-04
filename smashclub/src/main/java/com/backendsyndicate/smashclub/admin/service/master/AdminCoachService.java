@@ -18,7 +18,7 @@ import java.util.Optional;
 
 @Service
 @Transactional
-public class CoachService implements ICRUD<Coach> {
+public class AdminCoachService implements ICRUD<Coach, Long> {
     @Autowired
     private CoachRepo coachRepo;
     private ModelMapper modelMapper = new ModelMapper();
@@ -28,7 +28,7 @@ public class CoachService implements ICRUD<Coach> {
     }
 
     @Override
-    public ResponseEntity<Object> findAll(Pageable pageable, HttpServletRequest request) {
+    public ResponseEntity<Object> findAll(String keyword, Pageable pageable, HttpServletRequest request) {
         Page page = null;
 
         try {

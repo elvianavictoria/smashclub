@@ -1,6 +1,10 @@
 package com.backendsyndicate.smashclub.admin.service.internal;
 
 import com.backendsyndicate.smashclub.admin.core.ICRUD;
+import com.backendsyndicate.smashclub.admin.dto.relation.RelRoleMenuDTO;
+import com.backendsyndicate.smashclub.admin.dto.relation.RelRolePermissionDTO;
+import com.backendsyndicate.smashclub.admin.dto.response.RespAdminRoleDetailDTO;
+import com.backendsyndicate.smashclub.admin.dto.response.RespAdminRoleListDTO;
 import com.backendsyndicate.smashclub.admin.model.AdminRole;
 import com.backendsyndicate.smashclub.admin.repo.AdminRoleRepo;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
@@ -15,10 +19,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class AdminRoleService implements ICRUD<AdminRole> {
+public class AdminRoleService implements ICRUD<AdminRole, Integer> {
     @Autowired
     private AdminRoleRepo adminRoleRepo;
     private ModelMapper modelMapper = new ModelMapper();
@@ -28,25 +33,33 @@ public class AdminRoleService implements ICRUD<AdminRole> {
     }
 
     @Override
-    public ResponseEntity<Object> findAll(Pageable pageable, HttpServletRequest request) {
+    public ResponseEntity<Object> findAll(String keyword, Pageable pageable, HttpServletRequest request) {
         Page page = null;
 
         try {
-            page = adminRoleRepo.findAll(pageable);
+            if( keyword != "" ) {
+                page = adminRoleRepo.findAllByRoleCodeContainsOrRoleNameContains(keyword, keyword, pageable);
+            } else {
+                page = adminRoleRepo.findAll(pageable);
+            }
+
             if( page.isEmpty() ) {
                 return GlobalResponse.failed("Role list is empty!", generateErrorCode("01", "001"), null, request);
             }
+
+            page = page.map(adminRole -> { return modelMapper.map(adminRole, RespAdminRoleListDTO.class); });
+
         } catch(Exception e) {
             Logging.handleException("AdminRoleService", "findAll(Pageable pageable, HttpServletRequest request)", 33, generateErrorCode("01", "010"), e.getMessage());
             return GlobalResponse.failed("Failed to get role list!", generateErrorCode("01", "010"), null, request);
         }
 
-        return GlobalResponse.success("Successfully get adminRole list!", page, request);
+        return GlobalResponse.success("Successfully get admin role list!", page, request);
     }
 
     @Override
-    public ResponseEntity<Object> findById(Long id, HttpServletRequest request) {
-        AdminRole adminRole = null;
+    public ResponseEntity<Object> findById(Integer id, HttpServletRequest request) {
+        RespAdminRoleDetailDTO response = null;
 
         if( id == null ) {
             return GlobalResponse.failed("Role ID is required!", generateErrorCode("02", "001"), null, request);
@@ -58,12 +71,15 @@ public class AdminRoleService implements ICRUD<AdminRole> {
                 return GlobalResponse.failed("Role not found!", generateErrorCode("02", "002"), null, request);
             }
 
-            adminRole = optionalAdminRole.get();
+            AdminRole adminRole = optionalAdminRole.get();
+            response = modelMapper.map(adminRole, RespAdminRoleDetailDTO.class);
+            response.setMenuSet(adminRole.getMenuSet().stream().map(rowSet -> modelMapper.map(rowSet, RelRoleMenuDTO.class)).collect(Collectors.toSet()));
+            response.setPermissionSet(adminRole.getPermissionSet().stream().map(rowSet -> modelMapper.map(rowSet, RelRolePermissionDTO.class)).collect(Collectors.toSet()));
         } catch(Exception e) {
             return GlobalResponse.failed("Failed to get role data!", generateErrorCode("02", "010"), null, request);
         }
 
-        return GlobalResponse.success("Role data found!", adminRole, request);
+        return GlobalResponse.success("Role data found!", response, request);
     }
 
     @Override
@@ -83,7 +99,7 @@ public class AdminRoleService implements ICRUD<AdminRole> {
     }
 
     @Override
-    public ResponseEntity<Object> update(Long id, AdminRole adminRole, HttpServletRequest request) {
+    public ResponseEntity<Object> update(Integer id, AdminRole adminRole, HttpServletRequest request) {
         if( id == null ) {
             return GlobalResponse.failed("Role ID is required!", generateErrorCode("04", "001"), null, request);
         }
@@ -101,6 +117,7 @@ public class AdminRoleService implements ICRUD<AdminRole> {
             AdminRole adminRoleDB = optionalAdminRole.get();
             adminRoleDB.setRoleCode(adminRole.getRoleCode());
             adminRoleDB.setRoleName(adminRole.getRoleName());
+            adminRoleDB.setStatus(adminRole.getStatus());
             adminRoleDB.setMenuSet(adminRole.getMenuSet());
             adminRoleDB.setPermissionSet(adminRole.getPermissionSet());
         } catch(Exception e) {
@@ -112,7 +129,7 @@ public class AdminRoleService implements ICRUD<AdminRole> {
     }
 
     @Override
-    public ResponseEntity<Object> delete(Long id, HttpServletRequest request) {
+    public ResponseEntity<Object> delete(Integer id, HttpServletRequest request) {
         if( id == null ) {
             return GlobalResponse.failed("Role ID is required!", generateErrorCode("05", "001"), null, request);
         }

@@ -1,9 +1,12 @@
 package com.backendsyndicate.smashclub.common.constant;
 
+import org.springframework.stereotype.Component;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+//@Component
 public class TransactionStatusConstant {
     private static final Map<Integer, String> status = new HashMap<>();
     private static final Map<Integer, String> refundStatus = new HashMap<>();
