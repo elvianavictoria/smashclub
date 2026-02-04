@@ -42,9 +42,11 @@ public class Equipment {
     private int status = 0;
 
     @Column(name = "CreatedAt", updatable = false, nullable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "EquipmentCategoryID", foreignKey = @ForeignKey(name = "fk_equip_to_equipCat"), nullable = false)
     private EquipmentCategory equipmentCategory;
+
+    // Need field: EquipmentImgLink
 }

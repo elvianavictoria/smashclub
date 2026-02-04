@@ -1,6 +1,6 @@
 package com.backendsyndicate.smashclub.admin.controller;
 
-import com.backendsyndicate.smashclub.admin.dto.request.ReqLoginDTO;
+import com.backendsyndicate.smashclub.admin.dto.request.ReqAdminLoginDTO;
 import com.backendsyndicate.smashclub.admin.service.AdminAuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("admin/auth")
+@RequestMapping("api/v1/admin/auth")
 public class AdminAuthController {
     @Autowired
     private AdminAuthService adminAuthService;
@@ -24,7 +24,7 @@ public class AdminAuthController {
     }
 
     @PostMapping("login")
-    public ResponseEntity<Object> login(@Valid @RequestBody ReqLoginDTO dto, HttpServletRequest request) {
+    public ResponseEntity<Object> login(@Valid @RequestBody ReqAdminLoginDTO dto, HttpServletRequest request) {
         return adminAuthService.login(dto.getUsername(), dto.getPassword(), request);
     }
 

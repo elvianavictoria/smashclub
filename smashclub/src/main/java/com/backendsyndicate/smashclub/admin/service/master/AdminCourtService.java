@@ -1,8 +1,12 @@
 package com.backendsyndicate.smashclub.admin.service.master;
 
 import com.backendsyndicate.smashclub.admin.core.ICRUD;
+import com.backendsyndicate.smashclub.admin.dto.response.RespAdminCourtListDTO;
+import com.backendsyndicate.smashclub.admin.dto.response.RespAdminUserListDTO;
+import com.backendsyndicate.smashclub.admin.model.AdminUser;
 import com.backendsyndicate.smashclub.booking.model.Court;
 import com.backendsyndicate.smashclub.booking.repo.CourtRepo;
+import com.backendsyndicate.smashclub.common.util.DatetimeFormatting;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,7 +18,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+import java.util.function.Function;
 
 @Service
 @Transactional
@@ -32,10 +38,22 @@ public class AdminCourtService implements ICRUD<Court, Long> {
         Page page = null;
 
         try {
-            page = courtRepo.findAll(pageable);
+            if( !keyword.isEmpty() ) {
+                page = courtRepo.findAllByCourtCodeContainsOrCourtNameContains(keyword, keyword, pageable);
+            } else {
+                page = courtRepo.findAll(pageable);
+            }
+
             if( page.isEmpty() ) {
                 return GlobalResponse.failed("Court list is empty!", generateErrorCode("01", "001"), null, request);
             }
+
+            page = page.map(new Function<Court, RespAdminCourtListDTO>() {
+                @Override
+                public RespAdminCourtListDTO apply(Court court) {
+                    return mapListToDTO(court);
+                }
+            });
         } catch(Exception e) {
             Logging.handleException("CourtService", "findAll(Pageable pageable, HttpServletRequest request)", 33, generateErrorCode("01", "010"), e.getMessage());
             return GlobalResponse.failed("Failed to get court list!", generateErrorCode("01", "010"), null, request);
@@ -131,5 +149,23 @@ public class AdminCourtService implements ICRUD<Court, Long> {
         }
 
         return GlobalResponse.success("Successfully deleted court data!", null, request);
+    }
+
+    private RespAdminCourtListDTO mapListToDTO(Court court) {
+        RespAdminCourtListDTO result = modelMapper.map(court, RespAdminCourtListDTO.class);
+        if( court.getOpenTime() != null ) {
+            result.setOpenTime(DatetimeFormatting.getClockFormat(court.getOpenTime()));
+        }
+        if( court.getCloseTime() != null ) {
+            result.setCloseTime(DatetimeFormatting.getClockFormat(court.getCloseTime()));
+        }
+        if( court.getCreatedAt() != null ) {
+            result.setCreatedAt(DatetimeFormatting.getDatetimeFormat(court.getCreatedAt()));
+        }
+        if( court.getUpdatedAt() != null ) {
+            result.setUpdatedAt(DatetimeFormatting.getDatetimeFormat(court.getUpdatedAt()));
+        }
+
+        return result;
     }
 }

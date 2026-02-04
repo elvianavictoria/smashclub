@@ -7,6 +7,6 @@ import lombok.Setter;
 @Data
 @Getter
 @Setter
-public class RespLogoutDTO {
+public class RespAdminLogoutDTO {
     private boolean isLoggedOut;
 }

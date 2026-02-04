@@ -1,6 +1,6 @@
 package com.backendsyndicate.smashclub.admin.service.internal;
 
-import com.backendsyndicate.smashclub.admin.dto.relation.RelPermissionMenuDTO;
+import com.backendsyndicate.smashclub.admin.dto.relation.RelAdminPermissionMenuDTO;
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminPermissionListDTO;
 import com.backendsyndicate.smashclub.admin.model.AdminPermission;
 import com.backendsyndicate.smashclub.admin.repo.AdminPermissionRepo;
@@ -9,7 +9,6 @@ import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -43,7 +42,7 @@ public class AdminPermissionService {
                 RespAdminPermissionListDTO dest = new RespAdminPermissionListDTO();
                 dest.setId(item.getId());
                 dest.setPermissionName(item.getPermissionName());
-                dest.setMenu(modelMapper.map(item.getMenu(), RelPermissionMenuDTO.class));
+                dest.setMenu(modelMapper.map(item.getMenu(), RelAdminPermissionMenuDTO.class));
                 response.add(dest);
             }
         } catch(Exception e) {

@@ -1,8 +1,8 @@
 package com.backendsyndicate.smashclub.admin.service.internal;
 
 import com.backendsyndicate.smashclub.admin.core.ICRUD;
-import com.backendsyndicate.smashclub.admin.dto.relation.RelRoleMenuDTO;
-import com.backendsyndicate.smashclub.admin.dto.relation.RelRolePermissionDTO;
+import com.backendsyndicate.smashclub.admin.dto.relation.RelAdminRoleMenuDTO;
+import com.backendsyndicate.smashclub.admin.dto.relation.RelAdminRolePermissionDTO;
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminRoleDetailDTO;
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminRoleListDTO;
 import com.backendsyndicate.smashclub.admin.model.AdminRole;
@@ -37,7 +37,7 @@ public class AdminRoleService implements ICRUD<AdminRole, Integer> {
         Page page = null;
 
         try {
-            if( keyword != "" ) {
+            if( !keyword.isEmpty() ) {
                 page = adminRoleRepo.findAllByRoleCodeContainsOrRoleNameContains(keyword, keyword, pageable);
             } else {
                 page = adminRoleRepo.findAll(pageable);
@@ -73,8 +73,8 @@ public class AdminRoleService implements ICRUD<AdminRole, Integer> {
 
             AdminRole adminRole = optionalAdminRole.get();
             response = modelMapper.map(adminRole, RespAdminRoleDetailDTO.class);
-            response.setMenuSet(adminRole.getMenuSet().stream().map(rowSet -> modelMapper.map(rowSet, RelRoleMenuDTO.class)).collect(Collectors.toSet()));
-            response.setPermissionSet(adminRole.getPermissionSet().stream().map(rowSet -> modelMapper.map(rowSet, RelRolePermissionDTO.class)).collect(Collectors.toSet()));
+            response.setMenuSet(adminRole.getMenuSet().stream().map(rowSet -> modelMapper.map(rowSet, RelAdminRoleMenuDTO.class)).collect(Collectors.toSet()));
+            response.setPermissionSet(adminRole.getPermissionSet().stream().map(rowSet -> modelMapper.map(rowSet, RelAdminRolePermissionDTO.class)).collect(Collectors.toSet()));
         } catch(Exception e) {
             return GlobalResponse.failed("Failed to get role data!", generateErrorCode("02", "010"), null, request);
         }

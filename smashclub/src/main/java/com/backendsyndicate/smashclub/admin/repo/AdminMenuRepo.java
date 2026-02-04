@@ -4,6 +4,6 @@ import com.backendsyndicate.smashclub.admin.model.AdminMenu;
 import com.backendsyndicate.smashclub.admin.model.AdminUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface AdminMenuRepo extends JpaRepository<AdminMenu, Long> {
+public interface AdminMenuRepo extends JpaRepository<AdminMenu, Integer> {
 
 }

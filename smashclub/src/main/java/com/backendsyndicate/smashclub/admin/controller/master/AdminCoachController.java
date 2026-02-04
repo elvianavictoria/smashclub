@@ -1,6 +1,6 @@
 package com.backendsyndicate.smashclub.admin.controller.master;
 
-import com.backendsyndicate.smashclub.admin.dto.request.ReqCoachSaveDTO;
+import com.backendsyndicate.smashclub.admin.dto.request.ReqAdminCoachSaveDTO;
 import com.backendsyndicate.smashclub.admin.service.master.AdminCoachService;
 import com.backendsyndicate.smashclub.booking.model.Coach;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("admin/coach")
+@RequestMapping("api/v1/admin/coach")
 public class AdminCoachController {
     @Autowired
     private AdminCoachService adminCoachService;
@@ -30,13 +30,13 @@ public class AdminCoachController {
     }
 
     @PostMapping("save")
-    public ResponseEntity<Object> coachSave(@RequestBody ReqCoachSaveDTO dto, HttpServletRequest request) {
+    public ResponseEntity<Object> coachSave(@RequestBody ReqAdminCoachSaveDTO dto, HttpServletRequest request) {
         Coach coach = modelMapper.map(dto, Coach.class);
         return adminCoachService.save(coach, request);
     }
 
     @PutMapping("update/{coachId}")
-    public ResponseEntity<Object> coachUpdate(@PathVariable Long coachId, @RequestBody ReqCoachSaveDTO dto, HttpServletRequest request) {
+    public ResponseEntity<Object> coachUpdate(@PathVariable Long coachId, @RequestBody ReqAdminCoachSaveDTO dto, HttpServletRequest request) {
         Coach coach = modelMapper.map(dto, Coach.class);
         return adminCoachService.update(coachId, coach, request);
     }

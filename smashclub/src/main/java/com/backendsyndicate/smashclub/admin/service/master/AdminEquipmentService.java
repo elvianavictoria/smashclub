@@ -1,8 +1,12 @@
 package com.backendsyndicate.smashclub.admin.service.master;
 
 import com.backendsyndicate.smashclub.admin.core.ICRUD;
+import com.backendsyndicate.smashclub.admin.dto.response.RespAdminCourtListDTO;
+import com.backendsyndicate.smashclub.admin.dto.response.RespAdminEquipmentListDTO;
+import com.backendsyndicate.smashclub.booking.model.Court;
 import com.backendsyndicate.smashclub.booking.model.Equipment;
 import com.backendsyndicate.smashclub.booking.repo.EquipmentRepo;
+import com.backendsyndicate.smashclub.common.util.DatetimeFormatting;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 @Service
 @Transactional
@@ -32,10 +37,21 @@ public class AdminEquipmentService implements ICRUD<Equipment, Long> {
         Page page = null;
 
         try {
-            page = equipmentRepo.findAll(pageable);
+            if( !keyword.isEmpty() ) {
+                page = equipmentRepo.findAllByEquipmentNameContains(keyword, pageable);
+            } else {
+                page = equipmentRepo.findAll(pageable);
+            }
             if( page.isEmpty() ) {
                 return GlobalResponse.failed("Equipment list is empty!", generateErrorCode("01", "001"), null, request);
             }
+
+            page = page.map(new Function<Equipment, RespAdminEquipmentListDTO>() {
+                @Override
+                public RespAdminEquipmentListDTO apply(Equipment equipment) {
+                    return mapListToDTO(equipment);
+                }
+            });
         } catch(Exception e) {
             Logging.handleException("EquipmentService", "findAll(Pageable pageable, HttpServletRequest request)", 31, generateErrorCode("01", "010"), e.getMessage());
             return GlobalResponse.failed("Failed to get equipment list!", generateErrorCode("01", "010"), null, request);
@@ -134,5 +150,14 @@ public class AdminEquipmentService implements ICRUD<Equipment, Long> {
         }
 
         return GlobalResponse.success("Successfully deleted equipment data!", null, request);
+    }
+
+    private RespAdminEquipmentListDTO mapListToDTO(Equipment equipment) {
+        RespAdminEquipmentListDTO result = modelMapper.map(equipment, RespAdminEquipmentListDTO.class);
+        if( equipment.getCreatedAt() != null ) {
+            result.setCreatedAt(DatetimeFormatting.getDatetimeFormat(equipment.getCreatedAt()));
+        }
+
+        return result;
     }
 }

@@ -1,10 +1,7 @@
 package com.backendsyndicate.smashclub.admin.dto.response;
 
-import com.backendsyndicate.smashclub.admin.dto.relation.RelRoleMenuDTO;
-import com.backendsyndicate.smashclub.admin.dto.relation.RelRolePermissionDTO;
-import com.backendsyndicate.smashclub.admin.model.AdminMenu;
-import com.backendsyndicate.smashclub.admin.model.AdminPermission;
-import jakarta.persistence.*;
+import com.backendsyndicate.smashclub.admin.dto.relation.RelAdminRoleMenuDTO;
+import com.backendsyndicate.smashclub.admin.dto.relation.RelAdminRolePermissionDTO;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,6 +16,6 @@ public class RespAdminRoleDetailDTO {
     private String roleCode;
     private String roleName;
     private int status;
-    private Set<RelRoleMenuDTO> menuSet;
-    private Set<RelRolePermissionDTO> permissionSet;
+    private Set<RelAdminRoleMenuDTO> menuSet;
+    private Set<RelAdminRolePermissionDTO> permissionSet;
 }

@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("admin/permissions")
+@RequestMapping("api/v1/admin/permissions")
 public class AdminPermissionController {
     @Autowired
     private AdminPermissionService adminPermissionService;

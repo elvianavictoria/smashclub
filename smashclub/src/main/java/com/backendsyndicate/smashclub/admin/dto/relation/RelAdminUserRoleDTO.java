@@ -7,6 +7,8 @@ import lombok.Setter;
 @Data
 @Getter
 @Setter
-public class RelRoleMenuDTO {
+public class RelAdminUserRoleDTO {
     private int id;
+    private String roleCode;
+    private String roleName;
 }

@@ -1,6 +1,6 @@
 package com.backendsyndicate.smashclub.admin.controller.master;
 
-import com.backendsyndicate.smashclub.admin.dto.request.ReqCourtSaveDTO;
+import com.backendsyndicate.smashclub.admin.dto.request.ReqAdminCourtSaveDTO;
 import com.backendsyndicate.smashclub.admin.service.master.AdminCourtService;
 import com.backendsyndicate.smashclub.booking.model.Court;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("admin/court")
+@RequestMapping("api/v1/admin/court")
 public class AdminCourtController {
     @Autowired
     private AdminCourtService adminCourtService;
@@ -30,13 +30,13 @@ public class AdminCourtController {
     }
 
     @PostMapping("save")
-    public ResponseEntity<Object> courtSave(@RequestBody ReqCourtSaveDTO dto, HttpServletRequest request) {
+    public ResponseEntity<Object> courtSave(@RequestBody ReqAdminCourtSaveDTO dto, HttpServletRequest request) {
         Court court = modelMapper.map(dto, Court.class);
         return adminCourtService.save(court, request);
     }
 
     @PutMapping("update/{courtId}")
-    public ResponseEntity<Object> courtUpdate(@PathVariable Long courtId, @RequestBody ReqCourtSaveDTO dto, HttpServletRequest request) {
+    public ResponseEntity<Object> courtUpdate(@PathVariable Long courtId, @RequestBody ReqAdminCourtSaveDTO dto, HttpServletRequest request) {
         Court court = modelMapper.map(dto, Court.class);
         return adminCourtService.update(courtId, court, request);
     }

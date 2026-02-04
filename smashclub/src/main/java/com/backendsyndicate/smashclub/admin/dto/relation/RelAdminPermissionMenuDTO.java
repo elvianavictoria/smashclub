@@ -7,7 +7,7 @@ import lombok.Setter;
 @Data
 @Getter
 @Setter
-public class RelPermissionMenuDTO {
+public class RelAdminPermissionMenuDTO {
     private int id;
     private String menuCode;
     private String menuName;

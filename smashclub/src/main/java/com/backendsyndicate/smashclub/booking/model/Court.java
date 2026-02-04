@@ -36,8 +36,10 @@ public class Court {
     private byte status = 0;
 
     @Column(name = "CreatedAt", updatable = false, nullable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Column(name = "UpdatedAt", insertable = false, nullable = false)
-    private LocalDateTime updatedAt;
+    @Column(name = "UpdatedAt", insertable = false)
+    private LocalDateTime updatedAt = LocalDateTime.now();
+
+    // Need field: CourtImgLink, PricePerHour
 }

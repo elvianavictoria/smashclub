@@ -1,8 +1,8 @@
 package com.backendsyndicate.smashclub.admin.service;
 
 import com.backendsyndicate.smashclub.admin.core.IAuth;
-import com.backendsyndicate.smashclub.admin.dto.response.RespLoginDTO;
-import com.backendsyndicate.smashclub.admin.dto.response.RespLogoutDTO;
+import com.backendsyndicate.smashclub.admin.dto.response.RespAdminLoginDTO;
+import com.backendsyndicate.smashclub.admin.dto.response.RespAdminLogoutDTO;
 import com.backendsyndicate.smashclub.admin.model.AdminSession;
 import com.backendsyndicate.smashclub.admin.model.AdminUser;
 import com.backendsyndicate.smashclub.admin.repo.AdminSessionRepo;
@@ -47,7 +47,7 @@ public class AdminAuthService implements IAuth {
             return GlobalResponse.failed("Credential is empty!", generateErrorCode("01", "001"), null, request);
         }
 
-        RespLoginDTO response = null;
+        RespAdminLoginDTO response = null;
 
         try {
             Optional<AdminUser> opt = adminUserRepo.findByUsername(username);
@@ -69,7 +69,7 @@ public class AdminAuthService implements IAuth {
                 return GlobalResponse.failed("Failed to login!", generateErrorCode("01", "005"), null, request);
             }
 
-            response = modelMapper.map(user, RespLoginDTO.class);
+            response = modelMapper.map(user, RespAdminLoginDTO.class);
             response.setAccessToken(accessToken);
         } catch(Exception e) {
             Logging.handleException("AuthService", "login(String username, String password, HttpServletRequest request)", 35, generateErrorCode("01", "010"), e.getMessage());
@@ -81,7 +81,7 @@ public class AdminAuthService implements IAuth {
 
     @Override
     public ResponseEntity<Object> logout(String authToken, HttpServletRequest request) {
-        RespLogoutDTO response = new RespLogoutDTO();
+        RespAdminLogoutDTO response = new RespAdminLogoutDTO();
         response.setLoggedOut(false);
 
         try {

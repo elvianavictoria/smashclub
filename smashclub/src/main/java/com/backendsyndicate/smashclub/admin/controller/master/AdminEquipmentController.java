@@ -1,6 +1,6 @@
 package com.backendsyndicate.smashclub.admin.controller.master;
 
-import com.backendsyndicate.smashclub.admin.dto.request.ReqEquipmentSaveDTO;
+import com.backendsyndicate.smashclub.admin.dto.request.ReqAdminEquipmentSaveDTO;
 import com.backendsyndicate.smashclub.admin.service.master.AdminEquipmentService;
 import com.backendsyndicate.smashclub.booking.model.Equipment;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("admin/equipment")
+@RequestMapping("api/v1/admin/equipment")
 public class AdminEquipmentController {
     @Autowired
     private AdminEquipmentService adminEquipmentService;
@@ -30,13 +30,13 @@ public class AdminEquipmentController {
     }
 
     @PostMapping("save")
-    public ResponseEntity<Object> equipmentSave(@RequestBody ReqEquipmentSaveDTO dto, HttpServletRequest request) {
+    public ResponseEntity<Object> equipmentSave(@RequestBody ReqAdminEquipmentSaveDTO dto, HttpServletRequest request) {
         Equipment equipment = modelMapper.map(dto, Equipment.class);
         return adminEquipmentService.save(equipment, request);
     }
 
     @PutMapping("update/{equipmentId}")
-    public ResponseEntity<Object> equipmentUpdate(@PathVariable Long equipmentId, @RequestBody ReqEquipmentSaveDTO dto, HttpServletRequest request) {
+    public ResponseEntity<Object> equipmentUpdate(@PathVariable Long equipmentId, @RequestBody ReqAdminEquipmentSaveDTO dto, HttpServletRequest request) {
         Equipment equipment = modelMapper.map(dto, Equipment.class);
         return adminEquipmentService.update(equipmentId, equipment, request);
     }

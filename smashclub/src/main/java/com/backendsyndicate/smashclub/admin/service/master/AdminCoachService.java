@@ -1,8 +1,12 @@
 package com.backendsyndicate.smashclub.admin.service.master;
 
 import com.backendsyndicate.smashclub.admin.core.ICRUD;
+import com.backendsyndicate.smashclub.admin.dto.response.RespAdminCoachListDTO;
+import com.backendsyndicate.smashclub.admin.dto.response.RespAdminCourtListDTO;
 import com.backendsyndicate.smashclub.booking.model.Coach;
+import com.backendsyndicate.smashclub.booking.model.Court;
 import com.backendsyndicate.smashclub.booking.repo.CoachRepo;
+import com.backendsyndicate.smashclub.common.util.DatetimeFormatting;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 @Service
 @Transactional
@@ -32,10 +37,21 @@ public class AdminCoachService implements ICRUD<Coach, Long> {
         Page page = null;
 
         try {
-            page = coachRepo.findAll(pageable);
+            if( !keyword.isEmpty() ) {
+                page = coachRepo.findAllByCoachCodeContainsOrCoachNameContains(keyword, keyword, pageable);
+            } else {
+                page = coachRepo.findAll(pageable);
+            }
             if( page.isEmpty() ) {
                 return GlobalResponse.failed("Coach list is empty!", generateErrorCode("01", "001"), null, request);
             }
+
+            page = page.map(new Function<Coach, RespAdminCoachListDTO>() {
+                @Override
+                public RespAdminCoachListDTO apply(Coach coach) {
+                    return mapListToDTO(coach);
+                }
+            });
         } catch(Exception e) {
             Logging.handleException("CoachService", "findAll(Pageable pageable, HttpServletRequest request)", 35, generateErrorCode("01", "010"), e.getMessage());
             return GlobalResponse.failed("Failed to get coach list!", generateErrorCode("01", "010"), null, request);
@@ -130,5 +146,17 @@ public class AdminCoachService implements ICRUD<Coach, Long> {
         }
 
         return GlobalResponse.success("Successfully deleted coach data!", null, request);
+    }
+
+    private RespAdminCoachListDTO mapListToDTO(Coach coach) {
+        RespAdminCoachListDTO result = modelMapper.map(coach, RespAdminCoachListDTO.class);
+        if( coach.getCreatedAt() != null ) {
+            result.setCreatedAt(DatetimeFormatting.getDatetimeFormat(coach.getCreatedAt()));
+        }
+        if( coach.getUpdatedAt() != null ) {
+            result.setUpdatedAt(DatetimeFormatting.getDatetimeFormat(coach.getUpdatedAt()));
+        }
+
+        return result;
     }
 }

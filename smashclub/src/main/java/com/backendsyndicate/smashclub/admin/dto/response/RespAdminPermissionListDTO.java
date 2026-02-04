@@ -1,6 +1,6 @@
 package com.backendsyndicate.smashclub.admin.dto.response;
 
-import com.backendsyndicate.smashclub.admin.dto.relation.RelPermissionMenuDTO;
+import com.backendsyndicate.smashclub.admin.dto.relation.RelAdminPermissionMenuDTO;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,6 +11,6 @@ import lombok.Setter;
 public class RespAdminPermissionListDTO {
     private int id;
     private String permissionName;
-    private RelPermissionMenuDTO menu;
+    private RelAdminPermissionMenuDTO menu;
 //    private int status;
 }

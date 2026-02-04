@@ -14,7 +14,7 @@ public class PaymentInitLoader {
     }
 
     private static void loadConstant() {
-        Logging.printConsole("Loading all constant variables");
+        Logging.printConsole("Loading payment constant variables");
 
         PaymentMethodConstant.initLoad();
         TransactionStatusConstant.initLoad();

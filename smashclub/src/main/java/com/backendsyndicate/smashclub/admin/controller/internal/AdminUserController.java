@@ -1,8 +1,10 @@
 package com.backendsyndicate.smashclub.admin.controller.internal;
 
 import com.backendsyndicate.smashclub.admin.dto.request.ReqAdminUserSaveDTO;
+import com.backendsyndicate.smashclub.admin.model.AdminRole;
 import com.backendsyndicate.smashclub.admin.model.AdminUser;
 import com.backendsyndicate.smashclub.admin.service.internal.AdminUserService;
+import com.backendsyndicate.smashclub.common.util.Logging;
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
-@RequestMapping("admin/users")
+@RequestMapping("api/v1/admin/users")
 public class AdminUserController {
     @Autowired
     private AdminUserService adminUserService;
@@ -39,6 +40,8 @@ public class AdminUserController {
     @PutMapping("update/{userId}")
     public ResponseEntity<Object> adminUserUpdate(@PathVariable Long userId, @RequestBody ReqAdminUserSaveDTO dto, HttpServletRequest request) {
         AdminUser adminUser = modelMapper.map(dto, AdminUser.class);
+//        AdminRole adminRole = modelMapper.map(dto.getAdminRole(), AdminRole.class);
+//        adminUser.setAdminRole(adminRole);
         return adminUserService.update(userId, adminUser, request);
     }
 
