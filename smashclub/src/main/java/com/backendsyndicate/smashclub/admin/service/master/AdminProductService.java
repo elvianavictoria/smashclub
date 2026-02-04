@@ -36,7 +36,7 @@ public class AdminProductService implements ICRUD<Product, Long> {
 
         try {
             if( !keyword.isEmpty() ) {
-                page = productRepo.findAllByProductNameContains(keyword, pageable);
+                page = productRepo.findAllByProductNameContainsOrCategoryContains(keyword, keyword, pageable);
             } else {
                 page = productRepo.findAll(pageable);
             }

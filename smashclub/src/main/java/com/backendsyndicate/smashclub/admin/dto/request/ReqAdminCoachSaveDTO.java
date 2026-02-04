@@ -11,9 +11,9 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class ReqAdminCoachSaveDTO {
-    @Pattern(regexp="^[a-zA-Z0-9._-]{3,16}$", message="Coach code must be alphanumeric")
+    @Pattern(regexp="^[a-zA-Z0-9._-]{3,16}$", message="Coach code must be alphanumeric!")
     private String coachCode;
-    @Pattern(regexp="^[a-zA-Z0-9._-]{3,16}$", message="Coach name must be alphanumeric")
+    @Pattern(regexp="^[a-zA-Z]{3,16}$", message="Coach name must contain letters only!")
     private String coachName;
 
     private BigDecimal pricePerHour;
