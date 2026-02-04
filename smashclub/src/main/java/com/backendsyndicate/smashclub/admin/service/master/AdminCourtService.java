@@ -39,7 +39,7 @@ public class AdminCourtService implements ICRUD<Court, Long> {
 
         try {
             if( !keyword.isEmpty() ) {
-                page = courtRepo.findAllByCourtCodeContainsOrCourtNameContains(keyword, keyword, pageable);
+                page = courtRepo.findAllByCourtCodeContainsOrCourtNameContainsIgnoreCase(keyword, keyword, pageable);
             } else {
                 page = courtRepo.findAll(pageable);
             }

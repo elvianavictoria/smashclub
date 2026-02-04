@@ -46,6 +46,11 @@ public class AdminPermissionSeeder implements DataSeeder {
         generatePermissionItem(AdminConstant.PERMISSION_COACH_EDIT, "Edit Coach", CommonConstant.STATUS_ACTIVE, adminMenuSeeder.getMenus().get(AdminConstant.MENU_COACH));
         generatePermissionItem(AdminConstant.PERMISSION_COACH_DELETE, "Delete Coach", CommonConstant.STATUS_ACTIVE, adminMenuSeeder.getMenus().get(AdminConstant.MENU_COACH));
 
+        generatePermissionItem(AdminConstant.PERMISSION_EQUIPMENT_CATEGORY_READ, "View Equipment Category List", CommonConstant.STATUS_ACTIVE, adminMenuSeeder.getMenus().get(AdminConstant.MENU_EQUIPMENT_CATEGORY));
+        generatePermissionItem(AdminConstant.PERMISSION_EQUIPMENT_CATEGORY_CREATE, "Create Equipment Category", CommonConstant.STATUS_ACTIVE, adminMenuSeeder.getMenus().get(AdminConstant.MENU_EQUIPMENT_CATEGORY));
+        generatePermissionItem(AdminConstant.PERMISSION_EQUIPMENT_CATEGORY_EDIT, "Edit Equipment Category", CommonConstant.STATUS_ACTIVE, adminMenuSeeder.getMenus().get(AdminConstant.MENU_EQUIPMENT_CATEGORY));
+        generatePermissionItem(AdminConstant.PERMISSION_EQUIPMENT_CATEGORY_DELETE, "Delete Equipment Category", CommonConstant.STATUS_ACTIVE, adminMenuSeeder.getMenus().get(AdminConstant.MENU_EQUIPMENT_CATEGORY));
+
         generatePermissionItem(AdminConstant.PERMISSION_EQUIPMENT_READ, "View Equipment List", CommonConstant.STATUS_ACTIVE, adminMenuSeeder.getMenus().get(AdminConstant.MENU_EQUIPMENT));
         generatePermissionItem(AdminConstant.PERMISSION_EQUIPMENT_CREATE, "Create Equipment", CommonConstant.STATUS_ACTIVE, adminMenuSeeder.getMenus().get(AdminConstant.MENU_EQUIPMENT));
         generatePermissionItem(AdminConstant.PERMISSION_EQUIPMENT_EDIT, "Edit Equipment", CommonConstant.STATUS_ACTIVE, adminMenuSeeder.getMenus().get(AdminConstant.MENU_EQUIPMENT));

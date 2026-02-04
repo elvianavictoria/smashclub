@@ -39,9 +39,9 @@ public class AdminUserService implements ICRUD<AdminUser, Long> {
 
         try {
             if( !keyword.isEmpty() ) {
-                page = adminUserRepo.findAll(pageable);
+                page = adminUserRepo.findAllByUsernameContainsOrFullNameContainsIgnoreCase(keyword, keyword, pageable);
             } else {
-                page = adminUserRepo.findAllByUsernameContainsOrFullNameContains(keyword, keyword, pageable);
+                page = adminUserRepo.findAll(pageable);
             }
 
             if( page.isEmpty() ) {

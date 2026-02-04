@@ -1,6 +1,6 @@
 package com.backendsyndicate.smashclub.admin.dto.request;
 
-import com.backendsyndicate.smashclub.booking.model.EquipmentCategory;
+import com.backendsyndicate.smashclub.admin.dto.validation.ValAdminEquipmentEquipmentCategoryDTO;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.Getter;
@@ -23,5 +23,5 @@ public class ReqAdminEquipmentSaveDTO {
     private int stock;
     private String description = "";
     private int status;
-    private EquipmentCategory equipmentCategory;
+    private ValAdminEquipmentEquipmentCategoryDTO equipmentCategory;
 }

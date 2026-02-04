@@ -1,12 +1,14 @@
 package com.backendsyndicate.smashclub.admin.service.master;
 
 import com.backendsyndicate.smashclub.admin.core.ICRUD;
+import com.backendsyndicate.smashclub.admin.dto.response.RespAdminProductDetailDTO;
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminProductListDTO;
 import com.backendsyndicate.smashclub.ecommerce.model.Product;
 import com.backendsyndicate.smashclub.ecommerce.repo.ProductRepo;
 import com.backendsyndicate.smashclub.common.util.DatetimeFormatting;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
+import com.backendsyndicate.smashclub.ecommerce.repo.ProductVariantRepo;
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,8 @@ import java.util.function.Function;
 public class AdminProductService implements ICRUD<Product, Long> {
     @Autowired
     private ProductRepo productRepo;
+    @Autowired
+    private ProductVariantRepo productVariantRepo;
     private ModelMapper modelMapper = new ModelMapper();
 
     private String generateErrorCode(String methodNo, String errorNo) {
@@ -36,7 +40,7 @@ public class AdminProductService implements ICRUD<Product, Long> {
 
         try {
             if( !keyword.isEmpty() ) {
-                page = productRepo.findAllByProductNameContainsOrCategoryContains(keyword, keyword, pageable);
+                page = productRepo.findAllByProductNameContainsOrCategoryContainsIgnoreCase(keyword, keyword, pageable);
             } else {
                 page = productRepo.findAll(pageable);
             }
@@ -61,7 +65,7 @@ public class AdminProductService implements ICRUD<Product, Long> {
 
     @Override
     public ResponseEntity<Object> findById(Long id, HttpServletRequest request) {
-        Product product = null;
+        RespAdminProductDetailDTO response = null;
 
         if( id == null ) {
             return GlobalResponse.failed("Product ID is required!", generateErrorCode("02", "001"), null, request);
@@ -73,12 +77,13 @@ public class AdminProductService implements ICRUD<Product, Long> {
                 return GlobalResponse.failed("Product not found!", generateErrorCode("02", "002"), null, request);
             }
 
-            product = optionalProduct.get();
+            Product product = optionalProduct.get();
+            response = modelMapper.map(product, RespAdminProductDetailDTO.class);
         } catch(Exception e) {
             return GlobalResponse.failed("Failed to get product data!", generateErrorCode("02", "010"), null, request);
         }
 
-        return GlobalResponse.success("Product data found!", product, request);
+        return GlobalResponse.success("Product data found!", response, request);
     }
 
     @Override
@@ -136,6 +141,7 @@ public class AdminProductService implements ICRUD<Product, Long> {
                 return GlobalResponse.failed("Product data not found!", generateErrorCode("05", "002"), null, request);
             }
 
+            productVariantRepo.deleteByProduct_Id(id);
             productRepo.deleteById(id);
         } catch(Exception e) {
             Logging.handleException("ProductService", "delete(Long id, HttpServletRequest request)", 120, generateErrorCode("05", "010"), e.getMessage());

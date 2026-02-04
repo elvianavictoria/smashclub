@@ -3,6 +3,8 @@ package com.backendsyndicate.smashclub.ecommerce.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -31,4 +33,7 @@ public class Product {
 
     @Column(name = "DefaultImgLink", length = 500, nullable = false)
     private String defaultImgLink;
+
+    @OneToMany(mappedBy = "product")
+    private List<ProductVariant> productVariants;
 }

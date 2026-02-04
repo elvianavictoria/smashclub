@@ -38,7 +38,7 @@ public class AdminCoachService implements ICRUD<Coach, Long> {
 
         try {
             if( !keyword.isEmpty() ) {
-                page = coachRepo.findAllByCoachCodeContainsOrCoachNameContains(keyword, keyword, pageable);
+                page = coachRepo.findAllByCoachCodeContainsOrCoachNameContainsIgnoreCase(keyword, keyword, pageable);
             } else {
                 page = coachRepo.findAll(pageable);
             }

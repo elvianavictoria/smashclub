@@ -3,6 +3,7 @@ package com.backendsyndicate.smashclub.admin.service.master;
 import com.backendsyndicate.smashclub.admin.core.ICRUD;
 import com.backendsyndicate.smashclub.booking.model.EquipmentCategory;
 import com.backendsyndicate.smashclub.booking.repo.EquipmentCategoryRepo;
+import com.backendsyndicate.smashclub.booking.repo.EquipmentRepo;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +22,8 @@ import java.util.Optional;
 public class AdminEquipmentCategoryService implements ICRUD<EquipmentCategory, Long> {
     @Autowired
     private EquipmentCategoryRepo equipmentCategoryRepo;
+    @Autowired
+    private EquipmentRepo equipmentRepo;
     private ModelMapper modelMapper = new ModelMapper();
 
     private String generateErrorCode(String methodNo, String errorNo) {
@@ -32,7 +35,11 @@ public class AdminEquipmentCategoryService implements ICRUD<EquipmentCategory, L
         Page page = null;
 
         try {
-            page = equipmentCategoryRepo.findAll(pageable);
+            if( !keyword.isEmpty() ) {
+                page = equipmentCategoryRepo.findAllByCategoryNameContainsIgnoreCase(keyword, pageable);
+            } else {
+                page = equipmentCategoryRepo.findAll(pageable);
+            }
             if( page.isEmpty() ) {
                 return GlobalResponse.failed("Equipment category list is empty!", generateErrorCode("01", "001"), null, request);
             }
@@ -85,17 +92,17 @@ public class AdminEquipmentCategoryService implements ICRUD<EquipmentCategory, L
     @Override
     public ResponseEntity<Object> update(Long id, EquipmentCategory equipmentCategory, HttpServletRequest request) {
         if( id == null ) {
-            return GlobalResponse.failed("EquipmentCategory ID is required!", generateErrorCode("04", "001"), null, request);
+            return GlobalResponse.failed("Equipment category ID is required!", generateErrorCode("04", "001"), null, request);
         }
 
         if( equipmentCategory == null ) {
-            return GlobalResponse.failed("EquipmentCategory data is required!", generateErrorCode("04", "002"), null, request);
+            return GlobalResponse.failed("Equipment category data is required!", generateErrorCode("04", "002"), null, request);
         }
 
         try {
             Optional<EquipmentCategory> optionalEquipmentCategory = equipmentCategoryRepo.findById(id);
             if( optionalEquipmentCategory.isEmpty() ) {
-                return GlobalResponse.failed("EquipmentCategory data not found!", generateErrorCode("04", "003"), null, request);
+                return GlobalResponse.failed("Equipment category data not found!", generateErrorCode("04", "003"), null, request);
             }
 
             EquipmentCategory equipmentCategoryDB = optionalEquipmentCategory.get();
@@ -103,10 +110,10 @@ public class AdminEquipmentCategoryService implements ICRUD<EquipmentCategory, L
             equipmentCategoryDB.setStatus(equipmentCategory.getStatus());
         } catch(Exception e) {
             Logging.handleException("EquipmentCategoryService", "update(Long id, EquipmentCategory equipmentCategory, HttpServletRequest request)", 92, generateErrorCode("04", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to update equipmentCategory data!", generateErrorCode("04", "010"), null, request);
+            return GlobalResponse.failed("Failed to update equipment category data!", generateErrorCode("04", "010"), null, request);
         }
 
-        return GlobalResponse.success("Successfully updated equipmentCategory data!", null, request);
+        return GlobalResponse.success("Successfully updated equipment category data!", null, request);
     }
 
     @Override
@@ -118,9 +125,10 @@ public class AdminEquipmentCategoryService implements ICRUD<EquipmentCategory, L
         try {
             Optional<EquipmentCategory> optionalEquipmentCategory = equipmentCategoryRepo.findById(id);
             if( optionalEquipmentCategory.isEmpty() ) {
-                return GlobalResponse.failed("EquipmentCategory data not found!", generateErrorCode("05", "002"), null, request);
+                return GlobalResponse.failed("Equipment category data not found!", generateErrorCode("05", "002"), null, request);
             }
 
+            equipmentRepo.deleteByEquipmentCategory_Id(id);
             equipmentCategoryRepo.deleteById(id);
         } catch(Exception e) {
             Logging.handleException("EquipmentCategoryService", "delete(Long id, HttpServletRequest request)", 110, generateErrorCode("05", "010"), e.getMessage());

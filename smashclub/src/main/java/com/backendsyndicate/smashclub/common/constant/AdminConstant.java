@@ -11,14 +11,15 @@ public class AdminConstant {
     public static final int MENU_DASHBOARD = 1;
     public static final int MENU_COURT = 2;
     public static final int MENU_COACH = 3;
-    public static final int MENU_EQUIPMENT = 4;
-    public static final int MENU_PRODUCT = 5;
-    public static final int MENU_PLAYER = 6;
-    public static final int MENU_SALES = 7;
-    public static final int MENU_BOOKING_SALES = 8;
-    public static final int MENU_PRODUCT_SALES = 9;
-    public static final int MENU_ROLES = 10;
-    public static final int MENU_USER = 11;
+    public static final int MENU_EQUIPMENT_CATEGORY = 4;
+    public static final int MENU_EQUIPMENT = 5;
+    public static final int MENU_PRODUCT = 6;
+    public static final int MENU_PLAYER = 7;
+    public static final int MENU_SALES = 8;
+    public static final int MENU_BOOKING_SALES = 9;
+    public static final int MENU_PRODUCT_SALES = 10;
+    public static final int MENU_ROLES = 11;
+    public static final int MENU_USER = 12;
 
     // Permissions
     public static final int PERMISSION_DASHBOARD_READ = 1;
@@ -33,38 +34,43 @@ public class AdminConstant {
     public static final int PERMISSION_COACH_EDIT = 8;
     public static final int PERMISSION_COACH_DELETE = 9;
 
-    public static final int PERMISSION_EQUIPMENT_READ = 10;
-    public static final int PERMISSION_EQUIPMENT_CREATE = 11;
-    public static final int PERMISSION_EQUIPMENT_EDIT = 12;
-    public static final int PERMISSION_EQUIPMENT_DELETE = 13;
+    public static final int PERMISSION_EQUIPMENT_CATEGORY_READ = 10;
+    public static final int PERMISSION_EQUIPMENT_CATEGORY_CREATE = 11;
+    public static final int PERMISSION_EQUIPMENT_CATEGORY_EDIT = 12;
+    public static final int PERMISSION_EQUIPMENT_CATEGORY_DELETE = 13;
 
-    public static final int PERMISSION_PRODUCT_READ = 14;
-    public static final int PERMISSION_PRODUCT_CREATE = 15;
-    public static final int PERMISSION_PRODUCT_EDIT = 16;
-    public static final int PERMISSION_PRODUCT_DELETE = 17;
+    public static final int PERMISSION_EQUIPMENT_READ = 14;
+    public static final int PERMISSION_EQUIPMENT_CREATE = 15;
+    public static final int PERMISSION_EQUIPMENT_EDIT = 16;
+    public static final int PERMISSION_EQUIPMENT_DELETE = 17;
 
-    public static final int PERMISSION_PLAYER_READ = 18;
-    public static final int PERMISSION_PLAYER_EDIT = 19;
-    public static final int PERMISSION_PLAYER_DELETE = 20;
+    public static final int PERMISSION_PRODUCT_READ = 18;
+    public static final int PERMISSION_PRODUCT_CREATE = 19;
+    public static final int PERMISSION_PRODUCT_EDIT = 20;
+    public static final int PERMISSION_PRODUCT_DELETE = 21;
 
-    public static final int PERMISSION_SALES_READ = 21;
-    public static final int PERMISSION_SALES_DETAIL = 22;
+    public static final int PERMISSION_PLAYER_READ = 22;
+    public static final int PERMISSION_PLAYER_EDIT = 23;
+    public static final int PERMISSION_PLAYER_DELETE = 24;
 
-    public static final int PERMISSION_BOOKING_SALES_READ = 23;
-    public static final int PERMISSION_BOOKING_SALES_DETAIL = 24;
+    public static final int PERMISSION_SALES_READ = 25;
+    public static final int PERMISSION_SALES_DETAIL = 26;
 
-    public static final int PERMISSION_PRODUCT_SALES_READ = 25;
-    public static final int PERMISSION_PRODUCT_SALES_DETAIL = 26;
+    public static final int PERMISSION_BOOKING_SALES_READ = 27;
+    public static final int PERMISSION_BOOKING_SALES_DETAIL = 28;
 
-    public static final int PERMISSION_ROLES_READ = 27;
-    public static final int PERMISSION_ROLES_CREATE = 28;
-    public static final int PERMISSION_ROLES_EDIT = 29;
-    public static final int PERMISSION_ROLES_DELETE = 30;
+    public static final int PERMISSION_PRODUCT_SALES_READ = 29;
+    public static final int PERMISSION_PRODUCT_SALES_DETAIL = 30;
 
-    public static final int PERMISSION_USERS_READ = 31;
-    public static final int PERMISSION_USERS_CREATE = 32;
-    public static final int PERMISSION_USERS_EDIT = 33;
-    public static final int PERMISSION_USERS_DELETE = 34;
+    public static final int PERMISSION_ROLES_READ = 31;
+    public static final int PERMISSION_ROLES_CREATE = 32;
+    public static final int PERMISSION_ROLES_EDIT = 33;
+    public static final int PERMISSION_ROLES_DELETE = 34;
+
+    public static final int PERMISSION_USERS_READ = 35;
+    public static final int PERMISSION_USERS_CREATE = 36;
+    public static final int PERMISSION_USERS_EDIT = 37;
+    public static final int PERMISSION_USERS_DELETE = 38;
 
     // Roles
     public static final int ROLE_DEVELOPER = 1;

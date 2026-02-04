@@ -6,5 +6,5 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CourtRepo extends JpaRepository<Court, Long> {
-    Page<Court> findAllByCourtCodeContainsOrCourtNameContains(String courtCode, String courtName, Pageable pageable);
+    Page<Court> findAllByCourtCodeContainsOrCourtNameContainsIgnoreCase(String courtCode, String courtName, Pageable pageable);
 }

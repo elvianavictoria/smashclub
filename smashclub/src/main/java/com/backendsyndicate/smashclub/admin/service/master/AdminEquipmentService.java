@@ -2,6 +2,7 @@ package com.backendsyndicate.smashclub.admin.service.master;
 
 import com.backendsyndicate.smashclub.admin.core.ICRUD;
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminCourtListDTO;
+import com.backendsyndicate.smashclub.admin.dto.response.RespAdminEquipmentDetailDTO;
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminEquipmentListDTO;
 import com.backendsyndicate.smashclub.booking.model.Court;
 import com.backendsyndicate.smashclub.booking.model.Equipment;
@@ -38,7 +39,7 @@ public class AdminEquipmentService implements ICRUD<Equipment, Long> {
 
         try {
             if( !keyword.isEmpty() ) {
-                page = equipmentRepo.findAllByEquipmentNameContains(keyword, pageable);
+                page = equipmentRepo.findAllByEquipmentNameContainsIgnoreCase(keyword, pageable);
             } else {
                 page = equipmentRepo.findAll(pageable);
             }
@@ -62,7 +63,7 @@ public class AdminEquipmentService implements ICRUD<Equipment, Long> {
 
     @Override
     public ResponseEntity<Object> findById(Long id, HttpServletRequest request) {
-        Equipment equipment = null;
+        RespAdminEquipmentDetailDTO response = null;
 
         if( id == null ) {
             return GlobalResponse.failed("Equipment ID is required!", generateErrorCode("02", "001"), null, request);
@@ -74,12 +75,13 @@ public class AdminEquipmentService implements ICRUD<Equipment, Long> {
                 return GlobalResponse.failed("Equipment not found!", generateErrorCode("02", "002"), null, request);
             }
 
-            equipment = optionalEquipment.get();
+            Equipment equipment = optionalEquipment.get();
+            response = modelMapper.map(equipment, RespAdminEquipmentDetailDTO.class);
         } catch(Exception e) {
             return GlobalResponse.failed("Failed to get equipment data!", generateErrorCode("02", "010"), null, request);
         }
 
-        return GlobalResponse.success("Equipment data found!", equipment, request);
+        return GlobalResponse.success("Equipment data found!", response, request);
     }
 
     @Override

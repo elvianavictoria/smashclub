@@ -38,7 +38,7 @@ public class AdminRoleService implements ICRUD<AdminRole, Integer> {
 
         try {
             if( !keyword.isEmpty() ) {
-                page = adminRoleRepo.findAllByRoleCodeContainsOrRoleNameContains(keyword, keyword, pageable);
+                page = adminRoleRepo.findAllByRoleCodeContainsOrRoleNameContainsIgnoreCase(keyword, keyword, pageable);
             } else {
                 page = adminRoleRepo.findAll(pageable);
             }

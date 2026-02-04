@@ -6,5 +6,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface EquipmentRepo extends JpaRepository<Equipment, Long> {
-    Page<Equipment> findAllByEquipmentNameContains(String equipmentName, Pageable pageable);
+    Page<Equipment> findAllByEquipmentNameContainsIgnoreCase(String equipmentName, Pageable pageable);
+    void deleteByEquipmentCategory_Id(Long id);
 }

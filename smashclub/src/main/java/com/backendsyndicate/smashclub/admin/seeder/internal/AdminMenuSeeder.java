@@ -53,6 +53,7 @@ public class AdminMenuSeeder implements DataSeeder {
         // Master Data
         generateMenuItem(categories.get(AdminConstant.MENU_CATEGORY_MASTER_DATA), AdminConstant.MENU_COURT, "court", "Lapangan", CommonConstant.STATUS_ACTIVE, 0);
         generateMenuItem(categories.get(AdminConstant.MENU_CATEGORY_MASTER_DATA), AdminConstant.MENU_COACH, "coach", "Pelatih", CommonConstant.STATUS_ACTIVE, 0);
+        generateMenuItem(categories.get(AdminConstant.MENU_CATEGORY_MASTER_DATA), AdminConstant.MENU_EQUIPMENT_CATEGORY, "equipment-category", "Kategori Peralatan", CommonConstant.STATUS_ACTIVE, 0);
         generateMenuItem(categories.get(AdminConstant.MENU_CATEGORY_MASTER_DATA), AdminConstant.MENU_EQUIPMENT, "equipment", "Peralatan", CommonConstant.STATUS_ACTIVE, 0);
         generateMenuItem(categories.get(AdminConstant.MENU_CATEGORY_MASTER_DATA), AdminConstant.MENU_PRODUCT, "product", "Produk", CommonConstant.STATUS_ACTIVE, 0);
 
@@ -60,7 +61,7 @@ public class AdminMenuSeeder implements DataSeeder {
         generateMenuItem(categories.get(AdminConstant.MENU_CATEGORY_REPORT), AdminConstant.MENU_PLAYER, "player", "Data Pemain", CommonConstant.STATUS_ACTIVE, 0);
         generateMenuItem(categories.get(AdminConstant.MENU_CATEGORY_REPORT), AdminConstant.MENU_SALES, "sales", "Penjualan", CommonConstant.STATUS_ACTIVE, 0);
         generateMenuItem(categories.get(AdminConstant.MENU_CATEGORY_REPORT), AdminConstant.MENU_BOOKING_SALES, "court-booking", "Pemesanan Lapangan", CommonConstant.STATUS_ACTIVE, 0);
-        generateMenuItem(categories.get(AdminConstant.MENU_CATEGORY_REPORT), AdminConstant.MENU_PRODUCT_SALES, "product-sales", "Pemesanan Produk", CommonConstant.STATUS_ACTIVE, 0);
+        generateMenuItem(categories.get(AdminConstant.MENU_CATEGORY_REPORT), AdminConstant.MENU_PRODUCT_SALES, "product-sales", "Penjualan Produk", CommonConstant.STATUS_ACTIVE, 0);
 
         // Users Management
         generateMenuItem(categories.get(AdminConstant.MENU_CATEGORY_USER), AdminConstant.MENU_ROLES, "role", "Peran", CommonConstant.STATUS_ACTIVE, 0);

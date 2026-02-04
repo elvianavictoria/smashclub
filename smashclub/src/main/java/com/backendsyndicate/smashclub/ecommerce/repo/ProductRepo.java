@@ -6,5 +6,5 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProductRepo extends JpaRepository<Product, Long> {
-    Page<Product> findAllByProductNameContainsOrCategoryContains(String productName, String category, Pageable pageable);
+    Page<Product> findAllByProductNameContainsOrCategoryContainsIgnoreCase(String productName, String category, Pageable pageable);
 }
