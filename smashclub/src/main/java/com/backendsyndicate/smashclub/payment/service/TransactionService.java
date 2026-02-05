@@ -49,7 +49,7 @@ public class TransactionService implements IHistory<Object> {
         Page page = null;
 
         try {
-            page = transactionRepo.findByCreatedAtBetween(Timestamp.valueOf(startDate.atStartOfDay()), Timestamp.valueOf(endDate.atStartOfDay()), pageable);
+            page = transactionRepo.findByCreatedAtBetween(startDate.atStartOfDay(), endDate.atStartOfDay(), pageable);
             if( page.isEmpty() ) {
                 return GlobalResponse.failed("Transaction data not found!", generateErrorCode("01", "001"), null, request);
             }

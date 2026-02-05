@@ -7,6 +7,9 @@ import com.backendsyndicate.smashclub.common.util.Util;
 import com.backendsyndicate.smashclub.common.constant.PaymentMethodConstant;
 import com.backendsyndicate.smashclub.common.constant.TransactionStatusConstant;
 import com.backendsyndicate.smashclub.common.constant.TransactionTypeConstant;
+import com.backendsyndicate.smashclub.external.config.PaymentGatewayConfig;
+import com.backendsyndicate.smashclub.external.model.PaymentGatewayResponse;
+import com.backendsyndicate.smashclub.external.service.payment.XenditService;
 import com.backendsyndicate.smashclub.payment.core.IPayment;
 import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransactionDTO;
 import com.backendsyndicate.smashclub.payment.dto.response.RespPaymentTransactionDTO;
@@ -40,6 +43,8 @@ public class PaymentService implements IPayment {
     private TransactionLogRepo transactionLogRepo;
     @Autowired
     private RefundRequestRepo refundRequestRepo;
+    @Autowired
+    private XenditService xenditService;
 
 
     private ModelMapper modelMapper = new ModelMapper();
@@ -66,7 +71,7 @@ public class PaymentService implements IPayment {
      */
     @Override
     public RespCreateTransactionDTO createTransaction(String customerId, BigDecimal totalPrice, String referenceCode, int transactionType) {
-        RespCreateTransactionDTO response = new RespCreateTransactionDTO();
+        RespCreateTransactionDTO response = null;
 
         try {
             String trxCode = generateTransactionCode();
@@ -84,14 +89,35 @@ public class PaymentService implements IPayment {
             trx.setReferenceCode(referenceCode);
             trx.setTransactionType((byte) transactionType);
 
+            transactionRepo.save(trx);
+
             logTransactionUpdate(trx, -1);
 
-            response = modelMapper.map(trx, RespCreateTransactionDTO.class);
+            // Create payment link
+            Optional<Transaction> opt = transactionRepo.findByTransactionCode(trxCode);
+            if( opt.isEmpty() ) {
+                Logging.handleException("PaymentService", "createTransaction", 97, generateErrorCode("01", "001"), "Failed to get created transaction!");
+            } else {
+                Transaction transaction = opt.get();
 
-//            return GlobalResponse.success("Get Transaction Code!", response, request);
+                PaymentGatewayResponse pgResponse = new PaymentGatewayResponse();
+                if(PaymentGatewayConfig.getUseInvoice() == 'y') {
+                    pgResponse = xenditService.createPayment(trxCode, totalPrice, transaction.getUser().getEmail(), transaction.getTransactionLabel());
+                } else {
+                    /*
+                    * VA: Safe
+                    * E-wallet: Callback URL Issue
+                    * QRIS: Safe
+                    * */
+                    pgResponse = xenditService.createPayment(trxCode, totalPrice, transaction.getUser().getEmail(), transaction.getTransactionLabel(), PaymentMethodConstant.QRIS_DANA);
+                }
+
+                response = new RespCreateTransactionDTO();
+                response.setTransactionCode(trxCode);
+                response.setPaymentData(pgResponse.toMap());
+            }
         } catch(Exception e) {
-            Logging.handleException("PaymentService", "createTransaction", 65, generateErrorCode("01", "010"), e.getMessage());
-//            return GlobalResponse.failed("Failed to create transaction!", generateErrorCode("01", "010"), null, request);
+            Logging.handleException("PaymentService", "createTransaction", 107, generateErrorCode("01", "010"), e.getMessage());
         }
 
         return response;
@@ -199,14 +225,18 @@ public class PaymentService implements IPayment {
 
     private String generateTransactionCode() {
         LocalDate currentDt = LocalDate.now();
-        String currentDtString = ("" + currentDt.getYear()).substring(2) + currentDt.getMonth() + currentDt.getDayOfMonth();
-        String randomStr = Util.generateRandomString(4, false);
+        String strYear = "" + currentDt.getYear();
+        String strMonth = "0" + currentDt.getMonthValue();
+        String strDate = "0" + currentDt.getDayOfMonth();
+
+        String currentDtString = strYear.substring(2) + strMonth.substring(strMonth.length() - 2) + strDate.substring(strDate.length() - 2);
+        String randomStr = Util.generateRandomString(4, true);
 
         long trxCounter = transactionRepo.countTodayTransaction();
         trxCounter += 1;
         String strCounter = "00" + trxCounter;
 
-        return currentDtString + randomStr + strCounter.substring(strCounter.length() - 3);
+        return currentDtString + "-" + randomStr + "-" + strCounter.substring(strCounter.length() - 3);
     }
 
     private void logTransactionUpdate(Transaction transaction, int previousStatus) {

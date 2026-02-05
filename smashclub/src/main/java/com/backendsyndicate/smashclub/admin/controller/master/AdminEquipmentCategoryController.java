@@ -3,12 +3,14 @@ package com.backendsyndicate.smashclub.admin.controller.master;
 import com.backendsyndicate.smashclub.admin.dto.request.ReqAdminEquipmentCategorySaveDTO;
 import com.backendsyndicate.smashclub.admin.service.master.AdminEquipmentCategoryService;
 import com.backendsyndicate.smashclub.booking.model.EquipmentCategory;
+import com.backendsyndicate.smashclub.common.constant.PermissionConstant;
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,23 +26,27 @@ public class AdminEquipmentCategoryController {
         return adminEquipmentCategoryService.findAll(keyword, pageable, request);
     }
 
+    @PreAuthorize("hasAuthority(" + PermissionConstant.EQUIPMENT_EDIT_CODE + ")")
     @GetMapping("{categoryId}")
     public ResponseEntity<Object> equipmentCategoryDetail(@PathVariable Long categoryId, HttpServletRequest request) {
         return adminEquipmentCategoryService.findById(categoryId, request);
     }
 
+    @PreAuthorize("hasAuthority(" + PermissionConstant.EQUIPMENT_CREATE_CODE + ")")
     @PostMapping("save")
     public ResponseEntity<Object> equipmentCategorySave(@RequestBody ReqAdminEquipmentCategorySaveDTO dto, HttpServletRequest request) {
         EquipmentCategory equipmentCategory = modelMapper.map(dto, EquipmentCategory.class);
         return adminEquipmentCategoryService.save(equipmentCategory, request);
     }
 
+    @PreAuthorize("hasAuthority(" + PermissionConstant.EQUIPMENT_EDIT_CODE + ")")
     @PutMapping("update/{categoryId}")
     public ResponseEntity<Object> equipmentCategoryUpdate(@PathVariable Long categoryId, @RequestBody ReqAdminEquipmentCategorySaveDTO dto, HttpServletRequest request) {
         EquipmentCategory equipmentCategory = modelMapper.map(dto, EquipmentCategory.class);
         return adminEquipmentCategoryService.update(categoryId, equipmentCategory, request);
     }
 
+    @PreAuthorize("hasAuthority(" + PermissionConstant.EQUIPMENT_DELETE_CODE + ")")
     @DeleteMapping("delete/{categoryId}")
     public ResponseEntity<Object> equipmentCategoryDelete(@PathVariable Long categoryId, HttpServletRequest request) {
         return adminEquipmentCategoryService.delete(categoryId, request);

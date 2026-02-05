@@ -26,7 +26,7 @@ public class TransactionLog {
     private byte currentStatus = 0;
 
     @Column(name = "CreatedAt", updatable = false, nullable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "TransactionID", nullable = false)

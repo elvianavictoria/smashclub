@@ -1,5 +1,6 @@
 package com.backendsyndicate.smashclub.admin.seeder;
 
+import com.backendsyndicate.smashclub.admin.seeder.app.UserSeeder;
 import com.backendsyndicate.smashclub.admin.seeder.internal.AdminMenuSeeder;
 import com.backendsyndicate.smashclub.admin.seeder.internal.AdminPermissionSeeder;
 import com.backendsyndicate.smashclub.admin.seeder.internal.AdminRoleSeeder;
@@ -24,6 +25,8 @@ public class DatabaseSeeder implements ApplicationRunner {
     private final ProductSeeder productSeeder;
     private final ProductVariantSeeder productVariantSeeder;
 
+    private final UserSeeder userSeeder;
+
     public DatabaseSeeder(
             AdminMenuSeeder adminMenuSeeder,
             AdminPermissionSeeder adminPermissionSeeder,
@@ -34,7 +37,8 @@ public class DatabaseSeeder implements ApplicationRunner {
             EquipmentCategorySeeder equipmentCategorySeeder,
             EquipmentSeeder equipmentSeeder,
             ProductSeeder productSeeder,
-            ProductVariantSeeder productVariantSeeder
+            ProductVariantSeeder productVariantSeeder,
+            UserSeeder userSeeder
     ) {
         this.adminMenuSeeder = adminMenuSeeder;
         this.adminPermissionSeeder = adminPermissionSeeder;
@@ -47,6 +51,8 @@ public class DatabaseSeeder implements ApplicationRunner {
         this.equipmentSeeder = equipmentSeeder;
         this.productSeeder = productSeeder;
         this.productVariantSeeder = productVariantSeeder;
+
+        this.userSeeder = userSeeder;
     }
 
     @Override
@@ -63,6 +69,8 @@ public class DatabaseSeeder implements ApplicationRunner {
         productSeeder.seed();
         productVariantSeeder.seed();
 
-        Logging.printConsole("Seeded 10 seeders!");
+        userSeeder.seed();
+
+        Logging.printConsole("Seeded 11 seeders!");
     }
 }

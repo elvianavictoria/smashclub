@@ -1,13 +1,15 @@
 package com.backendsyndicate.smashclub.payment.dto.response;
 
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.Map;
+
+@Data
+@Getter
+@Setter
 public class RespCreateTransactionDTO {
     private String transactionCode;
-
-    public String getTransactionCode() {
-        return transactionCode;
-    }
-
-    public void setTransactionCode(String transactionCode) {
-        this.transactionCode = transactionCode;
-    }
+    private Map<String, Object> paymentData;
 }

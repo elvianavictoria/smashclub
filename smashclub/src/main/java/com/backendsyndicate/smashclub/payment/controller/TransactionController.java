@@ -1,9 +1,13 @@
 package com.backendsyndicate.smashclub.payment.controller;
 
+import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
+import com.backendsyndicate.smashclub.payment.dto.request.ReqCreateTransactionDTO;
+import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransactionDTO;
 import com.backendsyndicate.smashclub.payment.service.PaymentService;
 import com.backendsyndicate.smashclub.payment.service.TransactionService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -39,10 +43,11 @@ public class TransactionController {
         return transactionService.findByCode(transactionCode, request);
     }
 
-//    @PostMapping("/create")
-//    public ResponseEntity<Object> transactionOrder(@Valid @RequestBody ReqCreateTransactionDTO dto, HttpServletRequest request) {
-//        return paymentService.createTransaction(dto.getCustomerId(), dto.getTotalPrice(), dto.getReferenceCode(), dto.getTransactionType());
-//    }
+    @PostMapping("/create")
+    public ResponseEntity<Object> transactionOrder(@Valid @RequestBody ReqCreateTransactionDTO dto, HttpServletRequest request) {
+        RespCreateTransactionDTO payment = paymentService.createTransaction(dto.getCustomerId(), dto.getTotalPrice(), dto.getReferenceCode(), dto.getTransactionType());
+        return GlobalResponse.success("Successfully create transaction!", payment, request);
+    }
 
     @PostMapping("/payment/{transactionCode}")
     public ResponseEntity<Object> transactionPayment(@PathVariable String transactionCode, @RequestBody byte paymentMethodId, HttpServletRequest request) {

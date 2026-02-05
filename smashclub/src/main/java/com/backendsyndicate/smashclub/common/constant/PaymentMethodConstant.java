@@ -99,7 +99,7 @@ public class PaymentMethodConstant {
         return paymentMethod;
     }
 
-    public static Object getPaymentMethodCategory(int payMethodCategoryId) {
+    public static Map<String, Object> getPaymentMethodCategory(int payMethodCategoryId) {
         return paymentMethodCategories.get(payMethodCategoryId);
     }
 
@@ -107,7 +107,7 @@ public class PaymentMethodConstant {
         return paymentMethodCategories.get(payMethodCategoryId).get(attr);
     }
 
-    public static Object getPaymentMethod(int payMethodId) {
+    public static Map<String, Object> getPaymentMethod(int payMethodId) {
         return paymentMethod.get(payMethodId);
     }
 

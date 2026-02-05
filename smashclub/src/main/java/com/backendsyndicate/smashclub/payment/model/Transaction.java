@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -55,10 +56,10 @@ public class Transaction {
     private int paymentMethodID;
 
     @Column(name = "CreatedAt", updatable = false, nullable = false)
-    private Timestamp createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "UpdatedAt", insertable = false)
-    private Timestamp updatedAt;
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "UserId", foreignKey = @ForeignKey(name = "fk_transaction_to_user"), nullable = false)

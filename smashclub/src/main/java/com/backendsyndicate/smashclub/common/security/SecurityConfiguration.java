@@ -83,7 +83,7 @@ public class SecurityConfiguration {
                 ).
 //            headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable())). // Allow H2 console to run in a frame
 //                httpBasic(basic -> basic.authenticationEntryPoint(authenticationEntryPoint)).
-                exceptionHandling(Customizer.withDefaults()).
+                exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint)).
                 sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).
                 authenticationProvider(cmsAuthenticationProvider()).
                 addFilterBefore(adminJwtFilter, UsernamePasswordAuthenticationFilter.class);
@@ -102,38 +102,16 @@ public class SecurityConfiguration {
     @Order(2)
     public SecurityFilterChain appSecurityFilterChain(HttpSecurity http) throws Exception {
         return http
-//                .csrf(csrf -> csrf.disable())
-//                .cors(cors -> cors.disable())
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .securityMatcher("/api/v1/**")
-                .authorizeHttpRequests(authz -> authz.requestMatchers(
-                        "/api/v1/login",
-                        "/api/v1/register"
-                ).permitAll().anyRequest().authenticated())
+//                .securityMatcher("/api/v1/**")
+//                .authorizeHttpRequests(authz -> authz.requestMatchers(
+//                        "/api/v1/login",
+//                        "/api/v1/register"
+//                ).permitAll().anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
     }
-    /*public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.
-                csrf(AbstractHttpConfigurer::disable).
-                authorizeHttpRequests(
-                        request->request.requestMatchers(
-                                "/auth/**",
-                                "/api/v1/auth/**",
-                                "/transaction/**",
-                                    "/booking/**",
-                                    "/e-commerce/**",
-                                    "/admin/**"
-                        ).permitAll().anyRequest().authenticated());*/
-//            headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable())). // Allow H2 console to run in a frame
-//        httpBasic(basic -> basic.authenticationEntryPoint(authenticationEntryPoint)).
-//                exceptionHandling(Customizer.withDefaults()).
-//                sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).
-//                authenticationProvider(authenticationProvider()).
-//                addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
-        //return http.build();
-    //}
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {

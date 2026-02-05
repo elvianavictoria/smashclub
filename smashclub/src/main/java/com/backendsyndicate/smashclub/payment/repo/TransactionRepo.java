@@ -8,13 +8,14 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface TransactionRepo extends JpaRepository<Transaction, Long> {
     @Query(value="SELECT COUNT(t) FROM Transaction t WHERE cast(t.createdAt as string) LIKE CONCAT(CURRENT_DATE, '%')")
     Long countTodayTransaction();
 
-    Page<Transaction> findByCreatedAtBetween(Timestamp startDate, Timestamp endDate, Pageable pageable);
+    Page<Transaction> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
 
     Optional<Transaction> findByTransactionCode(String transactionCode);
 }
