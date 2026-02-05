@@ -7,8 +7,6 @@ import lombok.Setter;
 @Data
 @Getter
 @Setter
-public class RelAdminRolePermissionDTO {
-    private int id;
+public class RelAdminLoginPermissionDTO {
     private String permissionCode;
-    private String permissionName;
 }

@@ -96,6 +96,7 @@ public class AdminUserService implements ICRUD<AdminUser, Long> {
         }
 
         try {
+            adminUser.setPassword(passwordHasher.hash(adminUser.getPassword()));
             adminUserRepo.save(adminUser);
         } catch(Exception e) {
             Logging.handleException("AdminUserService", "save(AdminUser adminUser, HttpServletRequest request)", 73, generateErrorCode("03", "010"), e.getMessage());

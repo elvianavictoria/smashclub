@@ -40,4 +40,7 @@ public class AdminMenu {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "CategoryID", foreignKey = @ForeignKey(name = "fk_menuCategory_to_menu"), nullable = false)
     AdminMenuCategory category;
+
+    @OneToMany(mappedBy="menu", fetch = FetchType.LAZY)
+    Set<AdminPermission> permissions;
 }

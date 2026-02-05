@@ -23,54 +23,92 @@ public class AdminConstant {
 
     // Permissions
     public static final int PERMISSION_DASHBOARD_READ = 1;
+    public static final String DASHBOARD_READ_CODE = "DASHBOARD_READ";
 
     public static final int PERMISSION_COURT_READ = 2;
     public static final int PERMISSION_COURT_CREATE = 3;
     public static final int PERMISSION_COURT_EDIT = 4;
     public static final int PERMISSION_COURT_DELETE = 5;
+    public static final String COURT_READ_CODE = "COURT_READ";
+    public static final String COURT_CREATE_CODE = "COURT_CREATE";
+    public static final String COURT_EDIT_CODE = "COURT_EDIT";
+    public static final String COURT_DELETE_CODE = "COURT_DELETE";
 
     public static final int PERMISSION_COACH_READ = 6;
     public static final int PERMISSION_COACH_CREATE = 7;
     public static final int PERMISSION_COACH_EDIT = 8;
     public static final int PERMISSION_COACH_DELETE = 9;
+    public static final String COACH_READ_CODE = "COACH_READ";
+    public static final String COACH_CREATE_CODE = "COACH_CREATE";
+    public static final String COACH_EDIT_CODE = "COACH_EDIT";
+    public static final String COACH_DELETE_CODE = "COACH_DELETE";
 
     public static final int PERMISSION_EQUIPMENT_CATEGORY_READ = 10;
     public static final int PERMISSION_EQUIPMENT_CATEGORY_CREATE = 11;
     public static final int PERMISSION_EQUIPMENT_CATEGORY_EDIT = 12;
     public static final int PERMISSION_EQUIPMENT_CATEGORY_DELETE = 13;
+    public static final String EQUIPMENT_CATEGORY_READ_CODE = "EQUIPMENT_CATEGORY_READ";
+    public static final String EQUIPMENT_CATEGORY_CREATE_CODE = "EQUIPMENT_CATEGORY_CREATE";
+    public static final String EQUIPMENT_CATEGORY_EDIT_CODE = "EQUIPMENT_CATEGORY_EDIT";
+    public static final String EQUIPMENT_CATEGORY_DELETE_CODE = "EQUIPMENT_CATEGORY_DELETE";
 
     public static final int PERMISSION_EQUIPMENT_READ = 14;
     public static final int PERMISSION_EQUIPMENT_CREATE = 15;
     public static final int PERMISSION_EQUIPMENT_EDIT = 16;
     public static final int PERMISSION_EQUIPMENT_DELETE = 17;
+    public static final String EQUIPMENT_READ_CODE = "EQUIPMENT_READ";
+    public static final String EQUIPMENT_CREATE_CODE = "EQUIPMENT_CREATE";
+    public static final String EQUIPMENT_EDIT_CODE = "EQUIPMENT_EDIT";
+    public static final String EQUIPMENT_DELETE_CODE = "EQUIPMENT_DELETE";
 
     public static final int PERMISSION_PRODUCT_READ = 18;
     public static final int PERMISSION_PRODUCT_CREATE = 19;
     public static final int PERMISSION_PRODUCT_EDIT = 20;
     public static final int PERMISSION_PRODUCT_DELETE = 21;
+    public static final String PRODUCT_READ_CODE = "PRODUCT_READ";
+    public static final String PRODUCT_CREATE_CODE = "PRODUCT_CREATE";
+    public static final String PRODUCT_EDIT_CODE = "PRODUCT_EDIT";
+    public static final String PRODUCT_DELETE_CODE = "PRODUCT_DELETE";
 
     public static final int PERMISSION_PLAYER_READ = 22;
     public static final int PERMISSION_PLAYER_EDIT = 23;
     public static final int PERMISSION_PLAYER_DELETE = 24;
+    public static final String PLAYER_READ_CODE = "PLAYER_READ";
+    public static final String PLAYER_EDIT_CODE = "PLAYER_EDIT";
+    public static final String PLAYER_DELETE_CODE = "PLAYER_DELETE";
 
     public static final int PERMISSION_SALES_READ = 25;
     public static final int PERMISSION_SALES_DETAIL = 26;
+    public static final String SALES_READ_CODE = "SALES_READ";
+    public static final String SALES_DETAIL_CODE = "SALES_DETAIL";
 
     public static final int PERMISSION_BOOKING_SALES_READ = 27;
     public static final int PERMISSION_BOOKING_SALES_DETAIL = 28;
+    public static final String BOOKING_SALES_READ_CODE = "BOOKING_SALES_READ";
+    public static final String BOOKING_SALES_DETAIL_CODE = "BOOKING_SALES_DETAIL";
 
     public static final int PERMISSION_PRODUCT_SALES_READ = 29;
     public static final int PERMISSION_PRODUCT_SALES_DETAIL = 30;
+    public static final String PRODUCT_SALES_READ_CODE = "PRODUCT_SALES_READ";
+    public static final String PRODUCT_SALES_DETAIL_CODE = "PRODUCT_SALES_DETAIL";
 
     public static final int PERMISSION_ROLES_READ = 31;
     public static final int PERMISSION_ROLES_CREATE = 32;
     public static final int PERMISSION_ROLES_EDIT = 33;
     public static final int PERMISSION_ROLES_DELETE = 34;
+    public static final String ROLES_READ_CODE = "ROLES_READ";
+    public static final String ROLES_CREATE_CODE = "ROLES_CREATE";
+    public static final String ROLES_EDIT_CODE = "ROLES_EDIT";
+    public static final String ROLES_DELETE_CODE = "ROLES_DELETE";
 
     public static final int PERMISSION_USERS_READ = 35;
     public static final int PERMISSION_USERS_CREATE = 36;
     public static final int PERMISSION_USERS_EDIT = 37;
     public static final int PERMISSION_USERS_DELETE = 38;
+    public static final String USERS_READ_CODE = "USERS_READ";
+    public static final String USERS_CREATE_CODE = "USERS_CREATE";
+    public static final String USERS_EDIT_CODE = "USERS_EDIT";
+    public static final String USERS_DELETE_CODE = "USERS_DELETE";
 
     // Roles
     public static final int ROLE_DEVELOPER = 1;

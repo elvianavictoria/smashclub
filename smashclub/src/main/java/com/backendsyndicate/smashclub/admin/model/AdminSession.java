@@ -32,10 +32,10 @@ public class AdminSession {
     private int status = 0;
 
     @Column(name = "CreatedAt", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Column(name = "UpdatedAt", insertable = false)
-    private LocalDateTime updatedAt;
+    @Column(name = "UpdatedAt", insertable = false, nullable = true)
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "UserID", foreignKey = @ForeignKey(name = "fk_session_to_user"), nullable = false)

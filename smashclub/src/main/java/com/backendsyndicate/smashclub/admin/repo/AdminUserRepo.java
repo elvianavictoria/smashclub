@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface AdminUserRepo extends JpaRepository<AdminUser, Long> {
     Page<AdminUser> findAllByUsernameContainsOrFullNameContainsIgnoreCase(String username, String fullname, Pageable pageable);
     Optional<AdminUser> findByUsername(String username);
+    Optional<AdminUser> findByUsernameAndStatus(String username, int status);
 }

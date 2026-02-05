@@ -19,7 +19,9 @@ public class AdminAuthController {
 
     @PostMapping
     public ResponseEntity<Object> authenticate(HttpServletRequest request) {
-        String authToken = "";
+        String authToken = request.getHeader("Authorization");
+        authToken = authToken.replaceAll("Bearer ", "");
+
         return adminAuthService.isAuthenticated(authToken, request);
     }
 

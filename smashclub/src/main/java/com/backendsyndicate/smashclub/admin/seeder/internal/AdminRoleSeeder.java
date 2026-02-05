@@ -68,6 +68,8 @@ public class AdminRoleSeeder implements DataSeeder {
         userMenuSet.addAll(adminMenuSeeder.getMenus().values());
         userMenuSet.remove(adminMenuSeeder.getMenus().get(AdminConstant.MENU_ROLES));
         userMenuSet.remove(adminMenuSeeder.getMenus().get(AdminConstant.MENU_USER));
+        userMenuSet.remove(adminMenuSeeder.getMenus().get(AdminConstant.MENU_PLAYER));
+        userPermissionSet.add(adminPermissionSeeder.getPermissions().get(AdminConstant.PERMISSION_DASHBOARD_READ));
         userPermissionSet.add(adminPermissionSeeder.getPermissions().get(AdminConstant.PERMISSION_COURT_READ));
         userPermissionSet.add(adminPermissionSeeder.getPermissions().get(AdminConstant.PERMISSION_COACH_READ));
         userPermissionSet.add(adminPermissionSeeder.getPermissions().get(AdminConstant.PERMISSION_EQUIPMENT_READ));

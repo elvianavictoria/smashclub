@@ -7,14 +7,23 @@ import com.backendsyndicate.smashclub.admin.model.AdminSession;
 import com.backendsyndicate.smashclub.admin.model.AdminUser;
 import com.backendsyndicate.smashclub.admin.repo.AdminSessionRepo;
 import com.backendsyndicate.smashclub.admin.repo.AdminUserRepo;
+import com.backendsyndicate.smashclub.admin.security.jwt.AdminJwtModel;
+import com.backendsyndicate.smashclub.admin.security.jwt.AdminJwtUtility;
+import com.backendsyndicate.smashclub.common.config.AdminJwtConfig;
 import com.backendsyndicate.smashclub.common.constant.CommonConstant;
+import com.backendsyndicate.smashclub.common.security.Crypto;
 import com.backendsyndicate.smashclub.common.security.PasswordHasher;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import jakarta.servlet.http.HttpServletRequest;
+import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,11 +37,13 @@ import java.util.Optional;
  */
 @Service
 @Transactional
-public class AdminAuthService implements IAuth {
+public class AdminAuthService implements IAuth, UserDetailsService {
     @Autowired
     private AdminUserRepo adminUserRepo;
     @Autowired
     private AdminSessionRepo adminSessionRepo;
+    @Autowired
+    private AdminSessionService adminSessionService;
 
     private ModelMapper modelMapper = new ModelMapper();
     private PasswordHasher passwordHasher = new PasswordHasher();
@@ -50,13 +61,12 @@ public class AdminAuthService implements IAuth {
         RespAdminLoginDTO response = null;
 
         try {
-            Optional<AdminUser> opt = adminUserRepo.findByUsername(username);
-            if( opt.isEmpty() ) {
+            AdminUser user = getUser(username);
+            if( user == null ) {
                 return GlobalResponse.failed("Login invalid!", generateErrorCode("01", "002"), null, request);
             }
 
-            AdminUser user = opt.get();
-            if( user.getPassword() != passwordHasher.hash(password)) {
+            if( user.getPassword() == null || !passwordHasher.verify(password, user.getPassword()) ) {
                 return GlobalResponse.failed("Login invalid!", generateErrorCode("01", "003"), null, request);
             }
 
@@ -64,7 +74,7 @@ public class AdminAuthService implements IAuth {
                 return GlobalResponse.failed("Account is locked!", generateErrorCode("01", "004"), null, request);
             }
 
-            String accessToken = saveSession(user.getId());
+            String accessToken = adminSessionService.saveSession(user.getId(), user.getUsername(), user.getFullName());
             if( accessToken.isEmpty() ) {
                 return GlobalResponse.failed("Failed to login!", generateErrorCode("01", "005"), null, request);
             }
@@ -80,12 +90,12 @@ public class AdminAuthService implements IAuth {
     }
 
     @Override
-    public ResponseEntity<Object> logout(String authToken, HttpServletRequest request) {
+    public ResponseEntity<Object> logout(String accessToken, HttpServletRequest request) {
         RespAdminLogoutDTO response = new RespAdminLogoutDTO();
         response.setLoggedOut(false);
 
         try {
-            boolean invalidated = invalidateToken(authToken);
+            boolean invalidated = adminSessionService.invalidateToken(accessToken);
             response.setLoggedOut(invalidated);
 
             if( !response.isLoggedOut() ) {
@@ -93,7 +103,7 @@ public class AdminAuthService implements IAuth {
             }
 
         } catch(Exception e) {
-            Logging.handleException("AuthService", "logout(String authToken, HttpServletRequest request)", 89, generateErrorCode("02", "010"), e.getMessage());
+            Logging.handleException("AuthService", "logout(String accessToken, HttpServletRequest request)", 89, generateErrorCode("02", "010"), e.getMessage());
             return GlobalResponse.failed("Logout failed!", generateErrorCode("02", "010"), response, request);
         }
 
@@ -104,77 +114,82 @@ public class AdminAuthService implements IAuth {
      * 1. Extract token
      * 2. Get user ID
      * 3. Check active session with claimed user ID
+     * 4. If still active, check user with user ID
      *
-     * @param authToken
+     * @param accessToken
      * @return
      */
     @Override
-    public ResponseEntity<Object> isAuthenticated(String authToken, HttpServletRequest request) {
-        /**
-         * return adminSessionRepo.countByAdminUser_IdAndStatus(userId, CommonConstant.STATUS_ACTIVE) > 0;
-         */
+    public ResponseEntity<Object> isAuthenticated(String accessToken, HttpServletRequest request) {
+        if( accessToken.isEmpty() ) {
+            return GlobalResponse.unauthorized("Unauthorized access!", generateErrorCode("03", "001"), request);
+        }
 
-        return GlobalResponse.success("This user is authenticated!", Map.of("isAuthenticated", true), request);
+        RespAdminLoginDTO response = null;
+
+        try {
+            AdminJwtModel data = adminSessionService.getSessionData(accessToken);
+            if( data == null ) {
+                return GlobalResponse.unauthorized("Unauthorized access!", generateErrorCode("03", "002"), request);
+            }
+
+            AdminUser user = getUser(data.getUsername());
+            if( user == null ) {
+                return GlobalResponse.unauthorized("Unauthorized access!", generateErrorCode("03", "003"), request);
+            }
+
+            if( user.getStatus() != CommonConstant.STATUS_ACTIVE) {
+                return GlobalResponse.failed("Account is locked!", generateErrorCode("03", "004"), null, request);
+            }
+
+            response = modelMapper.map(user, RespAdminLoginDTO.class);
+            response.setAccessToken(accessToken);
+        } catch(Exception e) {
+            Logging.handleException("AuthService", "isAuthenticated(String accessToken, HttpServletRequest request)", 130, generateErrorCode("03", "010"), e.getMessage());
+            return GlobalResponse.unauthorized("Unauthenticated!", generateErrorCode("03", "010"), request);
+        }
+
+        return GlobalResponse.success("This user is authenticated!", response, request);
     }
 
-    /**
-     *
-     * 1. Invalidate all token related to this user
-     * 2. Generate new token
-     * 3. Save to session record
-     * 4. Return token
-     *
-     * @param userId
-     * @return
-     */
-    private String saveSession(long userId) {
-        LocalDateTime currentDatetime = LocalDateTime.now();
-        List<AdminSession> activeSessions = adminSessionRepo.findAllByAdminUser_Id(userId);
-        if( activeSessions.isEmpty() ) {
-            return "";
+    private AdminUser getUser(String username) {
+        AdminUser user = null;
+        try {
+            Optional<AdminUser> opt = adminUserRepo.findByUsername(username);
+            if( opt.isEmpty() ) {
+                return null;
+            }
+
+            user = opt.get();
+
+            if( user.getAdminRole() != null ) {
+                Logging.printConsole("User role is loaded!");
+                Hibernate.initialize(user.getAdminRole());
+
+                if( user.getAdminRole().getMenuSet() != null ) {
+                    Logging.printConsole("Role menu is loaded!");
+                    Hibernate.initialize(user.getAdminRole().getMenuSet());
+                }
+
+                if( user.getAdminRole().getPermissionSet() != null ) {
+                    Logging.printConsole("Role permission is loaded!");
+                    Hibernate.initialize(user.getAdminRole().getPermissionSet());
+                }
+            }
+        } catch(Exception e) {
+            Logging.handleException("AuthService", "getUser(String username)", 155, generateErrorCode("04", "010"), e.getMessage());
+            return null;
         }
 
-        for( int i = 0; i < activeSessions.size(); i++ ) {
-            AdminSession session = activeSessions.get(i);
-            session.setStatus(CommonConstant.STATUS_INACTIVE);
-        }
-
-        // Generate token
-        String accessToken = "";
-
-        AdminUser user = new AdminUser();
-        user.setId(userId);
-
-        AdminSession newSession = new AdminSession();
-        newSession.setLoginToken(accessToken);
-        newSession.setLoginTime(currentDatetime);
-        newSession.setExpiredTime(currentDatetime.plusHours(24));
-        newSession.setStatus(CommonConstant.STATUS_ACTIVE);
-        newSession.setAdminUser(user);
-
-        adminSessionRepo.save(newSession);
-
-        return accessToken;
+        return user;
     }
 
-    /**
-     * 1. Find session with input token
-     * 2. Invalidate that session
-     * 3. Return true if success
-     *
-     * @param token
-     * @return
-     */
-    private boolean invalidateToken(String token) {
-        Optional<AdminSession> currentSession = adminSessionRepo.findByLoginToken(token);
-        if( currentSession.isEmpty() ) {
-            Logging.handleException("AuthService", "invalidateToken(String token)", 155, generateErrorCode("INV-TKN", "001"), "Session token " + token + " not found!");
-            return false;
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<AdminUser> opt = adminUserRepo.findByUsernameAndStatus(username, CommonConstant.STATUS_ACTIVE);
+        if( opt.isEmpty() ) {
+            throw new UsernameNotFoundException("Invalid credentials!");
         }
-
-        AdminSession session = currentSession.get();
-        session.setStatus(CommonConstant.STATUS_INACTIVE);
-
-        return true;
+        AdminUser adminUser = opt.get();
+        return new User(adminUser.getUsername(), adminUser.getPassword(), adminUser.getAuthorities());
     }
 }

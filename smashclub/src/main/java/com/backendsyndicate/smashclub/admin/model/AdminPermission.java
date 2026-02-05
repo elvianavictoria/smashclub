@@ -19,6 +19,9 @@ public class AdminPermission {
     @EqualsAndHashCode.Include
     private int id;
 
+    @Column(name= "PermissionCode", nullable = false)
+    private String permissionCode;
+
     @Column(name = "PermissionName", nullable = false)
     private String permissionName;
 
