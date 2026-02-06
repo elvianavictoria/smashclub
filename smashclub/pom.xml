@@ -33,6 +33,7 @@
         <jaxb.version>2.3.1</jaxb.version>
         <spring-cloud.version>2025.1.0</spring-cloud.version>
         <xendit.version>1.23.0</xendit.version>
+        <cloudinary.version>2.0.0</cloudinary.version>
     </properties>
 
     <dependencies>
@@ -193,11 +194,23 @@
             <version>${project.parent.version}</version>
         </dependency>
 
-        <!-- Xendit Client -->
+        <!-- Xendit Client (Payment Gateway) -->
         <dependency>
             <groupId>com.xendit</groupId>
             <artifactId>xendit-java-lib</artifactId>
             <version>${xendit.version}</version>
+        </dependency>
+
+        <!-- Cloudinary (Cloud Storage) -->
+        <dependency>
+            <groupId>com.cloudinary</groupId>
+            <artifactId>cloudinary-http5</artifactId>
+            <version>${cloudinary.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.cloudinary</groupId>
+            <artifactId>cloudinary-taglib</artifactId>
+            <version>${cloudinary.version}</version>
         </dependency>
     </dependencies>
 

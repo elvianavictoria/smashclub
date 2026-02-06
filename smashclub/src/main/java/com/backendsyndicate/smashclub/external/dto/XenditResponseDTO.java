@@ -1,4 +1,4 @@
-package com.backendsyndicate.smashclub.external.model;
+package com.backendsyndicate.smashclub.external.dto;
 
 import com.backendsyndicate.smashclub.common.util.Logging;
 import lombok.Data;
@@ -13,7 +13,7 @@ import java.util.Map;
 @Data
 @Getter
 @Setter
-public class PaymentGatewayResponse {
+public class XenditResponseDTO {
     private String externalId;
 
     // Invoice
@@ -56,7 +56,7 @@ public class PaymentGatewayResponse {
     private String webhookUrl;
     private String expiresAt;
 
-    public Map<String, Object> toMap() {
+    public Map<String, Object> asMap() {
         Map<String, Object> map = new HashMap<>();
         Field[] fields = this.getClass().getDeclaredFields();
 

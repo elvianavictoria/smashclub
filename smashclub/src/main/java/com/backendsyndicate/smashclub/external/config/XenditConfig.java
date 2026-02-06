@@ -6,31 +6,31 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
 @Configuration
-@PropertySource("classpath:payment-gateway.properties")
-public class PaymentGatewayConfig {
-    private static String xenditSecretKey;
-    private static String xenditPublicKey;
+@PropertySource("classpath:xendit.properties")
+public class XenditConfig {
+    private static String secretKey;
+    private static String publicKey;
     private static char useInvoice;
 
     private static String successRedirectUrl;
     private static String failedRedirectUrl;
 
-    public static String getXenditSecretKey() {
-        return xenditSecretKey;
+    public static String getSecretKey() {
+        return secretKey;
     }
 
     @Value("${xendit.api.secret-key}")
-    private void setXenditSecretKey(String xenditSecretKey) {
-        PaymentGatewayConfig.xenditSecretKey = Crypto.performDecrypt(xenditSecretKey);
+    private void setSecretKey(String secretKey) {
+        XenditConfig.secretKey = Crypto.performDecrypt(secretKey);
     }
 
-    public static String getXenditPublicKey() {
-        return xenditPublicKey;
+    public static String getPublicKey() {
+        return publicKey;
     }
 
     @Value("${xendit.api.public-key}")
-    private void setXenditPublicKey(String xenditPublicKey) {
-        PaymentGatewayConfig.xenditPublicKey = Crypto.performDecrypt(xenditPublicKey);
+    private void setPublicKey(String publicKey) {
+        XenditConfig.publicKey = Crypto.performDecrypt(publicKey);
     }
 
     public static char getUseInvoice() {
@@ -39,7 +39,7 @@ public class PaymentGatewayConfig {
 
     @Value("${xendit.api.use-invoice}")
     private void setUseInvoice(char useInvoice) {
-        PaymentGatewayConfig.useInvoice = useInvoice;
+        XenditConfig.useInvoice = useInvoice;
     }
 
     public static String getSuccessRedirectUrl() {
@@ -48,7 +48,7 @@ public class PaymentGatewayConfig {
 
     @Value("${xendit.url.redirect-success}")
     private void setSuccessRedirectUrl(String successRedirectUrl) {
-        PaymentGatewayConfig.successRedirectUrl = successRedirectUrl;
+        XenditConfig.successRedirectUrl = successRedirectUrl;
     }
 
     public static String getFailedRedirectUrl() {
@@ -57,6 +57,6 @@ public class PaymentGatewayConfig {
 
     @Value("${xendit.url.redirect-failed}")
     private void setFailedRedirectUrl(String failedRedirectUrl) {
-        PaymentGatewayConfig.failedRedirectUrl = failedRedirectUrl;
+        XenditConfig.failedRedirectUrl = failedRedirectUrl;
     }
 }

@@ -5,7 +5,7 @@ import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.external.constant.XenditPaymentStatusConstant;
 import com.backendsyndicate.smashclub.external.core.IWebhook;
-import com.backendsyndicate.smashclub.external.model.XenditWebhookDTO;
+import com.backendsyndicate.smashclub.external.dto.XenditWebhookDTO;
 import com.backendsyndicate.smashclub.payment.model.Transaction;
 import com.backendsyndicate.smashclub.payment.repo.TransactionRepo;
 import jakarta.servlet.http.HttpServletRequest;

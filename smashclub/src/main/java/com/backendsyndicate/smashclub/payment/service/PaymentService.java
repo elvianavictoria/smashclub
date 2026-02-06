@@ -7,8 +7,8 @@ import com.backendsyndicate.smashclub.common.util.Util;
 import com.backendsyndicate.smashclub.common.constant.PaymentMethodConstant;
 import com.backendsyndicate.smashclub.common.constant.TransactionStatusConstant;
 import com.backendsyndicate.smashclub.common.constant.TransactionTypeConstant;
-import com.backendsyndicate.smashclub.external.config.PaymentGatewayConfig;
-import com.backendsyndicate.smashclub.external.model.PaymentGatewayResponse;
+import com.backendsyndicate.smashclub.external.config.XenditConfig;
+import com.backendsyndicate.smashclub.external.dto.XenditResponseDTO;
 import com.backendsyndicate.smashclub.external.service.payment.XenditService;
 import com.backendsyndicate.smashclub.payment.core.IPayment;
 import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransactionDTO;
@@ -104,8 +104,8 @@ public class PaymentService implements IPayment {
             } else {
                 Transaction transaction = opt.get();
 
-                PaymentGatewayResponse pgResponse = new PaymentGatewayResponse();
-                if(PaymentGatewayConfig.getUseInvoice() == 'y' || paymentMethodId == 0) {
+                XenditResponseDTO pgResponse = new XenditResponseDTO();
+                if(XenditConfig.getUseInvoice() == 'y' || paymentMethodId == 0) {
                     pgResponse = xenditService.createPayment(trxCode, totalPrice, transaction.getUser().getEmail(), transaction.getTransactionLabel());
                     if( pgResponse.getInvoiceUrl() != null ) {
                         // Write to payment log
@@ -122,7 +122,7 @@ public class PaymentService implements IPayment {
 
                 response = new RespCreateTransactionDTO();
                 response.setTransactionCode(trxCode);
-                response.setPaymentData(pgResponse.toMap());
+                response.setPaymentData(pgResponse.asMap());
             }
         } catch(Exception e) {
             Logging.handleException("PaymentService", "createTransaction", 107, generateErrorCode("01", "010"), e.getMessage());

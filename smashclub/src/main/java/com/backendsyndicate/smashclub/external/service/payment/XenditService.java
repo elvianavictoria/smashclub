@@ -2,8 +2,8 @@ package com.backendsyndicate.smashclub.external.service.payment;
 
 import com.backendsyndicate.smashclub.common.constant.PaymentMethodConstant;
 import com.backendsyndicate.smashclub.common.util.Logging;
-import com.backendsyndicate.smashclub.external.config.PaymentGatewayConfig;
-import com.backendsyndicate.smashclub.external.model.PaymentGatewayResponse;
+import com.backendsyndicate.smashclub.external.config.XenditConfig;
+import com.backendsyndicate.smashclub.external.dto.XenditResponseDTO;
 import com.xendit.XenditClient;
 import com.xendit.enums.BankCode;
 import com.xendit.exception.XenditException;
@@ -12,7 +12,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,8 +27,8 @@ public class XenditService {
     private ModelMapper modelMapper = new ModelMapper();
 
     public XenditService() {
-        this.secretKey = PaymentGatewayConfig.getXenditSecretKey();
-        this.publicKey = PaymentGatewayConfig.getXenditPublicKey();
+        this.secretKey = XenditConfig.getSecretKey();
+        this.publicKey = XenditConfig.getPublicKey();
 
         this.currency = "IDR";
         this.eWalletCheckoutMethod = "ONE_TIME_PAYMENT";
@@ -46,8 +45,8 @@ public class XenditService {
         return "XEN-" + methodNo + "E" + errorNo;
     }
 
-    public PaymentGatewayResponse createPayment(String externalId, BigDecimal amount, String payerEmail, String description) {
-        PaymentGatewayResponse response = new PaymentGatewayResponse();
+    public XenditResponseDTO createPayment(String externalId, BigDecimal amount, String payerEmail, String description) {
+        XenditResponseDTO response = new XenditResponseDTO();
 
         String paymentUrl = this.createInvoice(externalId, amount, payerEmail, description);
         response.setExternalId(externalId);
@@ -56,8 +55,8 @@ public class XenditService {
         return response;
     }
 
-    public PaymentGatewayResponse createPayment(String externalId, BigDecimal amount, String payerEmail, String description, int paymentMethodId) {
-        PaymentGatewayResponse response = new PaymentGatewayResponse();
+    public XenditResponseDTO createPayment(String externalId, BigDecimal amount, String payerEmail, String description, int paymentMethodId) {
+        XenditResponseDTO response = new XenditResponseDTO();
 
         int paymentMethodCategoryId = (int) PaymentMethodConstant.getPaymentMethod(paymentMethodId).get("categoryId");
 
@@ -85,7 +84,7 @@ public class XenditService {
             }
 
             FixedVirtualAccount va = this.createClosedVA(externalId, bankCode, "SMASHCLUB", amount);
-            response = modelMapper.map(va, PaymentGatewayResponse.class);
+            response = modelMapper.map(va, XenditResponseDTO.class);
             response.setName("SMASHCLUB");
         } else if( paymentMethodCategoryId == PaymentMethodConstant.CATEGORY_EWALLET ) {
             String channelCode = "";
@@ -109,10 +108,10 @@ public class XenditService {
             }
 
             EWalletCharge ew = createEWalletInvoice(externalId, amount, channelCode);
-            response = modelMapper.map(ew, PaymentGatewayResponse.class);
+            response = modelMapper.map(ew, XenditResponseDTO.class);
         } else if( paymentMethodCategoryId == PaymentMethodConstant.CATEGORY_QRIS ) {
             QRCode qr = createQR(externalId, amount);
-            response = modelMapper.map(qr, PaymentGatewayResponse.class);
+            response = modelMapper.map(qr, XenditResponseDTO.class);
         }
 
         return response;
@@ -160,7 +159,7 @@ public class XenditService {
 
         try {
             Map<String, String> channelProperties = new HashMap<>();
-            channelProperties.put("success_redirect_url", PaymentGatewayConfig.getSuccessRedirectUrl());
+            channelProperties.put("success_redirect_url", XenditConfig.getSuccessRedirectUrl());
 
             Map<String, Object> params = new HashMap<>();
             params.put("reference_id", referenceId);
@@ -185,7 +184,7 @@ public class XenditService {
         try {
             Map<String, Object> params = new HashMap<>();
             params.put("reference_id", referenceId);
-            params.put("type", QRCode.QRCodeType.STATIC);
+            params.put("type", QRCode.QRCodeType.DYNAMIC);
             params.put("currency", this.currency);
             params.put("amount", amount);
 

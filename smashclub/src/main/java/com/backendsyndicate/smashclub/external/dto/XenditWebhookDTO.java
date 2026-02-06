@@ -1,4 +1,4 @@
-package com.backendsyndicate.smashclub.external.model;
+package com.backendsyndicate.smashclub.external.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
