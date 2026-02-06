@@ -13,9 +13,11 @@ import com.backendsyndicate.smashclub.external.service.payment.XenditService;
 import com.backendsyndicate.smashclub.payment.core.IPayment;
 import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransactionDTO;
 import com.backendsyndicate.smashclub.payment.dto.response.RespPaymentTransactionDTO;
+import com.backendsyndicate.smashclub.payment.model.PaymentLog;
 import com.backendsyndicate.smashclub.payment.model.RefundRequest;
 import com.backendsyndicate.smashclub.payment.model.Transaction;
 import com.backendsyndicate.smashclub.payment.model.TransactionLog;
+import com.backendsyndicate.smashclub.payment.repo.PaymentLogRepo;
 import com.backendsyndicate.smashclub.payment.repo.RefundRequestRepo;
 import com.backendsyndicate.smashclub.payment.repo.TransactionLogRepo;
 import com.backendsyndicate.smashclub.payment.repo.TransactionRepo;
@@ -45,6 +47,8 @@ public class PaymentService implements IPayment {
     private RefundRequestRepo refundRequestRepo;
     @Autowired
     private XenditService xenditService;
+    @Autowired
+    private PaymentLogRepo paymentLogRepo;
 
 
     private ModelMapper modelMapper = new ModelMapper();
@@ -70,7 +74,7 @@ public class PaymentService implements IPayment {
      * @return
      */
     @Override
-    public RespCreateTransactionDTO createTransaction(String customerId, BigDecimal totalPrice, String referenceCode, int transactionType) {
+    public RespCreateTransactionDTO createTransaction(String customerId, BigDecimal totalPrice, String referenceCode, int transactionType, int paymentMethodId) {
         RespCreateTransactionDTO response = null;
 
         try {
@@ -101,8 +105,12 @@ public class PaymentService implements IPayment {
                 Transaction transaction = opt.get();
 
                 PaymentGatewayResponse pgResponse = new PaymentGatewayResponse();
-                if(PaymentGatewayConfig.getUseInvoice() == 'y') {
+                if(PaymentGatewayConfig.getUseInvoice() == 'y' || paymentMethodId == 0) {
                     pgResponse = xenditService.createPayment(trxCode, totalPrice, transaction.getUser().getEmail(), transaction.getTransactionLabel());
+                    if( pgResponse.getInvoiceUrl() != null ) {
+                        // Write to payment log
+                        logPaymentCreate(transaction, pgResponse.getInvoiceUrl());
+                    }
                 } else {
                     /*
                     * VA: Safe
@@ -246,5 +254,13 @@ public class PaymentService implements IPayment {
         trxLog.setTransaction(transaction);
 
         transactionLogRepo.save(trxLog);
+    }
+
+    private void logPaymentCreate(Transaction transaction, String paymentLink) {
+        PaymentLog paymentLog = new PaymentLog();
+        paymentLog.setPaymentLink(paymentLink);
+        paymentLog.setTransaction(transaction);
+
+        paymentLogRepo.save(paymentLog);
     }
 }

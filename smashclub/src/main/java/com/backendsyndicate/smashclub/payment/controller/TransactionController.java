@@ -45,7 +45,7 @@ public class TransactionController {
 
     @PostMapping("/create")
     public ResponseEntity<Object> transactionOrder(@Valid @RequestBody ReqCreateTransactionDTO dto, HttpServletRequest request) {
-        RespCreateTransactionDTO payment = paymentService.createTransaction(dto.getCustomerId(), dto.getTotalPrice(), dto.getReferenceCode(), dto.getTransactionType());
+        RespCreateTransactionDTO payment = paymentService.createTransaction(dto.getCustomerId(), dto.getTotalPrice(), dto.getReferenceCode(), dto.getTransactionType(), dto.getPaymentMethodId());
         return GlobalResponse.success("Successfully create transaction!", payment, request);
     }
 

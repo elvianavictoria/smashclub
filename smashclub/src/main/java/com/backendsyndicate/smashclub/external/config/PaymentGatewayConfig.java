@@ -1,5 +1,6 @@
 package com.backendsyndicate.smashclub.external.config;
 
+import com.backendsyndicate.smashclub.common.security.Crypto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -20,7 +21,7 @@ public class PaymentGatewayConfig {
 
     @Value("${xendit.api.secret-key}")
     private void setXenditSecretKey(String xenditSecretKey) {
-        PaymentGatewayConfig.xenditSecretKey = xenditSecretKey;
+        PaymentGatewayConfig.xenditSecretKey = Crypto.performDecrypt(xenditSecretKey);
     }
 
     public static String getXenditPublicKey() {
@@ -29,7 +30,7 @@ public class PaymentGatewayConfig {
 
     @Value("${xendit.api.public-key}")
     private void setXenditPublicKey(String xenditPublicKey) {
-        PaymentGatewayConfig.xenditPublicKey = xenditPublicKey;
+        PaymentGatewayConfig.xenditPublicKey = Crypto.performDecrypt(xenditPublicKey);
     }
 
     public static char getUseInvoice() {
