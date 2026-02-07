@@ -26,6 +26,9 @@ public class Coach {
     @Column(name = "CoachName", length = 100, nullable = false)
     private String coachName;
 
+    @Column(name = "CoachImgLink", length = 500)
+    private String coachImgLink;
+
     @Column(name = "PricePerHour", precision = 17, scale = 2,nullable = false)
     private BigDecimal pricePerHour;
 
