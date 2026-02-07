@@ -43,57 +43,35 @@ public class ReqAdminEquipmentSaveDTO extends CustomRequestValidation {
 
     @Override
     public void validate() {
-        List<Object> validationObject = new ArrayList<>();
+        List<Map<String, Object>> validationObject = new ArrayList<>();
 
         if( equipmentName == null || equipmentName.isEmpty() ) {
-            validationObject.add(Map.of(
-                    "field", "equipmentName",
-                    "rejected_value", "",
-                    "message", "Equipment name is required!"
-            ));
+            validationObject.add(constructValidationItem("equipmentName", "", "Equipment name is required!"));
         }
         // Need regex validation
         
         if( brand == null || brand.isEmpty() ) {
-            validationObject.add(Map.of(
-                    "field", "brand",
-                    "rejected_value", "",
-                    "message", "Brand is required!"
-            ));
+            validationObject.add(constructValidationItem("brand", "", "Brand is required!"));
         }
         // Need regex validation
+        // Need to guard length
 
         if( type == null || type.isEmpty() ) {
-            validationObject.add(Map.of(
-                    "field", "type",
-                    "rejected_value", "",
-                    "message", "Type is required!"
-            ));
+            validationObject.add(constructValidationItem("type", "", "Type is required!"));
         }
         // Need regex validation
+        // Need to guard length
 
         if( price == null ) {
-            validationObject.add(Map.of(
-                    "field", "price",
-                    "rejected_value", "",
-                    "message", "Price per hour is invalid!"
-            ));
+            validationObject.add(constructValidationItem("price", "", "Price is required!"));
         }
 
         if( stock < 0 ) {
-            validationObject.add(Map.of(
-                    "field", "stock",
-                    "rejected_value", stock,
-                    "message", "Stock is invalid!"
-            ));
+            validationObject.add(constructValidationItem("stock", stock, "Stock is required!"));
         }
 
         if( !List.of(CommonConstant.STATUS_ACTIVE, CommonConstant.STATUS_INACTIVE).contains((int) status) ) {
-            validationObject.add(Map.of(
-                    "field", "status",
-                    "rejected_value", status,
-                    "message", "Status is invalid!"
-            ));
+            validationObject.add(constructValidationItem("status", status, "Status is invalid!"));
         }
 
         validation = validationObject;

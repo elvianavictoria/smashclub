@@ -20,27 +20,27 @@ public class PlayerController {
     private PlayerService playerService;
     private ModelMapper modelMapper = new ModelMapper();
 
-    @PreAuthorize("hasAuthority(" + PermissionConstant.PLAYER_READ_CODE + ")")
+    @PreAuthorize("hasAuthority('" + PermissionConstant.PLAYER_READ_CODE + "')")
     @GetMapping
     public ResponseEntity<Object> playerList(@RequestParam String keyword, @RequestParam int page, @RequestParam int size, HttpServletRequest request) {
         Pageable pageable = PageRequest.of(page, size);
         return playerService.findAll(keyword, pageable, request);
     }
 
-    @PreAuthorize("hasAuthority(" + PermissionConstant.PLAYER_EDIT_CODE + ")")
+    @PreAuthorize("hasAuthority('" + PermissionConstant.PLAYER_EDIT_CODE + "')")
     @GetMapping("{playerId}")
     public ResponseEntity<Object> playerDetail(@PathVariable String playerId, HttpServletRequest request) {
         return playerService.findById(playerId, request);
     }
 
-    @PreAuthorize("hasAuthority(" + PermissionConstant.PLAYER_EDIT_CODE + ")")
+    @PreAuthorize("hasAuthority('" + PermissionConstant.PLAYER_EDIT_CODE + "')")
     @PutMapping("update/{playerId}")
     public ResponseEntity<Object> playerUpdate(@PathVariable String playerId, @RequestBody ReqAdminPlayerSaveDTO dto, HttpServletRequest request) {
         User player = modelMapper.map(dto, User.class);
         return playerService.update(playerId, player, request);
     }
 
-    @PreAuthorize("hasAuthority(" + PermissionConstant.PLAYER_DELETE_CODE + ")")
+    @PreAuthorize("hasAuthority('" + PermissionConstant.PLAYER_DELETE_CODE + "')")
     @DeleteMapping("delete/{playerId}")
     public ResponseEntity<Object> playerDelete(@PathVariable String playerId, HttpServletRequest request) {
         return playerService.delete(playerId, request);

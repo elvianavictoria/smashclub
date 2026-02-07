@@ -162,12 +162,13 @@ public class AdminCourtService implements ICRUD<Court, Long>, IUpload<Court, Lon
             return GlobalResponse.failed("Court data is required!", generateErrorCode("13", "001"), null, request);
         }
 
-//        CloudinaryResponseDTO cloudinary = cloudinaryService.uploadImage("court", file);
-//        if( cloudinary == null ) {
-//            return GlobalResponse.failed("Failed to upload court image!", generateErrorCode("13", "002"), null, request);
-//        }
-//
-//        court.setCourtImgLink(cloudinary.getSecureUrl());
+        String courtImgLink = uploadImage("court", file);
+        if( courtImgLink == null || courtImgLink.isEmpty() ) {
+            return GlobalResponse.failed("Failed to upload court image!", generateErrorCode("13", "002"), null, request);
+        }
+
+//            equipment.setCourtImgLink(courtImgLink);
+
         ResponseEntity<Object> response = save(court, request);
 
         return response;
@@ -184,17 +185,27 @@ public class AdminCourtService implements ICRUD<Court, Long>, IUpload<Court, Lon
         }
 
         if( file != null ) {
-    //        CloudinaryResponseDTO cloudinary = cloudinaryService.uploadImage("court", file);
-    //        if( cloudinary == null ) {
-    //            return GlobalResponse.failed("Failed to upload court image!", generateErrorCode("14", "003"), null, request);
-    //        }
-    //
-    //        court.setCourtImgLink(cloudinary.getSecureUrl());
+            String courtImgLink = uploadImage("court", file);
+            if( courtImgLink == null || courtImgLink.isEmpty() ) {
+                return GlobalResponse.failed("Failed to upload court image!", generateErrorCode("14", "003"), null, request);
+            }
+
+//            equipment.setCourtImgLink(courtImgLink);
         }
 
         ResponseEntity<Object> response = update(id, court, request);
 
         return response;
+    }
+
+    private String uploadImage(String folder, MultipartFile file) {
+//        try {
+//            CloudinaryResponseDTO cloudinary = cloudinaryService.uploadImage(folder, file);
+//            return cloudinary.getSecureUrl();
+//        } catch(Exception e) {
+//            return "";
+//        }
+        return "";
     }
 
     private RespAdminCourtListDTO mapListToDTO(Court court) {

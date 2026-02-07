@@ -39,48 +39,30 @@ public class ReqAdminCourtSaveDTO extends CustomRequestValidation {
 
     @Override
     public void validate() {
-        List<Object> validationObject = new ArrayList<>();
+        List<Map<String, Object>> validationObject = new ArrayList<>();
 
         if( courtCode == null || courtCode.isEmpty() ) {
-            validationObject.add(Map.of(
-                    "field", "courtCode",
-                    "rejected_value", "",
-                    "message", "Court code is required!"
-            ));
+            validationObject.add(constructValidationItem("courtCode", "", "Court code is required!"));
         }
         // Need regex validation
+        // Need to guard length
 
         if( courtName == null || courtName.isEmpty() ) {
-            validationObject.add(Map.of(
-                    "field", "courtName",
-                    "rejected_value", "",
-                    "message", "Court name is required!"
-            ));
+            validationObject.add(constructValidationItem("courtName", "", "Court name is required!"));
         }
         // Need regex validation
+        // Need to guard length
 
         if( openTime == null ) {
-            validationObject.add(Map.of(
-                    "field", "openTime",
-                    "rejected_value", "",
-                    "message", "Open time is required!"
-            ));
+            validationObject.add(constructValidationItem("openTime", "", "Open time is required!"));
         }
 
         if( closeTime == null ) {
-            validationObject.add(Map.of(
-                    "field", "closeTime",
-                    "rejected_value", "",
-                    "message", "Close time is required!"
-            ));
+            validationObject.add(constructValidationItem("closeTime", "", "Close time is required!"));
         }
 
         if( !List.of(CommonConstant.STATUS_ACTIVE, CommonConstant.STATUS_INACTIVE).contains((int) status) ) {
-            validationObject.add(Map.of(
-                    "field", "status",
-                    "rejected_value", status,
-                    "message", "Status is invalid!"
-            ));
+            validationObject.add(constructValidationItem("status", status, "Status is invalid!"));
         }
 
         validation = validationObject;

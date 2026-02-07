@@ -159,12 +159,13 @@ public class AdminCoachService implements ICRUD<Coach, Long>, IUpload<Coach, Lon
             return GlobalResponse.failed("Coach data is required!", generateErrorCode("13", "001"), null, request);
         }
 
-//        CloudinaryResponseDTO cloudinary = cloudinaryService.uploadImage("coach", file);
-//        if( cloudinary == null ) {
-//            return GlobalResponse.failed("Failed to upload coach image!", generateErrorCode("13", "002"), null, request);
-//        }
-//
-//        coach.setCoachImgLink(cloudinary.getSecureUrl());
+        String coachImgLink = uploadImage("coach", file);
+        if( coachImgLink == null || coachImgLink.isEmpty() ) {
+            return GlobalResponse.failed("Failed to upload coach image!", generateErrorCode("13", "003"), null, request);
+        }
+
+//            coach.setCoachImgLink(coachImgLink);
+
         ResponseEntity<Object> response = save(coach, request);
 
         return response;
@@ -181,17 +182,27 @@ public class AdminCoachService implements ICRUD<Coach, Long>, IUpload<Coach, Lon
         }
 
         if( file != null ) {
-    //        CloudinaryResponseDTO cloudinary = cloudinaryService.uploadImage("coach", file);
-    //        if( cloudinary == null ) {
-    //            return GlobalResponse.failed("Failed to upload coach image!", generateErrorCode("14", "003"), null, request);
-    //        }
-    //
-    //        coach.setCoachImgLink(cloudinary.getSecureUrl());
+            String coachImgLink = uploadImage("coach", file);
+            if( coachImgLink == null || coachImgLink.isEmpty() ) {
+                return GlobalResponse.failed("Failed to upload coach image!", generateErrorCode("14", "003"), null, request);
+            }
+
+//            coach.setCoachImgLink(coachImgLink);
         }
 
         ResponseEntity<Object> response = update(id, coach, request);
 
         return response;
+    }
+
+    private String uploadImage(String folder, MultipartFile file) {
+//        try {
+//            CloudinaryResponseDTO cloudinary = cloudinaryService.uploadImage(folder, file);
+//            return cloudinary.getSecureUrl();
+//        } catch(Exception e) {
+//            return "";
+//        }
+        return "";
     }
 
     private RespAdminCoachListDTO mapListToDTO(Coach coach) {

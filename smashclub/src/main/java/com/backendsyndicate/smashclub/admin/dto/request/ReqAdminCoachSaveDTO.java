@@ -34,40 +34,26 @@ public class ReqAdminCoachSaveDTO extends CustomRequestValidation {
 
     @Override
     public void validate() {
-        List<Object> validationObject = new ArrayList<>();
+        List<Map<String, Object>> validationObject = new ArrayList<>();
 
         if( coachCode == null || coachCode.isEmpty() ) {
-            validationObject.add(Map.of(
-                    "field", "coachCode",
-                    "rejected_value", "",
-                    "message", "Coach code is required!"
-            ));
+            validationObject.add(constructValidationItem("coachCode", "", "Coach code is required!"));
         }
         // Need regex validation
+        // Need to guard length
 
         if( coachName == null || coachName.isEmpty() ) {
-            validationObject.add(Map.of(
-                    "field", "coachName",
-                    "rejected_value", "",
-                    "message", "Coach name is required!"
-            ));
+            validationObject.add(constructValidationItem("coachName", "", "Coach name is required!"));
         }
         // Need regex validation
+        // Need to guard length
 
         if( pricePerHour == null ) {
-            validationObject.add(Map.of(
-                    "field", "pricePerHour",
-                    "rejected_value", "",
-                    "message", "Price per hour is required!"
-            ));
+            validationObject.add(constructValidationItem("pricePerHour", "", "Price per hour is required!"));
         }
 
         if( !List.of(CommonConstant.STATUS_ACTIVE, CommonConstant.STATUS_INACTIVE).contains((int) status) ) {
-            validationObject.add(Map.of(
-                    "field", "status",
-                    "rejected_value", status,
-                    "message", "Status is invalid!"
-            ));
+            validationObject.add(constructValidationItem("status", status, "Status is invalid!"));
         }
 
         validation = validationObject;

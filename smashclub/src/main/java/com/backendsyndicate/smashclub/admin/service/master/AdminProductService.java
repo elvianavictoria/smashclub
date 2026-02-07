@@ -1,10 +1,12 @@
 package com.backendsyndicate.smashclub.admin.service.master;
 
 import com.backendsyndicate.smashclub.admin.core.ICRUD;
-import com.backendsyndicate.smashclub.admin.core.IUpload;
+import com.backendsyndicate.smashclub.admin.core.IUploadWithVariants;
+import com.backendsyndicate.smashclub.admin.dto.request.CustomRequestValidation;
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminProductDetailDTO;
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminProductListDTO;
 import com.backendsyndicate.smashclub.ecommerce.model.Product;
+import com.backendsyndicate.smashclub.ecommerce.model.ProductVariant;
 import com.backendsyndicate.smashclub.ecommerce.repo.ProductRepo;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
@@ -21,12 +23,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @Transactional
-public class AdminProductService implements ICRUD<Product, Long>, IUpload<Product, Long> {
+public class AdminProductService implements ICRUD<Product, Long>, IUploadWithVariants<Product, Long> {
     @Autowired
     private ProductRepo productRepo;
     @Autowired
@@ -129,6 +136,10 @@ public class AdminProductService implements ICRUD<Product, Long>, IUpload<Produc
             productDB.setCategory(product.getCategory());
             if( product.getDefaultImgLink() != null ) productDB.setDefaultImgLink(product.getDefaultImgLink());
             productDB.setStatus(product.getStatus());
+
+            if( saveVariants(product.getProductVariants()) ) {
+
+            }
         } catch(Exception e) {
             Logging.handleException("ProductService", "update(Long id, Product product, HttpServletRequest request)", 120, generateErrorCode("04", "010"), e.getMessage());
             return GlobalResponse.failed("Failed to update product data!", generateErrorCode("04", "010"), null, request);
@@ -160,24 +171,41 @@ public class AdminProductService implements ICRUD<Product, Long>, IUpload<Produc
     }
 
     @Override
-    public ResponseEntity<Object> save(Product product, MultipartFile file, HttpServletRequest request) {
+    public ResponseEntity<Object> save(Product product, MultipartFile file, Map<String, MultipartFile> variants, HttpServletRequest request) {
         if( product == null ) {
             return GlobalResponse.failed("Product data is required!", generateErrorCode("13", "001"), null, request);
         }
 
-        CloudinaryResponseDTO cloudinary = cloudinaryService.uploadImage("product", file);
-        if( cloudinary == null ) {
+        String defaultImgUrl = uploadImage("product", file);
+        if( defaultImgUrl == null || defaultImgUrl.isEmpty() ) {
             return GlobalResponse.failed("Failed to upload product image!", generateErrorCode("13", "002"), null, request);
         }
 
-        product.setDefaultImgLink(cloudinary.getSecureUrl());
-        ResponseEntity<Object> response = save(product, request);
+        product.setDefaultImgLink(defaultImgUrl);
+        List<Map<String, Object>> variantValidationItems = new ArrayList<>();
+        for( Map.Entry<String, MultipartFile> entry: variants.entrySet() ) {
+            String key = entry.getKey();
+            MultipartFile variantFile = entry.getValue();
 
-        return response;
+            if( variantFile != null ) {
+                String variantImgUrl = uploadImage("product/variant", variantFile);
+                if( variantImgUrl == null || variantImgUrl.isEmpty() ) {
+                    variantValidationItems.add(CustomRequestValidation.constructValidationItem(String.format("productVariants[%s].variantImgLink", key), "", String.format("Variant image %s upload process failed!", key)));
+                } else {
+                    product.getProductVariants().get(Integer.parseInt(key)).setVariantImgLink(variantImgUrl);
+                }
+            }
+        }
+
+        if( !variantValidationItems.isEmpty() ) {
+            return GlobalResponse.failed("Failed to upload variant image!", generateErrorCode("13", "003"), variantValidationItems, request);
+        }
+
+        return save(product, request);
     }
 
     @Override
-    public ResponseEntity<Object> update(Long id, Product product, MultipartFile file, HttpServletRequest request) {
+    public ResponseEntity<Object> update(Long id, Product product, MultipartFile file, Map<String, MultipartFile> variants, HttpServletRequest request) {
         if( id == null ) {
             return GlobalResponse.failed("Product ID is required!", generateErrorCode("14", "001"), null, request);
         }
@@ -187,22 +215,94 @@ public class AdminProductService implements ICRUD<Product, Long>, IUpload<Produc
         }
 
         if( file != null ) {
-            CloudinaryResponseDTO cloudinary = cloudinaryService.uploadImage("product", file);
-            if( cloudinary == null ) {
+            String defaultImgUrl = uploadImage("product", file);
+            if( defaultImgUrl == null || defaultImgUrl.isEmpty() ) {
                 return GlobalResponse.failed("Failed to upload product image!", generateErrorCode("14", "003"), null, request);
             }
 
-            product.setDefaultImgLink(cloudinary.getSecureUrl());
+            product.setDefaultImgLink(defaultImgUrl);
         }
 
-        ResponseEntity<Object> response = update(id, product, request);
+        List<Map<String, Object>> variantValidationItems = new ArrayList<>();
+        List<ProductVariant> listTmp = new ArrayList<ProductVariant>();
+        variants.forEach( (key, variantFile) -> {
+            ProductVariant productVariantTmp;
 
-        return response;
+            if( !key.equals("defaultImgLink") ) {
+                String keyIndex = extractVariantKey(key);
+
+                if( variantFile != null ) {
+                    String variantImgUrl = uploadImage("product/variant", variantFile);
+                    if( variantImgUrl == null || variantImgUrl.isEmpty() ) {
+                        variantValidationItems.add(CustomRequestValidation.constructValidationItem(String.format("productVariants[%s].variantImgLink", keyIndex), "", String.format("Variant image %s upload process failed!", keyIndex)));
+                    } else {
+                        product.getProductVariants().get(Integer.parseInt(keyIndex)).setVariantImgLink(variantImgUrl);
+                    }
+                }
+            }
+        } );
+
+        if( !listTmp.isEmpty() ) {
+            product.setProductVariants(listTmp);
+        }
+
+        if( !variantValidationItems.isEmpty() ) {
+            return GlobalResponse.failed("Failed to upload variant image!", generateErrorCode("14", "004"), variantValidationItems, request);
+        }
+
+        return update(id, product, request);
+    }
+
+    private boolean saveVariants(List<ProductVariant> variants) {
+        try {
+            for( ProductVariant variant: variants ) {
+                if( variant.getId() != 0 ) {
+                    Optional<ProductVariant> opt = productVariantRepo.findById(variant.getId());
+                    if( opt.isEmpty() ) {
+                        return false;
+                    }
+
+                    ProductVariant variantDB = opt.get();
+                    variantDB.setName(variant.getName());
+                    variantDB.setSku(variant.getSku());
+                    variantDB.setPrice(variant.getPrice());
+                    variantDB.setStock(variant.getStock());
+                    if( variant.getVariantImgLink() != null ) variantDB.setVariantImgLink(variant.getVariantImgLink());
+                } else {
+                    productVariantRepo.save(variant);
+                }
+            }
+        } catch(Exception e) {
+            Logging.handleException("ProductService", "saveVariants(ProductVariant variant)", 260, generateErrorCode("06", "010"), e.getMessage());
+            return false;
+        }
+
+        return true;
+    }
+
+    private String uploadImage(String folder, MultipartFile file) {
+        try {
+            CloudinaryResponseDTO cloudinary = cloudinaryService.uploadImage(folder, file);
+            return cloudinary.getSecureUrl();
+        } catch(Exception e) {
+            return "";
+        }
     }
 
     private RespAdminProductListDTO mapListToDTO(Product product) {
         RespAdminProductListDTO result = modelMapper.map(product, RespAdminProductListDTO.class);
 
         return result;
+    }
+
+    private String extractVariantKey(String key) {
+        Pattern pattern = Pattern.compile("variantImages\\[(\\d+)]");
+        Matcher matcher = pattern.matcher(key);
+        if( !matcher.matches() ) {
+            Logging.printConsole("Failed to get index from " + key);
+            return "";
+        }
+
+        return matcher.group(1);
     }
 }

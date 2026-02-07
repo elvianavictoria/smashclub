@@ -165,12 +165,13 @@ public class AdminEquipmentService implements ICRUD<Equipment, Long>, IUpload<Eq
             return GlobalResponse.failed("Equipment data is required!", generateErrorCode("13", "001"), null, request);
         }
 
-//        CloudinaryResponseDTO cloudinary = cloudinaryService.uploadImage("equipment", file);
-//        if( cloudinary == null ) {
-//            return GlobalResponse.failed("Failed to upload equipment image!", generateErrorCode("13", "002"), null, request);
-//        }
-//
-//        equipment.setEquipmentImgLink(cloudinary.getSecureUrl());
+        String equipmentImgLink = uploadImage("equipment", file);
+        if( equipmentImgLink == null || equipmentImgLink.isEmpty() ) {
+            return GlobalResponse.failed("Failed to upload equipment image!", generateErrorCode("13", "002"), null, request);
+        }
+
+//            equipment.setEquipmentImgLink(equipmentImgLink);
+
         ResponseEntity<Object> response = save(equipment, request);
 
         return response;
@@ -187,17 +188,27 @@ public class AdminEquipmentService implements ICRUD<Equipment, Long>, IUpload<Eq
         }
 
         if( file != null ) {
-    //        CloudinaryResponseDTO cloudinary = cloudinaryService.uploadImage("equipment", file);
-    //        if( cloudinary == null ) {
-    //            return GlobalResponse.failed("Failed to upload equipment image!", generateErrorCode("14", "003"), null, request);
-    //        }
-    //
-    //        equipment.setEquipmentImgLink(cloudinary.getSecureUrl());
+            String equipmentImgLink = uploadImage("equipment", file);
+            if( equipmentImgLink == null || equipmentImgLink.isEmpty() ) {
+                return GlobalResponse.failed("Failed to upload equipment image!", generateErrorCode("14", "003"), null, request);
+            }
+
+//            equipment.setEquipmentImgLink(equipmentImgLink);
         }
 
         ResponseEntity<Object> response = update(id, equipment, request);
 
         return response;
+    }
+
+    private String uploadImage(String folder, MultipartFile file) {
+//        try {
+//            CloudinaryResponseDTO cloudinary = cloudinaryService.uploadImage(folder, file);
+//            return cloudinary.getSecureUrl();
+//        } catch(Exception e) {
+//            return "";
+//        }
+        return "";
     }
 
     private RespAdminEquipmentListDTO mapListToDTO(Equipment equipment) {

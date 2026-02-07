@@ -6,8 +6,8 @@ import com.backendsyndicate.smashclub.admin.service.master.AdminEquipmentService
 import com.backendsyndicate.smashclub.booking.model.Equipment;
 import com.backendsyndicate.smashclub.common.constant.PermissionConstant;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
+import com.backendsyndicate.smashclub.common.util.Util;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.constraints.Pattern;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import tools.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/admin/equipment")
@@ -56,7 +57,6 @@ public class AdminEquipmentController {
             @RequestParam String equipmentCategory,
             HttpServletRequest request
     ) {
-        ValAdminEquipmentEquipmentCategoryDTO equipmentCategoryDTO = objectMapper.readValue(equipmentCategory, ValAdminEquipmentEquipmentCategoryDTO.class);
         ReqAdminEquipmentSaveDTO dto = new ReqAdminEquipmentSaveDTO();
         dto.setEquipmentName(equipmentName);
         dto.setBrand(brand);
@@ -65,6 +65,10 @@ public class AdminEquipmentController {
         dto.setStock(stock);
         dto.setDescription(description);
         dto.setStatus(status);
+        ValAdminEquipmentEquipmentCategoryDTO equipmentCategoryDTO = Util.mapToModel(equipmentCategory, ValAdminEquipmentEquipmentCategoryDTO.class);
+        if( equipmentCategoryDTO == null ) {
+            return GlobalResponse.failed("Format tidak valid!", "X01001", List.of(dto.constructValidationItem("categoryId", equipmentCategory, "Equipment category is invalid!")), request);
+        }
         dto.setEquipmentCategory(equipmentCategoryDTO);
         dto.validate();
 
@@ -92,7 +96,6 @@ public class AdminEquipmentController {
             @RequestParam String equipmentCategory,
             HttpServletRequest request
     ) {
-        ValAdminEquipmentEquipmentCategoryDTO equipmentCategoryDTO = objectMapper.readValue(equipmentCategory, ValAdminEquipmentEquipmentCategoryDTO.class);
         ReqAdminEquipmentSaveDTO dto = new ReqAdminEquipmentSaveDTO();
 
         dto.setEquipmentName(equipmentName);
@@ -102,6 +105,10 @@ public class AdminEquipmentController {
         dto.setStock(stock);
         dto.setDescription(description);
         dto.setStatus(status);
+        ValAdminEquipmentEquipmentCategoryDTO equipmentCategoryDTO = Util.mapToModel(equipmentCategory, ValAdminEquipmentEquipmentCategoryDTO.class);
+        if( equipmentCategoryDTO == null ) {
+            return GlobalResponse.failed("Format tidak valid!", "X01001", List.of(dto.constructValidationItem("categoryId", equipmentCategory, "Equipment category is invalid!")), request);
+        }
         dto.setEquipmentCategory(equipmentCategoryDTO);
         dto.validate();
 
