@@ -1,14 +1,15 @@
 package com.backendsyndicate.smashclub.admin.service.master;
 
 import com.backendsyndicate.smashclub.admin.core.ICRUD;
+import com.backendsyndicate.smashclub.admin.core.IUpload;
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminCourtListDTO;
-import com.backendsyndicate.smashclub.admin.dto.response.RespAdminUserListDTO;
-import com.backendsyndicate.smashclub.admin.model.AdminUser;
 import com.backendsyndicate.smashclub.booking.model.Court;
 import com.backendsyndicate.smashclub.booking.repo.CourtRepo;
 import com.backendsyndicate.smashclub.common.util.DatetimeFormatting;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
+import com.backendsyndicate.smashclub.external.dto.CloudinaryResponseDTO;
+import com.backendsyndicate.smashclub.external.service.storage.CloudinaryService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -24,9 +26,11 @@ import java.util.function.Function;
 
 @Service
 @Transactional
-public class AdminCourtService implements ICRUD<Court, Long> {
+public class AdminCourtService implements ICRUD<Court, Long>, IUpload<Court, Long> {
     @Autowired
     private CourtRepo courtRepo;
+    @Autowired
+    private CloudinaryService cloudinaryService;
     private ModelMapper modelMapper = new ModelMapper();
 
     private String generateErrorCode(String methodNo, String errorNo) {
@@ -121,6 +125,7 @@ public class AdminCourtService implements ICRUD<Court, Long> {
             courtDB.setCourtName(court.getCourtName());
             courtDB.setOpenTime(court.getOpenTime());
             courtDB.setCloseTime(court.getCloseTime());
+//            if( court.getCourtImgLink() != null ) courtDB.setCourtImgLink(court.getCourtImgLink());
             courtDB.setStatus(court.getStatus());
         } catch(Exception e) {
             Logging.handleException("CourtService", "update(Long id, Court court, HttpServletRequest request)", 94, generateErrorCode("04", "010"), e.getMessage());
@@ -149,6 +154,47 @@ public class AdminCourtService implements ICRUD<Court, Long> {
         }
 
         return GlobalResponse.success("Successfully deleted court data!", null, request);
+    }
+
+    @Override
+    public ResponseEntity<Object> save(Court court, MultipartFile file, HttpServletRequest request) {
+        if( court == null ) {
+            return GlobalResponse.failed("Court data is required!", generateErrorCode("13", "001"), null, request);
+        }
+
+//        CloudinaryResponseDTO cloudinary = cloudinaryService.uploadImage("court", file);
+//        if( cloudinary == null ) {
+//            return GlobalResponse.failed("Failed to upload court image!", generateErrorCode("13", "002"), null, request);
+//        }
+//
+//        court.setCourtImgLink(cloudinary.getSecureUrl());
+        ResponseEntity<Object> response = save(court, request);
+
+        return response;
+    }
+
+    @Override
+    public ResponseEntity<Object> update(Long id, Court court, MultipartFile file, HttpServletRequest request) {
+        if( id == null ) {
+            return GlobalResponse.failed("Court ID is required!", generateErrorCode("14", "001"), null, request);
+        }
+
+        if( court == null ) {
+            return GlobalResponse.failed("Court data is required!", generateErrorCode("14", "002"), null, request);
+        }
+
+        if( file != null ) {
+    //        CloudinaryResponseDTO cloudinary = cloudinaryService.uploadImage("court", file);
+    //        if( cloudinary == null ) {
+    //            return GlobalResponse.failed("Failed to upload court image!", generateErrorCode("14", "003"), null, request);
+    //        }
+    //
+    //        court.setCourtImgLink(cloudinary.getSecureUrl());
+        }
+
+        ResponseEntity<Object> response = update(id, court, request);
+
+        return response;
     }
 
     private RespAdminCourtListDTO mapListToDTO(Court court) {

@@ -1,7 +1,9 @@
 package com.backendsyndicate.smashclub.external.config;
 
 import com.backendsyndicate.smashclub.common.security.Crypto;
+import com.cloudinary.Cloudinary;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
@@ -29,5 +31,10 @@ public class CloudinaryConfig {
 
     public static String getCloudinaryUrl() {
         return "cloudinary://" + apiKey + ":" + apiSecret + "@" + cloudName;
+    }
+
+    @Bean
+    public Cloudinary cloudinaryClient() {
+        return new Cloudinary(CloudinaryConfig.getCloudinaryUrl());
     }
 }

@@ -23,18 +23,20 @@ public class TestController {
 
     @PostMapping
     public ResponseEntity<Object> testUpload(@RequestBody MultipartFile file, HttpServletRequest request) {
+        CloudinaryResponseDTO dto = null;
+
         try {
             Logging.printConsole(file.getContentType());
             Logging.printConsole(file.getOriginalFilename());
             Logging.printConsole(file.getName());
             Logging.printConsole(file.getSize() + "");
 
-            CloudinaryResponseDTO dto = cloudinaryService.uploadImage("test", file);
+            dto = cloudinaryService.uploadImage("test", file);
             if( dto == null ) return GlobalResponse.failed("Failed to upload image!", "CMNTESTE001", dto, request);
         } catch(Exception e) {
             Logging.printConsole(e.getMessage());
         }
 
-        return GlobalResponse.success("Success!", null, request);
+        return GlobalResponse.success("Success!", dto, request);
     }
 }

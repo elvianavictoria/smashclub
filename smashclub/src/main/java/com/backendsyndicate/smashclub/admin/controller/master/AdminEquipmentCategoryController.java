@@ -5,6 +5,7 @@ import com.backendsyndicate.smashclub.admin.service.master.AdminEquipmentCategor
 import com.backendsyndicate.smashclub.booking.model.EquipmentCategory;
 import com.backendsyndicate.smashclub.common.constant.PermissionConstant;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -34,14 +35,14 @@ public class AdminEquipmentCategoryController {
 
     @PreAuthorize("hasAuthority(" + PermissionConstant.EQUIPMENT_CREATE_CODE + ")")
     @PostMapping("save")
-    public ResponseEntity<Object> equipmentCategorySave(@RequestBody ReqAdminEquipmentCategorySaveDTO dto, HttpServletRequest request) {
+    public ResponseEntity<Object> equipmentCategorySave(@Valid @RequestBody ReqAdminEquipmentCategorySaveDTO dto, HttpServletRequest request) {
         EquipmentCategory equipmentCategory = modelMapper.map(dto, EquipmentCategory.class);
         return adminEquipmentCategoryService.save(equipmentCategory, request);
     }
 
     @PreAuthorize("hasAuthority(" + PermissionConstant.EQUIPMENT_EDIT_CODE + ")")
     @PutMapping("update/{categoryId}")
-    public ResponseEntity<Object> equipmentCategoryUpdate(@PathVariable Long categoryId, @RequestBody ReqAdminEquipmentCategorySaveDTO dto, HttpServletRequest request) {
+    public ResponseEntity<Object> equipmentCategoryUpdate(@PathVariable Long categoryId, @Valid @RequestBody ReqAdminEquipmentCategorySaveDTO dto, HttpServletRequest request) {
         EquipmentCategory equipmentCategory = modelMapper.map(dto, EquipmentCategory.class);
         return adminEquipmentCategoryService.update(categoryId, equipmentCategory, request);
     }

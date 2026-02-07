@@ -1,14 +1,16 @@
 package com.backendsyndicate.smashclub.admin.service.master;
 
 import com.backendsyndicate.smashclub.admin.core.ICRUD;
+import com.backendsyndicate.smashclub.admin.core.IUpload;
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminProductDetailDTO;
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminProductListDTO;
 import com.backendsyndicate.smashclub.ecommerce.model.Product;
 import com.backendsyndicate.smashclub.ecommerce.repo.ProductRepo;
-import com.backendsyndicate.smashclub.common.util.DatetimeFormatting;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.ecommerce.repo.ProductVariantRepo;
+import com.backendsyndicate.smashclub.external.dto.CloudinaryResponseDTO;
+import com.backendsyndicate.smashclub.external.service.storage.CloudinaryService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,15 +19,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 import java.util.function.Function;
 
 @Service
 @Transactional
-public class AdminProductService implements ICRUD<Product, Long> {
+public class AdminProductService implements ICRUD<Product, Long>, IUpload<Product, Long> {
     @Autowired
     private ProductRepo productRepo;
+    @Autowired
+    private CloudinaryService cloudinaryService;
     @Autowired
     private ProductVariantRepo productVariantRepo;
     private ModelMapper modelMapper = new ModelMapper();
@@ -120,9 +125,12 @@ public class AdminProductService implements ICRUD<Product, Long> {
 
             Product productDB = optionalProduct.get();
             productDB.setProductName(product.getProductName());
+            productDB.setProductDesc(product.getProductDesc());
+            productDB.setCategory(product.getCategory());
+            if( product.getDefaultImgLink() != null ) productDB.setDefaultImgLink(product.getDefaultImgLink());
             productDB.setStatus(product.getStatus());
         } catch(Exception e) {
-            Logging.handleException("ProductService", "update(Long id, Product product, HttpServletRequest request)", 94, generateErrorCode("04", "010"), e.getMessage());
+            Logging.handleException("ProductService", "update(Long id, Product product, HttpServletRequest request)", 120, generateErrorCode("04", "010"), e.getMessage());
             return GlobalResponse.failed("Failed to update product data!", generateErrorCode("04", "010"), null, request);
         }
 
@@ -144,11 +152,52 @@ public class AdminProductService implements ICRUD<Product, Long> {
             productVariantRepo.deleteByProduct_Id(id);
             productRepo.deleteById(id);
         } catch(Exception e) {
-            Logging.handleException("ProductService", "delete(Long id, HttpServletRequest request)", 120, generateErrorCode("05", "010"), e.getMessage());
+            Logging.handleException("ProductService", "delete(Long id, HttpServletRequest request)", 150, generateErrorCode("05", "010"), e.getMessage());
             return GlobalResponse.failed("Failed to delete product data!", generateErrorCode("05", "010"), null, request);
         }
 
         return GlobalResponse.success("Successfully deleted product data!", null, request);
+    }
+
+    @Override
+    public ResponseEntity<Object> save(Product product, MultipartFile file, HttpServletRequest request) {
+        if( product == null ) {
+            return GlobalResponse.failed("Product data is required!", generateErrorCode("13", "001"), null, request);
+        }
+
+        CloudinaryResponseDTO cloudinary = cloudinaryService.uploadImage("product", file);
+        if( cloudinary == null ) {
+            return GlobalResponse.failed("Failed to upload product image!", generateErrorCode("13", "002"), null, request);
+        }
+
+        product.setDefaultImgLink(cloudinary.getSecureUrl());
+        ResponseEntity<Object> response = save(product, request);
+
+        return response;
+    }
+
+    @Override
+    public ResponseEntity<Object> update(Long id, Product product, MultipartFile file, HttpServletRequest request) {
+        if( id == null ) {
+            return GlobalResponse.failed("Product ID is required!", generateErrorCode("14", "001"), null, request);
+        }
+
+        if( product == null ) {
+            return GlobalResponse.failed("Product data is required!", generateErrorCode("14", "002"), null, request);
+        }
+
+        if( file != null ) {
+            CloudinaryResponseDTO cloudinary = cloudinaryService.uploadImage("product", file);
+            if( cloudinary == null ) {
+                return GlobalResponse.failed("Failed to upload product image!", generateErrorCode("14", "003"), null, request);
+            }
+
+            product.setDefaultImgLink(cloudinary.getSecureUrl());
+        }
+
+        ResponseEntity<Object> response = update(id, product, request);
+
+        return response;
     }
 
     private RespAdminProductListDTO mapListToDTO(Product product) {

@@ -3,6 +3,7 @@ package com.backendsyndicate.smashclub.admin.core;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface ICRUD<T, TID> {
     public ResponseEntity<Object> findAll(String keyword, Pageable pageable, HttpServletRequest request);

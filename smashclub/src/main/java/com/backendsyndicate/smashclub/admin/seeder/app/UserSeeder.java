@@ -37,13 +37,15 @@ public class UserSeeder implements DataSeeder {
     }
 
     private void generateUser(String fullName, String email, String password, int status) {
-        User x = new User();
-        x.setFullName(fullName);
-        x.setEmail(email);
-        x.setPasswordHash(passwordHasher.hash(password));
-        x.setStatus((byte) status);
-        x.setCreatedDate(LocalDateTime.now());
+        userRepo.findByEmail(email).orElseGet( () -> {
+            User x = new User();
+            x.setFullName(fullName);
+            x.setEmail(email);
+            x.setPasswordHash(passwordHasher.hash(password));
+            x.setStatus((byte) status);
+            x.setCreatedDate(LocalDateTime.now());
 
-        userRepo.save(x);
+            return userRepo.save(x);
+        } );
     }
 }

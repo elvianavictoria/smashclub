@@ -1,15 +1,16 @@
 package com.backendsyndicate.smashclub.admin.service.master;
 
 import com.backendsyndicate.smashclub.admin.core.ICRUD;
-import com.backendsyndicate.smashclub.admin.dto.response.RespAdminCourtListDTO;
+import com.backendsyndicate.smashclub.admin.core.IUpload;
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminEquipmentDetailDTO;
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminEquipmentListDTO;
-import com.backendsyndicate.smashclub.booking.model.Court;
 import com.backendsyndicate.smashclub.booking.model.Equipment;
 import com.backendsyndicate.smashclub.booking.repo.EquipmentRepo;
 import com.backendsyndicate.smashclub.common.util.DatetimeFormatting;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
+import com.backendsyndicate.smashclub.external.dto.CloudinaryResponseDTO;
+import com.backendsyndicate.smashclub.external.service.storage.CloudinaryService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,15 +19,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 import java.util.function.Function;
 
 @Service
 @Transactional
-public class AdminEquipmentService implements ICRUD<Equipment, Long> {
+public class AdminEquipmentService implements ICRUD<Equipment, Long>, IUpload<Equipment, Long> {
     @Autowired
     private EquipmentRepo equipmentRepo;
+    @Autowired
+    private CloudinaryService cloudinaryService;
     private ModelMapper modelMapper = new ModelMapper();
 
     private String generateErrorCode(String methodNo, String errorNo) {
@@ -124,6 +128,7 @@ public class AdminEquipmentService implements ICRUD<Equipment, Long> {
             equipmentDB.setDescription(equipment.getDescription());
             equipmentDB.setStock(equipment.getStock());
             equipmentDB.setType(equipment.getType());
+//            if( equipment.getEquipmentImgLink() != null ) equipmentDB.setEquipmentImgLink(equipment.getEquipmentImgLink());
             equipmentDB.setStatus(equipment.getStatus());
         } catch(Exception e) {
             Logging.handleException("EquipmentService", "update(Long id, Equipment equipment, HttpServletRequest request)", 92, generateErrorCode("04", "010"), e.getMessage());
@@ -152,6 +157,47 @@ public class AdminEquipmentService implements ICRUD<Equipment, Long> {
         }
 
         return GlobalResponse.success("Successfully deleted equipment data!", null, request);
+    }
+
+    @Override
+    public ResponseEntity<Object> save(Equipment equipment, MultipartFile file, HttpServletRequest request) {
+        if( equipment == null ) {
+            return GlobalResponse.failed("Equipment data is required!", generateErrorCode("13", "001"), null, request);
+        }
+
+//        CloudinaryResponseDTO cloudinary = cloudinaryService.uploadImage("equipment", file);
+//        if( cloudinary == null ) {
+//            return GlobalResponse.failed("Failed to upload equipment image!", generateErrorCode("13", "002"), null, request);
+//        }
+//
+//        equipment.setEquipmentImgLink(cloudinary.getSecureUrl());
+        ResponseEntity<Object> response = save(equipment, request);
+
+        return response;
+    }
+
+    @Override
+    public ResponseEntity<Object> update(Long id, Equipment equipment, MultipartFile file, HttpServletRequest request) {
+        if( id == null ) {
+            return GlobalResponse.failed("Equipment ID is required!", generateErrorCode("14", "001"), null, request);
+        }
+
+        if( equipment == null ) {
+            return GlobalResponse.failed("Equipment data is required!", generateErrorCode("14", "002"), null, request);
+        }
+
+        if( file != null ) {
+    //        CloudinaryResponseDTO cloudinary = cloudinaryService.uploadImage("equipment", file);
+    //        if( cloudinary == null ) {
+    //            return GlobalResponse.failed("Failed to upload equipment image!", generateErrorCode("14", "003"), null, request);
+    //        }
+    //
+    //        equipment.setEquipmentImgLink(cloudinary.getSecureUrl());
+        }
+
+        ResponseEntity<Object> response = update(id, equipment, request);
+
+        return response;
     }
 
     private RespAdminEquipmentListDTO mapListToDTO(Equipment equipment) {

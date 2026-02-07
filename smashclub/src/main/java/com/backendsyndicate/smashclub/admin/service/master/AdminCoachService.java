@@ -1,14 +1,15 @@
 package com.backendsyndicate.smashclub.admin.service.master;
 
 import com.backendsyndicate.smashclub.admin.core.ICRUD;
+import com.backendsyndicate.smashclub.admin.core.IUpload;
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminCoachListDTO;
-import com.backendsyndicate.smashclub.admin.dto.response.RespAdminCourtListDTO;
 import com.backendsyndicate.smashclub.booking.model.Coach;
-import com.backendsyndicate.smashclub.booking.model.Court;
 import com.backendsyndicate.smashclub.booking.repo.CoachRepo;
 import com.backendsyndicate.smashclub.common.util.DatetimeFormatting;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
+import com.backendsyndicate.smashclub.external.dto.CloudinaryResponseDTO;
+import com.backendsyndicate.smashclub.external.service.storage.CloudinaryService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,15 +18,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 import java.util.function.Function;
 
 @Service
 @Transactional
-public class AdminCoachService implements ICRUD<Coach, Long> {
+public class AdminCoachService implements ICRUD<Coach, Long>, IUpload<Coach, Long> {
     @Autowired
     private CoachRepo coachRepo;
+    @Autowired
+    private CloudinaryService cloudinaryService;
     private ModelMapper modelMapper = new ModelMapper();
 
     private String generateErrorCode(String methodNo, String errorNo) {
@@ -117,8 +121,9 @@ public class AdminCoachService implements ICRUD<Coach, Long> {
             Coach coachDB = optionalCoach.get();
             coachDB.setCoachCode(coach.getCoachCode());
             coachDB.setCoachName(coach.getCoachName());
-            coachDB.setStatus(coach.getStatus());
             coachDB.setPricePerHour(coach.getPricePerHour());
+//            if( coach.getCoachImgLink() != null ) coachDB.setCoachImgLink(coach.getCoachImgLink());
+            coachDB.setStatus(coach.getStatus());
         } catch(Exception e) {
             Logging.handleException("CoachService", "update(Long id, Coach coach, HttpServletRequest request)", 94, generateErrorCode("04", "010"), e.getMessage());
             return GlobalResponse.failed("Failed to update coach data!", generateErrorCode("04", "010"), null, request);
@@ -146,6 +151,47 @@ public class AdminCoachService implements ICRUD<Coach, Long> {
         }
 
         return GlobalResponse.success("Successfully deleted coach data!", null, request);
+    }
+
+    @Override
+    public ResponseEntity<Object> save(Coach coach, MultipartFile file, HttpServletRequest request) {
+        if( coach == null ) {
+            return GlobalResponse.failed("Coach data is required!", generateErrorCode("13", "001"), null, request);
+        }
+
+//        CloudinaryResponseDTO cloudinary = cloudinaryService.uploadImage("coach", file);
+//        if( cloudinary == null ) {
+//            return GlobalResponse.failed("Failed to upload coach image!", generateErrorCode("13", "002"), null, request);
+//        }
+//
+//        coach.setCoachImgLink(cloudinary.getSecureUrl());
+        ResponseEntity<Object> response = save(coach, request);
+
+        return response;
+    }
+
+    @Override
+    public ResponseEntity<Object> update(Long id, Coach coach, MultipartFile file, HttpServletRequest request) {
+        if( id == null ) {
+            return GlobalResponse.failed("Coach ID is required!", generateErrorCode("14", "001"), null, request);
+        }
+
+        if( coach == null ) {
+            return GlobalResponse.failed("Coach data is required!", generateErrorCode("14", "002"), null, request);
+        }
+
+        if( file != null ) {
+    //        CloudinaryResponseDTO cloudinary = cloudinaryService.uploadImage("coach", file);
+    //        if( cloudinary == null ) {
+    //            return GlobalResponse.failed("Failed to upload coach image!", generateErrorCode("14", "003"), null, request);
+    //        }
+    //
+    //        coach.setCoachImgLink(cloudinary.getSecureUrl());
+        }
+
+        ResponseEntity<Object> response = update(id, coach, request);
+
+        return response;
     }
 
     private RespAdminCoachListDTO mapListToDTO(Coach coach) {
