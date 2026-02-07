@@ -14,10 +14,13 @@ import java.util.Set;
 
 public class AdminPermission {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
     @EqualsAndHashCode.Include
     private int id;
+
+    @Column(name= "PermissionCode", nullable = false)
+    private String permissionCode;
 
     @Column(name = "PermissionName", nullable = false)
     private String permissionName;

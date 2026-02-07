@@ -14,13 +14,19 @@ import java.util.Set;
 
 public class AdminMenu {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
     @EqualsAndHashCode.Include
-    private Long id;
+    private int id;
+
+    @Column(name = "MenuCode")
+    private String menuCode;
 
     @Column(name = "MenuName", nullable = false)
     private String menuName;
+
+//    @Column(name = "MenuRoute", nullable = false)
+//    private String menuRoute;
 
     @Column(name = "ParentID", nullable = false)
     private int parentId; //fk?
@@ -30,4 +36,11 @@ public class AdminMenu {
 
     @ManyToMany(mappedBy = "menuSet")
     Set<AdminRole>  adminRoles;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "CategoryID", foreignKey = @ForeignKey(name = "fk_menuCategory_to_menu"), nullable = false)
+    AdminMenuCategory category;
+
+    @OneToMany(mappedBy="menu", fetch = FetchType.LAZY)
+    Set<AdminPermission> permissions;
 }

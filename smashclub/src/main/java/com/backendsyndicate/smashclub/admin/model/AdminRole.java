@@ -15,7 +15,7 @@ import java.util.Set;
 
 public class AdminRole {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
     @EqualsAndHashCode.Include
     private int id;

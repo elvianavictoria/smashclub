@@ -22,7 +22,7 @@ public class ResponseHandler {
      * @param request
      * @return
      */
-    public ResponseEntity<Object> handleResponse(
+    public Map<String, Object> constructResponseFormat(
             String message,
             HttpStatus status,
             Object errorCode,
@@ -39,6 +39,18 @@ public class ResponseHandler {
             m.put("errorCode",errorCode);
             m.put("path",request.getRequestURI());
         }
+
+        return m;
+    }
+
+    public ResponseEntity<Object> handleResponse(
+            String message,
+            HttpStatus status,
+            Object errorCode,
+            Object data,
+            HttpServletRequest request
+    ) {
+        Map<String, Object> m = constructResponseFormat(message, status, errorCode, data, request);
         return new ResponseEntity<>(m,status);
     }
 

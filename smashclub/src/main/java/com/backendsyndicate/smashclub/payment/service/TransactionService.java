@@ -1,6 +1,7 @@
 package com.backendsyndicate.smashclub.payment.service;
 
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
+import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.payment.core.IHistory;
 import com.backendsyndicate.smashclub.payment.model.Transaction;
 import com.backendsyndicate.smashclub.payment.repo.TransactionRepo;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -47,11 +49,12 @@ public class TransactionService implements IHistory<Object> {
         Page page = null;
 
         try {
-            page = transactionRepo.findByCreatedAtBetween(startDate, endDate, pageable);
+            page = transactionRepo.findByCreatedAtBetween(startDate.atStartOfDay(), endDate.atStartOfDay(), pageable);
             if( page.isEmpty() ) {
                 return GlobalResponse.failed("Transaction data not found!", generateErrorCode("01", "001"), null, request);
             }
         } catch(Exception e) {
+            Logging.handleException("TransactionService", "findAll(Pageable pageable, LocalDate startDate, LocalDate endDate, HttpServletRequest request)", 51, generateErrorCode("01", "010"), e.getMessage());
             return GlobalResponse.failed("Failed to get transaction list!", generateErrorCode("01", "010"), null, request);
         }
 
@@ -81,6 +84,7 @@ public class TransactionService implements IHistory<Object> {
 
             trx = optionalTrx.get();
         } catch(Exception e) {
+            Logging.handleException("TransactionService", "findByCode(String code, HttpServletRequest request)", 79, generateErrorCode("02", "010"), e.getMessage());
             return GlobalResponse.failed("Failed to get transaction data!", generateErrorCode("02", "010"), null, request);
         }
 

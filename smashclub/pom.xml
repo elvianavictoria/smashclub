@@ -31,6 +31,9 @@
         <javafaker.version>1.0.2</javafaker.version>
         <poi.version>5.5.1</poi.version>
         <jaxb.version>2.3.1</jaxb.version>
+        <spring-cloud.version>2025.1.0</spring-cloud.version>
+        <xendit.version>1.23.0</xendit.version>
+        <cloudinary.version>2.0.0</cloudinary.version>
     </properties>
 
     <dependencies>
@@ -38,9 +41,14 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
-        <!-- Testing -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -185,15 +193,24 @@
             <artifactId>spring-boot-starter-log4j2</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+
+        <!-- Xendit Client (Payment Gateway) -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-logging</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>com.xendit</groupId>
+            <artifactId>xendit-java-lib</artifactId>
+            <version>${xendit.version}</version>
+        </dependency>
+
+        <!-- Cloudinary (Cloud Storage) -->
+        <dependency>
+            <groupId>com.cloudinary</groupId>
+            <artifactId>cloudinary-http5</artifactId>
+            <version>${cloudinary.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.cloudinary</groupId>
+            <artifactId>cloudinary-taglib</artifactId>
+            <version>${cloudinary.version}</version>
         </dependency>
     </dependencies>
 

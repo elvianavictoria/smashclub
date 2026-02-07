@@ -4,16 +4,20 @@ import com.backendsyndicate.smashclub.auth.model.User;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.common.util.Util;
-import com.backendsyndicate.smashclub.payment.constant.PaymentMethodConstant;
-import com.backendsyndicate.smashclub.payment.constant.TransactionStatusConstant;
-import com.backendsyndicate.smashclub.payment.constant.TransactionTypeConstant;
+import com.backendsyndicate.smashclub.common.constant.PaymentMethodConstant;
+import com.backendsyndicate.smashclub.common.constant.TransactionStatusConstant;
+import com.backendsyndicate.smashclub.common.constant.TransactionTypeConstant;
+import com.backendsyndicate.smashclub.external.config.XenditConfig;
+import com.backendsyndicate.smashclub.external.dto.XenditResponseDTO;
+import com.backendsyndicate.smashclub.external.service.payment.XenditService;
 import com.backendsyndicate.smashclub.payment.core.IPayment;
-import com.backendsyndicate.smashclub.payment.dto.request.ReqUpdateBalanceDTO;
 import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransactionDTO;
 import com.backendsyndicate.smashclub.payment.dto.response.RespPaymentTransactionDTO;
+import com.backendsyndicate.smashclub.payment.model.PaymentLog;
 import com.backendsyndicate.smashclub.payment.model.RefundRequest;
 import com.backendsyndicate.smashclub.payment.model.Transaction;
 import com.backendsyndicate.smashclub.payment.model.TransactionLog;
+import com.backendsyndicate.smashclub.payment.repo.PaymentLogRepo;
 import com.backendsyndicate.smashclub.payment.repo.RefundRequestRepo;
 import com.backendsyndicate.smashclub.payment.repo.TransactionLogRepo;
 import com.backendsyndicate.smashclub.payment.repo.TransactionRepo;
@@ -41,6 +45,10 @@ public class PaymentService implements IPayment {
     private TransactionLogRepo transactionLogRepo;
     @Autowired
     private RefundRequestRepo refundRequestRepo;
+    @Autowired
+    private XenditService xenditService;
+    @Autowired
+    private PaymentLogRepo paymentLogRepo;
 
 
     private ModelMapper modelMapper = new ModelMapper();
@@ -66,8 +74,8 @@ public class PaymentService implements IPayment {
      * @return
      */
     @Override
-    public RespCreateTransactionDTO createTransaction(String customerId, BigDecimal totalPrice, String referenceCode, int transactionType) {
-        RespCreateTransactionDTO response = new RespCreateTransactionDTO();
+    public RespCreateTransactionDTO createTransaction(String customerId, BigDecimal totalPrice, String referenceCode, int transactionType, int paymentMethodId) {
+        RespCreateTransactionDTO response = null;
 
         try {
             String trxCode = generateTransactionCode();
@@ -85,14 +93,39 @@ public class PaymentService implements IPayment {
             trx.setReferenceCode(referenceCode);
             trx.setTransactionType((byte) transactionType);
 
+            transactionRepo.save(trx);
+
             logTransactionUpdate(trx, -1);
 
-            response = modelMapper.map(trx, RespCreateTransactionDTO.class);
+            // Create payment link
+            Optional<Transaction> opt = transactionRepo.findByTransactionCode(trxCode);
+            if( opt.isEmpty() ) {
+                Logging.handleException("PaymentService", "createTransaction", 97, generateErrorCode("01", "001"), "Failed to get created transaction!");
+            } else {
+                Transaction transaction = opt.get();
 
-//            return GlobalResponse.success("Get Transaction Code!", response, request);
+                XenditResponseDTO pgResponse = new XenditResponseDTO();
+                if(XenditConfig.getUseInvoice() == 'y' || paymentMethodId == 0) {
+                    pgResponse = xenditService.createPayment(trxCode, totalPrice, transaction.getUser().getEmail(), transaction.getTransactionLabel());
+                    if( pgResponse.getInvoiceUrl() != null ) {
+                        // Write to payment log
+                        logPaymentCreate(transaction, pgResponse.getInvoiceUrl());
+                    }
+                } else {
+                    /*
+                    * VA: Safe
+                    * E-wallet: Callback URL Issue
+                    * QRIS: Safe
+                    * */
+                    pgResponse = xenditService.createPayment(trxCode, totalPrice, transaction.getUser().getEmail(), transaction.getTransactionLabel(), PaymentMethodConstant.QRIS_DANA);
+                }
+
+                response = new RespCreateTransactionDTO();
+                response.setTransactionCode(trxCode);
+                response.setPaymentData(pgResponse.asMap());
+            }
         } catch(Exception e) {
-            Logging.handleException("PaymentService", "createTransaction", 65, generateErrorCode("01", "010"), e.getMessage());
-//            return GlobalResponse.failed("Failed to create transaction!", generateErrorCode("01", "010"), null, request);
+            Logging.handleException("PaymentService", "createTransaction", 107, generateErrorCode("01", "010"), e.getMessage());
         }
 
         return response;
@@ -200,14 +233,18 @@ public class PaymentService implements IPayment {
 
     private String generateTransactionCode() {
         LocalDate currentDt = LocalDate.now();
-        String currentDtString = ("" + currentDt.getYear()).substring(2) + currentDt.getMonth() + currentDt.getDayOfMonth();
-        String randomStr = Util.generateRandomString(4, false);
+        String strYear = "" + currentDt.getYear();
+        String strMonth = "0" + currentDt.getMonthValue();
+        String strDate = "0" + currentDt.getDayOfMonth();
+
+        String currentDtString = strYear.substring(2) + strMonth.substring(strMonth.length() - 2) + strDate.substring(strDate.length() - 2);
+        String randomStr = Util.generateRandomString(4, true);
 
         long trxCounter = transactionRepo.countTodayTransaction();
         trxCounter += 1;
         String strCounter = "00" + trxCounter;
 
-        return currentDtString + randomStr + strCounter.substring(strCounter.length() - 3);
+        return currentDtString + "-" + randomStr + "-" + strCounter.substring(strCounter.length() - 3);
     }
 
     private void logTransactionUpdate(Transaction transaction, int previousStatus) {
@@ -217,5 +254,13 @@ public class PaymentService implements IPayment {
         trxLog.setTransaction(transaction);
 
         transactionLogRepo.save(trxLog);
+    }
+
+    private void logPaymentCreate(Transaction transaction, String paymentLink) {
+        PaymentLog paymentLog = new PaymentLog();
+        paymentLog.setPaymentLink(paymentLink);
+        paymentLog.setTransaction(transaction);
+
+        paymentLogRepo.save(paymentLog);
     }
 }

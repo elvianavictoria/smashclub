@@ -33,8 +33,10 @@ public class Coach {
     private byte status = 0;
 
     @Column(name = "CreatedAt", updatable = false, nullable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "UpdatedAt", insertable = false)
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedAt = LocalDateTime.now();
+
+    // Need field: CoachImgLink
 }

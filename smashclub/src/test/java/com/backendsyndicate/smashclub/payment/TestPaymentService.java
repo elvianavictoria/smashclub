@@ -1,8 +1,8 @@
 package com.backendsyndicate.smashclub.payment;
 
 import com.backendsyndicate.smashclub.common.util.Logging;
-import com.backendsyndicate.smashclub.payment.constant.PaymentMethodConstant;
-import com.backendsyndicate.smashclub.payment.constant.TransactionTypeConstant;
+import com.backendsyndicate.smashclub.common.constant.PaymentMethodConstant;
+import com.backendsyndicate.smashclub.common.constant.TransactionTypeConstant;
 import com.backendsyndicate.smashclub.payment.dto.request.ReqPaymentTransactionDTO;
 import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransactionDTO;
 import com.backendsyndicate.smashclub.payment.service.PaymentService;
@@ -18,6 +18,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.math.BigDecimal;
+import java.util.Map;
 import java.util.Random;
 
 import static io.restassured.RestAssured.given;
@@ -36,6 +37,7 @@ public class TestPaymentService extends AbstractTestNGSpringContextTests {
 
     // Payment Trx
     private String transactionCode;
+    private Map<String, Object> paymentData;
     private int paymentMethodId;
 
     // Refund Trx
@@ -65,11 +67,14 @@ public class TestPaymentService extends AbstractTestNGSpringContextTests {
         RespCreateTransactionDTO response;
 
         try {
-            response = paymentService.createTransaction(customerId, totalPrice, referenceCode, transactionType);
+            response = paymentService.createTransaction(customerId, totalPrice, referenceCode, transactionType, 0);
             transactionCode = response.getTransactionCode();
+            paymentData = response.getPaymentData();
+
             isContinue = transactionCode != null && !transactionCode.isBlank();
 
             Assert.assertTrue(isContinue, "Transaction code is required!");
+            Assert.assertTrue(paymentData.containsKey("invoiceUrl"), "Payment link is required!");
         } catch(Exception e) {
             Logging.handleException("TestTransactionController", "transactionList", 42, "TEST-PYMT-001", e.getMessage());
             Assert.assertNotNull(null);

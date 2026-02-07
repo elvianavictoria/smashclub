@@ -23,10 +23,10 @@ public class PaymentLog {
     private String paymentLink = " ";
 
     @Column(name = "CreatedAt", updatable = false, nullable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "UpdatedAt", insertable = false)
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "TransactionID", foreignKey = @ForeignKey(name = "fk_paymentLog_to_trans"), nullable = false)

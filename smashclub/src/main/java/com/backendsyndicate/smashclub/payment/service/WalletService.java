@@ -2,7 +2,7 @@ package com.backendsyndicate.smashclub.payment.service;
 
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
-import com.backendsyndicate.smashclub.payment.constant.TransactionTypeConstant;
+import com.backendsyndicate.smashclub.common.constant.TransactionTypeConstant;
 import com.backendsyndicate.smashclub.payment.core.IWallet;
 import com.backendsyndicate.smashclub.payment.dto.request.ReqUpdateBalanceDTO;
 import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransactionDTO;
@@ -115,7 +115,7 @@ public class WalletService implements IWallet {
         RespCreateTransactionDTO response = null;
 
         try {
-            response = paymentService.createTransaction(userId, balance, "", TransactionTypeConstant.WALLET_TOPUP);
+            response = paymentService.createTransaction(userId, balance, "", TransactionTypeConstant.WALLET_TOPUP, 0);
         } catch(Exception e) {
             return GlobalResponse.failed("Failed to request topup balance!", generateErrorCode("03", "010"), null, request);
         }

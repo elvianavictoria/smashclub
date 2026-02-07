@@ -13,7 +13,7 @@ public interface IPayment {
     * Refund => Refund Transaction -> Perubahan status
     * */
 
-    public RespCreateTransactionDTO createTransaction(String customerId, BigDecimal totalPrice, String referenceCode, int transactionType);
+    public RespCreateTransactionDTO createTransaction(String customerId, BigDecimal totalPrice, String referenceCode, int transactionType, int paymentMethodId);
     public ResponseEntity<Object> paymentTransaction(String transactionCode, int paymentMethodId, HttpServletRequest request);
     public boolean refundTransaction(String transactionCode, String notes);
 

@@ -30,7 +30,8 @@ public class Logging {
 
     public static void printConsole(String message) {
         if( LogConfig.isEnableLog() ) {
-            System.out.println(message);
+            Timestamp now = new Timestamp(System.currentTimeMillis());
+            System.out.println(String.format("%tY-%<tm-%<td %<tH:%<tM:%<tS [APPLICATION] INFO: %s", now, message));
         }
     }
 }
