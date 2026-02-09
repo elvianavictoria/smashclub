@@ -1,4 +1,4 @@
-// Untuk generate secret key yang aman
+package com.backendsyndicate.smashclub.common.security;// Untuk generate secret key yang aman
 import io.jsonwebtoken.security.Keys;
 import java.util.Base64;
 import javax.crypto.SecretKey;

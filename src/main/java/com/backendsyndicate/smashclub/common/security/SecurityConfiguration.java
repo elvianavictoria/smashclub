@@ -1,6 +1,5 @@
 package com.backendsyndicate.smashclub.common.security;
 
-
 import com.backendsyndicate.smashclub.admin.security.jwt.AdminJwtFilter;
 import com.backendsyndicate.smashclub.admin.service.AdminAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +47,7 @@ public class SecurityConfiguration {
 //    private AuthenticationEntryPoint authenticationEntryPoint;
 //
 //    @Autowired
-//    private AuthService authService;
+//    private AuthService2 authService;
 //
 //    /*
 //        401 -> Otentikasi
