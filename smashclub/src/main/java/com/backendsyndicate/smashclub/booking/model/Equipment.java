@@ -35,6 +35,9 @@ public class Equipment {
     @Column(name = "Stock", nullable = false)
     private int stock = 0;
 
+    @Column(name = "EquipmentImgLink", length = 500)
+    private String equipmentImgLink;
+
     @Column(name = "Description")
     private String description;
 

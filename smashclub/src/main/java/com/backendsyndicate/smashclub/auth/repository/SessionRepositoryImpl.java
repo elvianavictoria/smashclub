@@ -1,4 +1,4 @@
-package com.backendsyndicate.smashclub.auth.repository.impl;
+package com.backendsyndicate.smashclub.auth.repository;
 
 import com.backendsyndicate.smashclub.auth.model.Sessions;
 import com.backendsyndicate.smashclub.auth.repository.SessionRepositoryCustom;

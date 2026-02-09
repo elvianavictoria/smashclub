@@ -1,6 +1,7 @@
 package com.backendsyndicate.smashclub.auth.repository;
 
 import com.backendsyndicate.smashclub.auth.model.PasswordResetTokens;
+import com.backendsyndicate.smashclub.auth.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -8,31 +9,33 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetTokens, String> {
 
-    // 1. Cari token yang masih valid (belum dipakai)
+    // Existing methods
     Optional<PasswordResetTokens> findByTokenAndUsedAtIsNull(String token);
+    Optional<PasswordResetTokens> findByToken(String token);
 
-    // 2. Cari token berdasarkan user ID
-    Optional<PasswordResetTokens> findByUserIdAndUsedAtIsNull(String userId);
-
-    // 3. INVALIDATE TOKENS - NATIVE QUERY (FIXED)
+    // 1. FIX: Native query invalidate (yang sudah ada)
     @Modifying
     @Transactional
-    @Query(value = "UPDATE password_reset_tokens SET used_at = :usedAt WHERE user_id = :userId AND used_at IS NULL",
+    @Query(value = "UPDATE password_reset_tokens SET UsedAt = :usedAt WHERE UserId = :userId AND UsedAt IS NULL",
             nativeQuery = true)
-    void invalidateUserTokens(@Param("userId") String userId, @Param("usedAt") LocalDateTime usedAt);
+    int invalidateUserTokens(@Param("userId") String userId, @Param("usedAt") LocalDateTime usedAt);
 
-    // 4. CLEANUP EXPIRED TOKENS - NATIVE QUERY (FIXED)
+    // 2. TAMBAH Method countByUserAndUsedAtIsNull (DIBUTUHKAN!)
+    @Query("SELECT COUNT(p) FROM PasswordResetTokens p WHERE p.user = :user AND p.usedAt IS NULL")
+    Long countByUserAndUsedAtIsNull(@Param("user") User user);
+
+    // 3. TAMBAH Method invalidateByUser (DIBUTUHKAN!)
     @Modifying
     @Transactional
-    @Query(value = "DELETE FROM password_reset_tokens WHERE expires_at < :cutoffDate",
-            nativeQuery = true)
-    void cleanupExpiredTokens(@Param("cutoffDate") LocalDateTime cutoffDate);
+    @Query("UPDATE PasswordResetTokens p SET p.usedAt = :usedAt WHERE p.user = :user AND p.usedAt IS NULL")
+    int invalidateByUser(@Param("user") User user, @Param("usedAt") LocalDateTime usedAt);
 
-    // 5. Cari token yang expired tapi belum dipakai
-    @Query("SELECT p FROM PasswordResetTokens p WHERE p.expiresAt < :now AND p.usedAt IS NULL")
-    java.util.List<PasswordResetTokens> findExpiredUnusedTokens(@Param("now") LocalDateTime now);
+    // 4. TAMBAH untuk debugging
+    @Query("SELECT p FROM PasswordResetTokens p WHERE p.user = :user")
+    List<PasswordResetTokens> findByUser(@Param("user") User user);
 }
