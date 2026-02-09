@@ -26,6 +26,9 @@ public class Court {
     @Column(name = "CourtName", length = 100, nullable = false)
     private String courtName;
 
+    @Column(name = "CourtImgLink", length = 500)
+    private String courtImgLink;
+
     @Column(name = "OpenTime", nullable = false)
     private LocalTime openTime;
 

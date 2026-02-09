@@ -1,4 +1,4 @@
-package com.backendsyndicate.smashclub.auth.service.impl;
+package com.backendsyndicate.smashclub.auth.service;
 
 import com.backendsyndicate.smashclub.auth.service.EmailService;
 import lombok.RequiredArgsConstructor;
