@@ -12,9 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -26,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class TransactionService implements IHistory<Object> {
+public class TransactionService implements IHistory {
     @Autowired
     private TransactionRepo transactionRepo;
     private ModelMapper modelMapper = new ModelMapper();
@@ -49,7 +47,7 @@ public class TransactionService implements IHistory<Object> {
         Page page = null;
 
         try {
-            page = transactionRepo.findByCreatedAtBetween(startDate.atStartOfDay(), endDate.atStartOfDay(), pageable);
+            page = transactionRepo.findAllByCreatedAtBetween(startDate.atStartOfDay(), endDate.atStartOfDay(), pageable);
             if( page.isEmpty() ) {
                 return GlobalResponse.failed("Transaction data not found!", generateErrorCode("01", "001"), null, request);
             }

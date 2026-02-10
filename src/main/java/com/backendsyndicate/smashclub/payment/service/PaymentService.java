@@ -13,6 +13,7 @@ import com.backendsyndicate.smashclub.external.service.payment.XenditService;
 import com.backendsyndicate.smashclub.payment.core.IPayment;
 import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransactionDTO;
 import com.backendsyndicate.smashclub.payment.dto.response.RespPaymentTransactionDTO;
+import com.backendsyndicate.smashclub.payment.dto.response.RespRefundTransactionDTO;
 import com.backendsyndicate.smashclub.payment.model.PaymentLog;
 import com.backendsyndicate.smashclub.payment.model.RefundRequest;
 import com.backendsyndicate.smashclub.payment.model.Transaction;
@@ -108,6 +109,7 @@ public class PaymentService implements IPayment {
                 if(XenditConfig.getUseInvoice() == 'y' || paymentMethodId == 0) {
                     pgResponse = xenditService.createPayment(trxCode, totalPrice, transaction.getUser().getEmail(), transaction.getTransactionLabel());
                     if( pgResponse.getInvoiceUrl() != null ) {
+                        transaction.setPaymentLink(pgResponse.getInvoiceUrl());
                         // Write to payment log
                         logPaymentCreate(transaction, pgResponse.getInvoiceUrl());
                     }
@@ -183,18 +185,19 @@ public class PaymentService implements IPayment {
      * (-) Controller
      *
      * @param transactionCode
-     * @param notes
+     * @param refundReason
      * @return
      */
     @Override
-    public boolean refundTransaction(String transactionCode, String notes) {
-        boolean isRequested = false;
+    public RespRefundTransactionDTO refundTransaction(String transactionCode, String refundReason) {
+        RespRefundTransactionDTO response = new RespRefundTransactionDTO();
+        response.setTransactionCode(transactionCode);
 
         try {
             Optional<Transaction> optionalTrx = transactionRepo.findByTransactionCode(transactionCode);
             if( optionalTrx.isEmpty() ) {
                 Logging.handleException("PaymentService", "refundTransaction", 152, generateErrorCode("03", "001"), "Transaction not found!");
-                return isRequested;
+                return response;
             }
             Transaction trx = optionalTrx.get();
             int previousStatus = trx.getStatus();
@@ -209,15 +212,16 @@ public class PaymentService implements IPayment {
             RefundRequest refundRequest = new RefundRequest();
             refundRequest.setTransaction(trx);
             refundRequest.setRefundStatus((byte) TransactionStatusConstant.REFUND_REQUESTED);
+            refundRequest.setRefundReason(refundReason);
 
             refundRequestRepo.save(refundRequest);
 
-            isRequested = true;
+            response.setRequested(true);
         } catch(Exception e) {
             Logging.handleException("PaymentService", "refundTransaction", 147, generateErrorCode("03", "010"), e.getMessage());
         }
 
-        return isRequested;
+        return response;
     }
 
     /**

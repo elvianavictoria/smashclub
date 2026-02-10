@@ -21,11 +21,17 @@ public class RefundRequest {
     @Column(name = "RefundStatus", nullable = false)
     private byte refundStatus = 0;
 
+    @Column(name = "RefundReason", nullable = false)
+    private String refundReason = "";
+
+    @Column(name = "RefundNotes", nullable = false)
+    private String refundNotes = "";
+
     @Column(name = "CreatedAt", updatable = false, nullable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "UpdatedAt", insertable = false)
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "TransactionID", foreignKey = @ForeignKey(name = "fk_refundRequest_to_trans"), nullable = false)

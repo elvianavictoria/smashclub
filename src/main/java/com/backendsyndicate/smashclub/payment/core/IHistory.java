@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import java.time.LocalDate;
 import java.util.List;
 
-public interface IHistory<T> {
-    public ResponseEntity<T> findAll(Pageable pageable, LocalDate startDate, LocalDate endDate, HttpServletRequest request);
-    public ResponseEntity<T> findByCode(String code, HttpServletRequest request);
+public interface IHistory {
+    public ResponseEntity<Object> findAll(Pageable pageable, LocalDate startDate, LocalDate endDate, HttpServletRequest request);
+    public ResponseEntity<Object> findByCode(String code, HttpServletRequest request);
 }

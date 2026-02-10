@@ -3,7 +3,9 @@ package com.backendsyndicate.smashclub.payment.controller;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.payment.dto.request.ReqCreateTransactionDTO;
+import com.backendsyndicate.smashclub.payment.dto.request.ReqPaymentTransactionDTO;
 import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransactionDTO;
+import com.backendsyndicate.smashclub.payment.dto.response.RespRefundTransactionDTO;
 import com.backendsyndicate.smashclub.payment.service.PaymentService;
 import com.backendsyndicate.smashclub.payment.service.TransactionService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -50,14 +52,15 @@ public class TransactionController {
     }
 
     @PostMapping("/payment/{transactionCode}")
-    public ResponseEntity<Object> transactionPayment(@PathVariable String transactionCode, @RequestBody byte paymentMethodId, HttpServletRequest request) {
-        return paymentService.paymentTransaction(transactionCode, paymentMethodId, request);
+    public ResponseEntity<Object> transactionPayment(@PathVariable String transactionCode, @RequestBody ReqPaymentTransactionDTO dto, HttpServletRequest request) {
+        return paymentService.paymentTransaction(transactionCode, dto.getPaymentMethodId(), request);
     }
 
-//    @PostMapping("/refund/{transactionCode}")
-//    public ResponseEntity<Object> transactionRefund(@PathVariable String transactionCode, @RequestBody String notes, HttpServletRequest request) {
-//        return paymentService.refundTransaction(transactionCode, notes);
-//    }
+    @PostMapping("/refund/{transactionCode}")
+    public ResponseEntity<Object> transactionRefund(@PathVariable String transactionCode, @RequestBody String refundReason, HttpServletRequest request) {
+        RespRefundTransactionDTO refund = paymentService.refundTransaction(transactionCode, refundReason);
+        return GlobalResponse.success("Successfully request refund transaction!", refund, request);
+    }
 
     @GetMapping("/payment-method")
     public ResponseEntity<Object> paymentMethodList(HttpServletRequest request) {

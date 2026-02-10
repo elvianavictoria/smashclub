@@ -2,6 +2,7 @@ package com.backendsyndicate.smashclub.common.util;
 
 import tools.jackson.databind.ObjectMapper;
 
+import java.util.Map;
 import java.util.Random;
 
 public class Util {
@@ -29,6 +30,16 @@ public class Util {
             return objectMapper.readValue(json, cls);
         } catch(Exception e) {
             Logging.handleException("Util", "mapToModel(String json, Class<T> cls)", 29, "UTLMTME010", e.getMessage());
+            return null;
+        }
+    }
+
+    public static <T> T mapToModel(Map<String, Object> map, Class<T> cls) {
+        try {
+            String json = objectMapper.writeValueAsString(map);
+            return mapToModel(json, cls);
+        } catch(Exception e) {
+            Logging.handleException("Util", "mapToModel(Map<String, Object> map, Class<T> cls)", 38, "UTLMTME020", e.getMessage());
             return null;
         }
     }

@@ -5,6 +5,7 @@ import com.backendsyndicate.smashclub.common.constant.PaymentMethodConstant;
 import com.backendsyndicate.smashclub.common.constant.TransactionTypeConstant;
 import com.backendsyndicate.smashclub.payment.dto.request.ReqPaymentTransactionDTO;
 import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransactionDTO;
+import com.backendsyndicate.smashclub.payment.dto.response.RespRefundTransactionDTO;
 import com.backendsyndicate.smashclub.payment.service.PaymentService;
 import com.backendsyndicate.smashclub.util.DataGenerator;
 import io.restassured.RestAssured;
@@ -111,11 +112,11 @@ public class TestPaymentService extends AbstractTestNGSpringContextTests {
             Assert.assertNotNull(null);
         }
 
-        boolean response;
+        RespRefundTransactionDTO response;
 
         try {
             response = paymentService.refundTransaction(transactionCode, notes);
-            isContinue = response;
+            isContinue = response.isRequested();
 
             Assert.assertTrue(isContinue, "Transaction code is required!");
         } catch(Exception e) {

@@ -77,7 +77,11 @@ public class SecurityConfiguration {
                 authorizeHttpRequests(
                        auth -> auth
                                // Endpoints that open for public
-                               .requestMatchers("/api/v1/admin/auth/login").permitAll()
+                               .requestMatchers(
+                                       "/api/v1/admin/auth/login",
+                                       // Test
+                                       "/api/v1/admin/sales/**"
+                               ).permitAll()
                                .anyRequest().authenticated()
                 ).
 //            headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable())). // Allow H2 console to run in a frame
