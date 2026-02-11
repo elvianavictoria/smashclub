@@ -80,7 +80,8 @@ public class SecurityConfiguration {
                                .requestMatchers(
                                        "/api/v1/admin/auth/login",
                                        // Test
-                                       "/api/v1/admin/sales/**"
+                                       "/api/v1/admin/sales/**",
+                                       "/api/v1/admin/refund-request/**"
                                ).permitAll()
                                .anyRequest().authenticated()
                 ).

@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,10 +25,10 @@ public class Wallet {
     private BigDecimal userBalance = BigDecimal.ZERO;
 
     @Column(name = "CreatedAt", updatable = false, nullable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "UpdatedAt", insertable = false)
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @MapsId

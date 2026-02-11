@@ -4,6 +4,8 @@ import com.backendsyndicate.smashclub.admin.service.report.AdminSalesService;
 import com.backendsyndicate.smashclub.common.constant.PermissionConstant;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +26,16 @@ public class AdminSalesController {
 
 //    @PreAuthorize("hasAuthority('" + PermissionConstant.SALES_READ_CODE + "')")
     @GetMapping("list")
-    public ResponseEntity<Object> salesDaily(@RequestParam int year, @RequestParam int month, HttpServletRequest request) {
-        return adminSalesService.list(year, month, request);
+    public ResponseEntity<Object> salesDaily(
+            @RequestParam int year,
+            @RequestParam int month,
+            @RequestParam int page,
+            @RequestParam int size,
+            @RequestParam String keyword,
+            HttpServletRequest request
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return adminSalesService.list(year, month, keyword, pageable, request);
     }
 
 //    @PreAuthorize("hasAuthority('" + PermissionConstant.SALES_DETAIL_CODE + "')")

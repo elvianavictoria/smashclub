@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 @Getter
 @Setter
-public class RespAdminSalesStatisticDTO {
+public class RespAdminTransactionStatisticDTO {
     private BigDecimal totalTransactionValue;
     private BigDecimal averageTransactionValue;
     private List<ExtAdminTransactionMonthlyDTO> monthlyTransactionValue;

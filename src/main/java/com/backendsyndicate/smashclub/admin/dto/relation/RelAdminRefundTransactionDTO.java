@@ -5,16 +5,12 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Data
 @Getter
 @Setter
-public class RelAdminSalesListDTO {
+public class RelAdminRefundTransactionDTO {
     private String transactionCode;
-    private String transactionLabel;
-    private RelAdminSalesPlayerDTO user;
+    private RelAdminTransactionPlayerDTO user;
     private BigDecimal totalPrice;
-    private String createdAt;
-    private String updatedAt;
 }

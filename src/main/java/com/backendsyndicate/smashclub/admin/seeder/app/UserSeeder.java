@@ -7,6 +7,7 @@ import com.backendsyndicate.smashclub.booking.model.Coach;
 import com.backendsyndicate.smashclub.booking.repo.CoachRepo;
 import com.backendsyndicate.smashclub.common.constant.CommonConstant;
 import com.backendsyndicate.smashclub.common.security.PasswordHasher;
+import com.backendsyndicate.smashclub.payment.service.WalletService;
 import jakarta.persistence.Column;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -20,11 +21,13 @@ import java.time.LocalDateTime;
 @Profile("dev")
 public class UserSeeder implements DataSeeder {
     private UserRepository userRepo;
+    private WalletService walletService;
     private PasswordHasher passwordHasher;
 
-    public UserSeeder(UserRepository userRepo, PasswordHasher passwordHasher) {
+    public UserSeeder(UserRepository userRepo, WalletService walletService, PasswordHasher passwordHasher) {
         this.userRepo = userRepo;
         this.passwordHasher = passwordHasher;
+        this.walletService = walletService;
     }
 
     @Override
@@ -37,7 +40,7 @@ public class UserSeeder implements DataSeeder {
     }
 
     private void generateUser(String fullName, String email, String password, int status) {
-        userRepo.findByEmail(email).orElseGet( () -> {
+        User user = userRepo.findByEmail(email).orElseGet( () -> {
             User x = new User();
             x.setFullName(fullName);
             x.setEmail(email);
@@ -47,5 +50,7 @@ public class UserSeeder implements DataSeeder {
 
             return userRepo.save(x);
         } );
+
+        walletService.createWallet(user.getId());
     }
 }

@@ -1,6 +1,6 @@
 package com.backendsyndicate.smashclub.external.service.payment;
 
-import com.backendsyndicate.smashclub.common.constant.TransactionStatusConstant;
+import com.backendsyndicate.smashclub.common.constant.TransactionConstant;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.external.constant.XenditPaymentStatusConstant;
@@ -47,12 +47,12 @@ public class XenditCallbackService implements IWebhook<XenditWebhookDTO> {
             Transaction trx = opt.get();
             switch(dto.getStatus()) {
                 case XenditPaymentStatusConstant.PAID_STATUS:
-                    if( trx.getStatus() == TransactionStatusConstant.PAYMENT_UNPAID ) {
-                        trx.setStatus((byte) TransactionStatusConstant.PAYMENT_PAID);
+                    if( trx.getStatus() == TransactionConstant.PAYMENT_UNPAID ) {
+                        trx.setStatus((byte) TransactionConstant.PAYMENT_PAID);
                     }
                     break;
                 case XenditPaymentStatusConstant.EXPIRED_STATUS:
-                    trx.setStatus((byte) TransactionStatusConstant.PAYMENT_EXPIRED);
+                    trx.setStatus((byte) TransactionConstant.PAYMENT_EXPIRED);
                     break;
             }
 

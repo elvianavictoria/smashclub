@@ -8,6 +8,7 @@ import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransaction
 import com.backendsyndicate.smashclub.payment.dto.response.RespRefundTransactionDTO;
 import com.backendsyndicate.smashclub.payment.service.PaymentService;
 import com.backendsyndicate.smashclub.payment.service.TransactionService;
+import com.backendsyndicate.smashclub.payment.service.helper.PaymentHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +23,10 @@ import java.time.LocalDate;
 @RestController
 @RequestMapping("api/v1/transaction")
 public class TransactionController {
+//    @Autowired
+//    private PaymentService paymentService;
     @Autowired
-    private PaymentService paymentService;
+    private PaymentHelper paymentService;
     @Autowired
     private TransactionService transactionService;
 

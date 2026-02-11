@@ -1,5 +1,6 @@
 package com.backendsyndicate.smashclub.payment.service;
 
+import com.backendsyndicate.smashclub.auth.model.User;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.common.constant.TransactionTypeConstant;
@@ -157,6 +158,7 @@ public class WalletService implements IWallet {
             wallet = optionalWallet.get();
             BigDecimal previousBalance = wallet.getUserBalance();
             BigDecimal updatedBalance = reqUpdateBalanceDTO.isAddition() ? previousBalance.add(reqUpdateBalanceDTO.getValue()) : previousBalance.subtract(reqUpdateBalanceDTO.getValue());
+            Logging.printConsole("Update balance to " + updatedBalance + "!");
             wallet.setUserBalance(updatedBalance);
 
             logWalletUpdate(wallet, previousBalance);
@@ -168,6 +170,33 @@ public class WalletService implements IWallet {
 
         } catch(Exception e) {
             Logging.handleException("WalletService", "updateBalance", 146, generateErrorCode("04", "010"), e.getMessage());
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean createWallet(String userId) {
+        if( userId == null ) {
+            Logging.handleException("WalletService", "createWallet(String userId)", 180, generateErrorCode("05", "001"), "User ID is required!");
+            return false;
+        }
+
+        try {
+            Optional<Wallet> optionalWallet = walletRepo.findByUserId(userId);
+            if( optionalWallet.isPresent() ) {
+                Logging.handleException("WalletService", "createWallet(String userId)", 189, generateErrorCode("05", "002"), "This user wallet already exists!");
+                return false;
+            }
+
+            Wallet wallet = new Wallet();
+            User user = new User();
+            user.setId(userId);
+            wallet.setUser(user);
+
+            walletRepo.save(wallet);
+        } catch(Exception e) {
+            Logging.handleException("WalletService", "createWallet(String userId)", 186, generateErrorCode("05", "010"), e.getMessage());
             return false;
         }
 

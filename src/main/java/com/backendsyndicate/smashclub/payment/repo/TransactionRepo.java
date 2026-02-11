@@ -20,6 +20,8 @@ public interface TransactionRepo extends JpaRepository<Transaction, Long> {
 
     // Transaction Filter by Date
     Page<Transaction> findAllByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
+    // Transaction Filter by Date and Transaction Code
+    Page<Transaction> findAllByCreatedAtBetweenAndTransactionCodeContainsIgnoreCase(LocalDateTime startDate, LocalDateTime endDate, String transactionCode, Pageable pageable);
     // Transaction Detail
     Optional<Transaction> findByTransactionCode(String transactionCode);
 
@@ -30,5 +32,4 @@ public interface TransactionRepo extends JpaRepository<Transaction, Long> {
     BigDecimal averageTotalPriceByCreatedAt(LocalDateTime startDate, LocalDateTime endDate);
     @Query(value="SELECT FORMAT(t.createdAt, 'MMMM yyyy') AS month, COUNT(t) AS totalTransactionCount, SUM(t.totalPrice) AS totalTransactionValue, AVG(t.totalPrice) AS avgTransactionValue FROM Transaction t WHERE t.createdAt BETWEEN ?1 AND ?2 GROUP BY FORMAT(t.createdAt, 'MMMM yyyy')")
     List<Map<String, Object>> findAllGroupByCreatedAt(LocalDateTime startDate, LocalDateTime endDate);
-    List<Transaction> findAllByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
 }

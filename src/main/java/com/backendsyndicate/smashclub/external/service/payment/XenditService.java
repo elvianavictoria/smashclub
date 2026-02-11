@@ -9,6 +9,7 @@ import com.xendit.enums.BankCode;
 import com.xendit.exception.XenditException;
 import com.xendit.model.*;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -17,9 +18,8 @@ import java.util.Map;
 
 @Service
 public class XenditService {
-    private XenditClient client;
-    private String secretKey;
-    private String publicKey;
+    @Autowired
+    private XenditClient xenditClient;
 
     private String currency;
     private String eWalletCheckoutMethod;
@@ -27,18 +27,9 @@ public class XenditService {
     private ModelMapper modelMapper = new ModelMapper();
 
     public XenditService() {
-        this.secretKey = XenditConfig.getSecretKey();
-        this.publicKey = XenditConfig.getPublicKey();
 
         this.currency = "IDR";
         this.eWalletCheckoutMethod = "ONE_TIME_PAYMENT";
-        initClient();
-    }
-
-    private void initClient() {
-        this.client = new XenditClient.Builder()
-                .setApikey(this.secretKey)
-                .build();
     }
 
     private String generateErrorCode(String methodNo, String errorNo) {
@@ -127,7 +118,7 @@ public class XenditService {
             params.put("payer_email", payerEmail);
             params.put("description", description);
 
-            Invoice invoice = client.invoice.create(params);
+            Invoice invoice = xenditClient.invoice.create(params);
             invoiceUrl = invoice.getInvoiceUrl();
         } catch(XenditException xe) {
             Logging.handleException("XenditService", "createInvoice(String externalId, BigDecimal amount, String payerEmail, String description)", 126, generateErrorCode("01", "010"), xe.getMessage());
@@ -146,7 +137,7 @@ public class XenditService {
             params.put("name", name);
             params.put("amount", amount);
 
-            virtualAccount = client.fixedVirtualAccount.createOpen(params);
+            virtualAccount = xenditClient.fixedVirtualAccount.createOpen(params);
         } catch(XenditException xe) {
             Logging.handleException("XenditService", "createClosedVA(String externalId, String bankCode, String name, BigDecimal amount)", 136, generateErrorCode("02", "010"), xe.getMessage());
         }
@@ -170,7 +161,7 @@ public class XenditService {
             params.put("channel_properties", channelProperties);
             params.put("source", channelCode);
 
-            charge = client.eWallet.createEWalletCharge(params);
+            charge = xenditClient.eWallet.createEWalletCharge(params);
         } catch(XenditException xe) {
             Logging.handleException("XenditService", "createEWalletInvoice(String referenceId, BigDecimal amount, String channelCode, String customerId)", 154, generateErrorCode("03", "010"), xe.getMessage());
         }
@@ -188,7 +179,7 @@ public class XenditService {
             params.put("currency", this.currency);
             params.put("amount", amount);
 
-            qr = client.qrCode.createQRCode(params);
+            qr = xenditClient.qrCode.createQRCode(params);
         } catch(XenditException xe) {
             Logging.handleException("XenditService", "createQR(String referenceId, BigDecimal amount)", 177, generateErrorCode("04", "010"), xe.getMessage());
         }

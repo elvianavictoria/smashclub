@@ -48,7 +48,7 @@ public class Crypto {
 
     // Remove later when compiling it to jar for production
     public static void main(String[] args) {
-        String strToEncrypt = "wnloX2tRODCpmJe3lB0IgKJPYuc";
+        String strToEncrypt = "adiputera841@gmail.com";
         System.out.println("Encryption Result for " + strToEncrypt + ": " + performEncrypt(strToEncrypt));
 
         String strToDecrypt = "a66b7ef2f967873fd6a1b3bd2306aa37";

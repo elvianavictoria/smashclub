@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -36,7 +37,7 @@ public class WalletLog {
     private String refID = " ";
 
     @Column(name = "CreatedAt", updatable = false, nullable = false)
-    private Timestamp createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "UserId", nullable = false)

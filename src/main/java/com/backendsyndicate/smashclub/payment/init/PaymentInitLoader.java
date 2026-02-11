@@ -2,7 +2,7 @@ package com.backendsyndicate.smashclub.payment.init;
 
 import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.common.constant.PaymentMethodConstant;
-import com.backendsyndicate.smashclub.common.constant.TransactionStatusConstant;
+import com.backendsyndicate.smashclub.common.constant.TransactionConstant;
 import com.backendsyndicate.smashclub.common.constant.TransactionTypeConstant;
 import com.backendsyndicate.smashclub.common.constant.WalletConstant;
 import org.springframework.stereotype.Component;
@@ -17,7 +17,7 @@ public class PaymentInitLoader {
         Logging.printConsole("Loading payment constant variables");
 
         PaymentMethodConstant.initLoad();
-        TransactionStatusConstant.initLoad();
+        TransactionConstant.initLoad();
         TransactionTypeConstant.initLoad();
         WalletConstant.initLoad();
     }

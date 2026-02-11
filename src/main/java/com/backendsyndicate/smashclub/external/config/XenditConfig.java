@@ -1,7 +1,10 @@
 package com.backendsyndicate.smashclub.external.config;
 
 import com.backendsyndicate.smashclub.common.security.Crypto;
+import com.cloudinary.Cloudinary;
+import com.xendit.XenditClient;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
@@ -58,5 +61,12 @@ public class XenditConfig {
     @Value("${xendit.url.redirect-failed}")
     private void setFailedRedirectUrl(String failedRedirectUrl) {
         XenditConfig.failedRedirectUrl = failedRedirectUrl;
+    }
+
+    @Bean
+    public XenditClient xenditClient() {
+        return new XenditClient.Builder()
+                .setApikey(this.secretKey)
+                .build();
     }
 }
