@@ -1,0 +1,14 @@
+.mvn
+.gradle
+.idea
+.vscode
+target/
+build/
+*.log
+*.class
+Dockerfile
+docker-compose.yml
+README.md
+LICENSE
+.git
+.gitignore

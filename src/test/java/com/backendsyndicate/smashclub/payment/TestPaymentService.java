@@ -115,7 +115,7 @@ public class TestPaymentService extends AbstractTestNGSpringContextTests {
         RespRefundTransactionDTO response;
 
         try {
-            response = paymentService.cancelTransaction(transactionCode, notes, (byte) 1);
+            response = paymentService.cancelTransaction(transactionCode, notes);
             isContinue = response.isRequested();
 
             Assert.assertTrue(isContinue, "Transaction code is required!");

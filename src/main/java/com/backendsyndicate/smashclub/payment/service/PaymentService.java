@@ -232,7 +232,7 @@ public class PaymentService implements IPayment {
      * @return
      */
     @Override
-    public RespRefundTransactionDTO cancelTransaction(String transactionCode, String refundReason, byte isRefund) {
+    public RespRefundTransactionDTO cancelTransaction(String transactionCode, String refundReason) {
         RespRefundTransactionDTO response = new RespRefundTransactionDTO();
         response.setTransactionCode(transactionCode);
 
@@ -252,7 +252,9 @@ public class PaymentService implements IPayment {
             trx.setStatus((byte) TransactionConstant.PAYMENT_CANCELLED);
             logTransactionUpdate(trx, previousStatus);
 
-            if( isRefund == CommonConstant.STATUS_ACTIVE) {
+            boolean isRefund = previousStatus > TransactionConstant.PAYMENT_UNPAID;
+
+            if( isRefund ) {
                 RefundRequest refundRequest = new RefundRequest();
                 refundRequest.setTransaction(trx);
                 refundRequest.setRefundStatus((byte) TransactionConstant.REFUND_REQUESTED);
