@@ -228,8 +228,7 @@ public class AdminUserService implements ICRUD<AdminUser, Long>, IUpload<AdminUs
 
     private String uploadImage(String folder, MultipartFile file) {
         try {
-            CloudinaryResponseDTO cloudinary = cloudinaryService.uploadImage(folder, file);
-            return cloudinary.getSecureUrl();
+            return cloudinaryService.uploadImageGetUrl(folder, file);
         } catch(Exception e) {
             return "";
         }

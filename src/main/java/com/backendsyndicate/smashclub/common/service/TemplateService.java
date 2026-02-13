@@ -16,6 +16,8 @@ public class TemplateService {
 
     public static final String TEMPLATE_PAYMENT_NOTIFY_PAID = "PAYMENT_NOTIFY_PAID";
     public static final String TEMPLATE_PAYMENT_NOTIFY_UNPAID = "PAYMENT_NOTIFY_UNPAID";
+    public static final String TEMPLATE_REFUND_NOTIFY_APPROVED = "REFUND_NOTIFY_APPROVED";
+    public static final String TEMPLATE_REFUND_NOTIFY_REJECTED = "REFUND_NOTIFY_REJECTED";
 
     public TemplateService() {
         createTemplateResolver();
