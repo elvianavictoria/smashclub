@@ -1,6 +1,7 @@
 package com.backendsyndicate.smashclub.booking.model;
 
 import com.backendsyndicate.smashclub.auth.model.User;
+import com.backendsyndicate.smashclub.common.constant.BookingConstant;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -45,7 +46,7 @@ public class Booking {
     private BigDecimal totalPrice;
 
     @Column(name = "Status", nullable = false)
-    private byte status = 0;
+    private byte status = BookingConstant.BOOKING_PENDING;
 
     @Column(name = "CreatedAt", updatable = false, nullable = false)
     private LocalDateTime createdAt;

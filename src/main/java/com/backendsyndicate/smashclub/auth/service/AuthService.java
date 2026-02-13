@@ -1,6 +1,7 @@
 package com.backendsyndicate.smashclub.auth.service;
 
 import com.backendsyndicate.smashclub.auth.dto.request.*;
+import com.backendsyndicate.smashclub.common.security.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ public class AuthService {
     private final PasswordService passwordService;
     private final TokenService tokenService;
     private final SessionService sessionService;
+    private final JwtService jwtService;
     private final com.backendsyndicate.smashclub.common.handler.ResponseHandler responseHandler;
 
     // ============ REGISTRATION ============
@@ -97,5 +99,43 @@ public class AuthService {
     @Transactional(readOnly = true)
     public ResponseEntity<Object> validateResetToken(String token, HttpServletRequest httpRequest) {
         return passwordService.validateResetToken(token, httpRequest, responseHandler);
+    }
+
+    // Tambahkan di AuthService.java
+    private final ProfileManagementService profileManagementService;
+
+    // ============ PROFILE MANAGEMENT ============
+    @Transactional(readOnly = true)
+    public ResponseEntity<Object> getProfile(String userId, HttpServletRequest httpRequest) {
+        return profileManagementService.getProfile(userId, httpRequest, responseHandler);
+    }
+
+    @Transactional
+    public ResponseEntity<Object> updateProfile(String userId, ProfileUpdateRequest request, HttpServletRequest httpRequest) {
+        return profileManagementService.updateProfile(userId, request, httpRequest, responseHandler);
+    }
+
+    @Transactional
+    public ResponseEntity<Object> changePassword(String userId, ChangePasswordRequest request, HttpServletRequest httpRequest) {
+        return profileManagementService.changePassword(userId, request, httpRequest, responseHandler);
+    }
+
+    @Transactional
+    public ResponseEntity<Object> verifyEmailChange(VerifyEmailChangeRequest request, HttpServletRequest httpRequest) {
+        return profileManagementService.verifyEmailChange(request, httpRequest, responseHandler);
+    }
+
+    @Transactional
+    public ResponseEntity<Object> cancelEmailChange(String userId, HttpServletRequest httpRequest) {
+        return profileManagementService.cancelEmailChange(userId, httpRequest, responseHandler);
+    }
+
+    public String getUserIdFromToken(String token) {
+        try {
+            return jwtService.extractUserId(token);
+        } catch (Exception e) {
+            log.error("Error extracting user ID from token: {}", e.getMessage());
+            return null;
+        }
     }
 }
