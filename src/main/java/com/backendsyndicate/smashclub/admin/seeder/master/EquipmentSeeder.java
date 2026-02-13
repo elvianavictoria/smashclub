@@ -13,9 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
+@Profile("dev")
 @Component
 @Transactional
-@Profile("dev")
 public class EquipmentSeeder implements DataSeeder {
     private EquipmentRepo equipmentRepo;
     private EquipmentCategorySeeder equipmentCategorySeeder;

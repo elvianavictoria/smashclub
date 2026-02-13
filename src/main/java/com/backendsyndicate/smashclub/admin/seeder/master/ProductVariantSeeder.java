@@ -16,9 +16,9 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
+@Profile("dev")
 @Component
 @Transactional
-@Profile("dev")
 public class ProductVariantSeeder implements DataSeeder {
     private ProductVariantRepo productVariantRepo;
     private ProductSeeder productSeeder;

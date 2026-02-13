@@ -11,9 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 
+@Profile("dev")
 @Component
 @Transactional
-@Profile("dev")
 public class CourtSeeder implements DataSeeder {
     private CourtRepo courtRepo;
 
