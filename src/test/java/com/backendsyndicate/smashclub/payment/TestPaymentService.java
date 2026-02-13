@@ -68,7 +68,7 @@ public class TestPaymentService extends AbstractTestNGSpringContextTests {
         RespCreateTransactionDTO response;
 
         try {
-            response = paymentService.createTransaction(customerId, totalPrice, referenceCode, transactionType, 0);
+            response = paymentService.createTransaction(customerId, totalPrice, referenceCode, transactionType);
             transactionCode = response.getTransactionCode();
             paymentData = response.getPaymentData();
 

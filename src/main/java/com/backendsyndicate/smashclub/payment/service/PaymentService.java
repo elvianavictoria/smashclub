@@ -88,7 +88,7 @@ public class PaymentService implements IPayment {
      * @return
      */
     @Override
-    public RespCreateTransactionDTO createTransaction(String customerId, BigDecimal totalPrice, String referenceCode, int transactionType, int paymentMethodId) {
+    public RespCreateTransactionDTO createTransaction(String customerId, BigDecimal totalPrice, String referenceCode, int transactionType) {
         RespCreateTransactionDTO response = null;
 
         try {
@@ -124,7 +124,7 @@ public class PaymentService implements IPayment {
                 Hibernate.initialize(transaction.getUser());
 
                 XenditResponseDTO pgResponse = new XenditResponseDTO();
-                if(XenditConfig.getUseInvoice() == 'y' || paymentMethodId == 0) {
+                if(XenditConfig.getUseInvoice() == 'y') {
                     pgResponse = xenditService.createPayment(trxCode, totalPrice, transaction.getUser().getEmail(), transaction.getTransactionLabel());
                     if( pgResponse.getInvoiceUrl() != null ) {
                         transaction.setPaymentLink(pgResponse.getInvoiceUrl());
@@ -168,12 +168,11 @@ public class PaymentService implements IPayment {
      * Code: 02
      *
      * @param transactionCode
-     * @param paymentMethodId
      * @param request
      * @return
      */
     @Override
-    public ResponseEntity<Object> paymentTransaction(String transactionCode, int paymentMethodId, HttpServletRequest request) {
+    public ResponseEntity<Object> paymentTransaction(String transactionCode, HttpServletRequest request) {
         if( transactionCode == null ) {
             return GlobalResponse.failed("Transaction code is required!", generateErrorCode("02", "001"), null, request);
         }

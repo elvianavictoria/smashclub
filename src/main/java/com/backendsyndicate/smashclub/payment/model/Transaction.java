@@ -53,7 +53,7 @@ public class Transaction {
     private int transactionType;
 
     @Column(name = "PaymentMethodID")
-    private int paymentMethodID;
+    private int paymentMethodID = 0;
 
     @Column(name = "CreatedAt", updatable = false, nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

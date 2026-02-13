@@ -50,13 +50,13 @@ public class TransactionController {
 
     @PostMapping("/create")
     public ResponseEntity<Object> transactionOrder(@Valid @RequestBody ReqCreateTransactionDTO dto, HttpServletRequest request) {
-        RespCreateTransactionDTO payment = paymentService.createTransaction(dto.getCustomerId(), dto.getTotalPrice(), dto.getReferenceCode(), dto.getTransactionType(), dto.getPaymentMethodId());
+        RespCreateTransactionDTO payment = paymentService.createTransaction(dto.getCustomerId(), dto.getTotalPrice(), dto.getReferenceCode(), dto.getTransactionType());
         return GlobalResponse.success("Successfully create transaction!", payment, request);
     }
 
     @PostMapping("/payment/{transactionCode}")
     public ResponseEntity<Object> transactionPayment(@PathVariable String transactionCode, @RequestBody ReqPaymentTransactionDTO dto, HttpServletRequest request) {
-        return paymentService.paymentTransaction(transactionCode, dto.getPaymentMethodId(), request);
+        return paymentService.paymentTransaction(transactionCode, request);
     }
 
     @PostMapping("/cancel/{transactionCode}")

@@ -116,7 +116,7 @@ public class WalletService implements IWallet {
         RespCreateTransactionDTO response = null;
 
         try {
-            response = paymentService.createTransaction(userId, balance, "", TransactionTypeConstant.WALLET_TOPUP, 0);
+            response = paymentService.createTransaction(userId, balance, "", TransactionTypeConstant.WALLET_TOPUP);
         } catch(Exception e) {
             return GlobalResponse.failed("Failed to request topup balance!", generateErrorCode("03", "010"), null, request);
         }

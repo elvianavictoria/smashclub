@@ -19,8 +19,8 @@ public class PaymentHelper extends PaymentService {
     private WalletService walletService;
     private ModelMapper modelMapper = new ModelMapper();
 
-    public ResponseEntity<Object> paymentTransaction(String transactionCode, int paymentMethodId, HttpServletRequest request) {
-        ResponseEntity<Object> response = super.paymentTransaction(transactionCode, paymentMethodId, request);
+    public ResponseEntity<Object> paymentTransaction(String transactionCode, HttpServletRequest request) {
+        ResponseEntity<Object> response = super.paymentTransaction(transactionCode, request);
         RespPaymentTransactionDTO dto = modelMapper.map(response, RespPaymentTransactionDTO.class);
 
         try {
