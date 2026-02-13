@@ -1,5 +1,6 @@
 package com.backendsyndicate.smashclub.booking.model;
 
+import com.backendsyndicate.smashclub.common.constant.BookingConstant;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,7 +34,7 @@ public class Coach {
     private BigDecimal pricePerHour;
 
     @Column(name = "Status", nullable = false)
-    private byte status = 0;
+    private byte status = BookingConstant.RESOURCE_ACTIVE;
 
     @Column(name = "CreatedAt", updatable = false, nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

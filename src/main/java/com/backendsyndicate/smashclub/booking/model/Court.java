@@ -1,8 +1,10 @@
 package com.backendsyndicate.smashclub.booking.model;
 
+import com.backendsyndicate.smashclub.common.constant.BookingConstant;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -35,14 +37,29 @@ public class Court {
     @Column(name = "CloseTime", nullable = false)
     private LocalTime closeTime;
 
+    @Column(name = "PricePerHour", precision = 17, scale = 2,nullable = false)
+    private BigDecimal pricePerHour = BigDecimal.ZERO;
+
     @Column(name = "Status", nullable = false)
-    private byte status = 0;
+    private byte status = BookingConstant.RESOURCE_ACTIVE;
 
     @Column(name = "CreatedAt", updatable = false, nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
-    @Column(name = "UpdatedAt", insertable = false)
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    @Column(name = "UpdatedAt", nullable = false)
+    private LocalDateTime updatedAt;
 
-    // Need field: CourtImgLink, PricePerHour
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();  // ✅ SET VALUE SAAT INSERT!
+        if (status == 0) {
+            status = BookingConstant.RESOURCE_ACTIVE;
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

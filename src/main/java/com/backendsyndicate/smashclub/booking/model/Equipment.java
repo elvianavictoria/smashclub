@@ -1,5 +1,6 @@
 package com.backendsyndicate.smashclub.booking.model;
 
+import com.backendsyndicate.smashclub.common.constant.BookingConstant;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -42,7 +43,7 @@ public class Equipment {
     private String description;
 
     @Column(name = "Status", nullable = false)
-    private int status = 0;
+    private byte status = BookingConstant.RESOURCE_ACTIVE;
 
     @Column(name = "CreatedAt", updatable = false, nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

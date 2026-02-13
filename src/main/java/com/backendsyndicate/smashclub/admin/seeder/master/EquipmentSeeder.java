@@ -48,7 +48,7 @@ public class EquipmentSeeder implements DataSeeder {
             x.setPrice(price);
             x.setStock(stock);
             x.setDescription(description);
-            x.setStatus(status);
+            x.setStatus((byte)status);
             x.setEquipmentCategory(equipmentCategory);
 
             return equipmentRepo.save(x);
