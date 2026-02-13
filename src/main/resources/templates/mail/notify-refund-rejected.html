@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="id">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>SmashClub - Update Pengajuan Refund</title>
+    <style>
+        /* Base styles */
+        body {
+            background-color: #f5f8f8;
+            color: #1e293b;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+
+        table {
+            border-spacing: 0;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .main-wrapper {
+            background-color: #f5f8f8;
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-top: 4px solid #00BBA7;
+            border-radius: 12px;
+            display: inline-block;
+            margin: 0 auto;
+            max-width: 600px;
+            text-align: left;
+            vertical-align: top;
+            width: 100%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Branding */
+        .header {
+            padding: 40px 0 20px 0;
+            text-align: center;
+        }
+
+        .brand-logo {
+            display: inline-block;
+            vertical-align: middle;
+            width: 32px;
+            height: 32px;
+            background-color: #00BBA7;
+            border-radius: 8px;
+            color: #ffffff;
+            line-height: 32px;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .brand-name {
+            color: #0f172a;
+            display: inline-block;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            padding-left: 8px;
+            text-transform: uppercase;
+            vertical-align: middle;
+            line-height: 1;
+        }
+
+        /* Hero section */
+        .hero {
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        .status-icon-outer {
+            background-color: #fef2f2;
+            border-radius: 50%;
+            display: inline-block;
+            height: 56px;
+            line-height: 56px;
+            text-align: center;
+            width: 56px;
+        }
+
+        .status-icon-inner {
+            background-color: #fee2e2;
+            border-radius: 50%;
+            color: #ef4444;
+            display: inline-block;
+            font-size: 22px;
+            height: 40px;
+            line-height: 40px;
+            vertical-align: middle;
+            width: 40px;
+            font-weight: bold;
+        }
+
+        .h1 {
+            color: #0f172a;
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+            padding: 24px 0 8px 0;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 14px;
+            margin: 0;
+            padding-bottom: 30px;
+            text-align: center;
+        }
+
+        /* Content body */
+        .content {
+            padding: 0 40px 40px 40px;
+        }
+
+        .greeting {
+            color: #1e293b;
+            font-size: 16px;
+            font-weight: 600;
+            padding-bottom: 16px;
+        }
+
+        .body-text {
+            color: #475569;
+            font-size: 15px;
+            line-height: 1.6;
+            padding-bottom: 30px;
+        }
+
+        /* Rejection Box */
+        .rejection-box {
+            background-color: #f8fafc;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+
+        .rejection-status {
+            color: #ef4444;
+            font-size: 12px;
+            font-weight: 700;
+            padding-bottom: 12px;
+            display: block;
+        }
+
+        .rejection-status-icon {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 6px;
+            font-size: 14px;
+        }
+
+        .rejection-label {
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 700;
+            padding-bottom: 8px;
+        }
+
+        .rejection-reason {
+            color: #64748b;
+            font-size: 14px;
+            font-style: italic;
+            line-height: 1.6;
+        }
+
+        .closing-note {
+            color: #475569;
+            font-size: 14px;
+            line-height: 1.6;
+            padding-bottom: 30px;
+        }
+
+        /* Support Button */
+        .button-section {
+            text-align: center;
+            padding-bottom: 40px;
+        }
+
+        .primary-button {
+            background-color: #00BBA7;
+            border-radius: 8px;
+            color: #ffffff;
+            display: inline-block;
+            font-size: 15px;
+            font-weight: 700;
+            padding: 16px 32px;
+            text-decoration: none;
+            box-shadow: 0 4px 6px rgba(0, 187, 167, 0.2);
+        }
+
+        .signature {
+            color: #64748b;
+            font-size: 14px;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .signature-name {
+            color: #1e293b;
+            font-weight: 700;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 40px;
+            text-align: center;
+        }
+
+        .social-links {
+            padding-bottom: 24px;
+        }
+
+        .social-icon {
+            background-color: #e2e8f0;
+            border-radius: 50%;
+            color: #64748b;
+            display: inline-block;
+            height: 32px;
+            line-height: 32px;
+            margin: 0 6px;
+            text-decoration: none;
+            width: 32px;
+            font-size: 14px;
+        }
+
+        .footer-text {
+            color: #94a3b8;
+            font-size: 10px;
+            line-height: 1.6;
+            margin: 0;
+            padding-bottom: 20px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .footer-nav {
+            color: #94a3b8;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .nav-item {
+            padding: 0 8px;
+            color: #94a3b8;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+<div class="main-wrapper">
+    <div class="card">
+        <!-- Header Brand -->
+        <div class="header">
+            <div>
+                <div class="brand-logo">🎾</div>
+                <span class="brand-name">SmashClub</span>
+            </div>
+        </div>
+
+        <!-- Hero Status -->
+        <div class="hero">
+            <div class="status-icon-outer">
+                <div class="status-icon-inner">!</div>
+            </div>
+            <h1 class="h1">Update Pengajuan Pengembalian Dana</h1>
+            <p class="subtitle" th:text="'ID Pesanan: #' + ${transactionCode}">ID Pesanan: #SC-9823104</p>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content">
+            <div class="greeting">Halo <span th:text="${fullName}">Andi Pratama</span>,</div>
+            <div class="body-text">
+                Terima kasih telah menghubungi SmashClub. Kami ingin menginformasikan hasil peninjauan atas
+                permintaan pengembalian dana (refund) untuk pesanan Anda.
+            </div>
+
+            <!-- Rejection Highlight Box -->
+            <div class="rejection-box">
+                <div class="rejection-status">
+                    <span class="rejection-status-icon">ⓧ</span> STATUS: PENGAJUAN TIDAK DISETUJUI
+                </div>
+                <div class="rejection-label">Alasan Penolakan:</div>
+                <div class="rejection-reason" th:text="${refundNotes}">
+                    "Permintaan pengembalian dana melewati batas waktu maksimal 24 jam sebelum jadwal pemakaian
+                    lapangan sesuai dengan Syarat dan Ketentuan pembatalan SmashClub."
+                </div>
+            </div>
+
+            <div class="closing-note">
+                Kami memahami ini mungkin bukan kabar yang Anda harapkan. Jika Anda merasa ada kekeliruan atau
+                memiliki pertanyaan lebih lanjut mengenai kebijakan kami, tim dukungan kami siap membantu Anda.
+            </div>
+
+            <!-- Action Button -->
+            <div class="button-section">
+                <a href="#" class="primary-button">Hubungi Layanan Pelanggan ↗</a>
+            </div>
+
+            <div class="signature">
+                Salam hangat,<br>
+                <span class="signature-name">Tim SmashClub</span>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p class="footer-text">
+                Anda menerima email ini karena Anda adalah pengguna terdaftar SmashClub.<br>
+                © 2024 SmashClub Indonesia. Seluruh hak cipta dilindungi undang-undang.
+            </p>
+            <div class="footer-nav">
+                <a href="#" class="nav-item">Kebijakan Privasi</a>
+                <span style="color: #cbd5e1;">•</span>
+                <a href="#" class="nav-item">Syarat & Ketentuan</a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>

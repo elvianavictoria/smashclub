@@ -59,9 +59,9 @@ public class TransactionController {
         return paymentService.paymentTransaction(transactionCode, dto.getPaymentMethodId(), request);
     }
 
-    @PostMapping("/refund/{transactionCode}")
-    public ResponseEntity<Object> transactionRefund(@PathVariable String transactionCode, @RequestBody String refundReason, HttpServletRequest request) {
-        RespRefundTransactionDTO refund = paymentService.refundTransaction(transactionCode, refundReason);
+    @PostMapping("/cancel/{transactionCode}")
+    public ResponseEntity<Object> transactionCancel(@PathVariable String transactionCode, @RequestBody String refundReason, @RequestBody Integer isRefund, HttpServletRequest request) {
+        RespRefundTransactionDTO refund = paymentService.cancelTransaction(transactionCode, refundReason, isRefund.byteValue());
         return GlobalResponse.success("Successfully request refund transaction!", refund, request);
     }
 

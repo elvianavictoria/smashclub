@@ -2,6 +2,7 @@ package com.backendsyndicate.smashclub.payment.service;
 
 import com.backendsyndicate.smashclub.auth.model.User;
 import com.backendsyndicate.smashclub.auth.repository.UserRepository;
+import com.backendsyndicate.smashclub.common.constant.CommonConstant;
 import com.backendsyndicate.smashclub.common.service.TemplateService;
 import com.backendsyndicate.smashclub.common.util.DatetimeFormatting;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
@@ -231,7 +232,7 @@ public class PaymentService implements IPayment {
      * @return
      */
     @Override
-    public RespRefundTransactionDTO refundTransaction(String transactionCode, String refundReason) {
+    public RespRefundTransactionDTO cancelTransaction(String transactionCode, String refundReason, byte isRefund) {
         RespRefundTransactionDTO response = new RespRefundTransactionDTO();
         response.setTransactionCode(transactionCode);
 
@@ -251,12 +252,15 @@ public class PaymentService implements IPayment {
             trx.setStatus((byte) TransactionConstant.PAYMENT_CANCELLED);
             logTransactionUpdate(trx, previousStatus);
 
-            RefundRequest refundRequest = new RefundRequest();
-            refundRequest.setTransaction(trx);
-            refundRequest.setRefundStatus((byte) TransactionConstant.REFUND_REQUESTED);
-            refundRequest.setRefundReason(refundReason);
+            if( isRefund == CommonConstant.STATUS_ACTIVE) {
+                RefundRequest refundRequest = new RefundRequest();
+                refundRequest.setTransaction(trx);
+                refundRequest.setRefundStatus((byte) TransactionConstant.REFUND_REQUESTED);
+                refundRequest.setRefundReason(refundReason);
 
-            refundRequestRepo.save(refundRequest);
+                refundRequestRepo.save(refundRequest);
+            }
+
 
             response.setRequested(true);
         } catch(Exception e) {

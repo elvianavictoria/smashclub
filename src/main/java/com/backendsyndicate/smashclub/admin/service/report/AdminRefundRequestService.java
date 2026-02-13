@@ -4,9 +4,11 @@ import com.backendsyndicate.smashclub.admin.dto.relation.RelAdminTransactionList
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminRefundRequestListDTO;
 import com.backendsyndicate.smashclub.common.constant.CommonConstant;
 import com.backendsyndicate.smashclub.common.constant.TransactionConstant;
+import com.backendsyndicate.smashclub.common.service.TemplateService;
 import com.backendsyndicate.smashclub.common.util.DatetimeFormatting;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
+import com.backendsyndicate.smashclub.external.service.notification.MailService;
 import com.backendsyndicate.smashclub.payment.dto.request.ReqUpdateBalanceDTO;
 import com.backendsyndicate.smashclub.payment.model.RefundRequest;
 import com.backendsyndicate.smashclub.payment.model.Transaction;
@@ -25,6 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -37,6 +41,8 @@ public class AdminRefundRequestService {
     private PaymentService paymentService;
     @Autowired
     private WalletService walletService;
+    @Autowired
+    private MailService mailService;
     private ModelMapper modelMapper = new ModelMapper();
 
     private String generateErrorCode(String methodNo, String errorNo) {
@@ -99,8 +105,20 @@ public class AdminRefundRequestService {
                 updateBalanceDTO.setValue(refundRequest.getTransaction().getTotalPrice());
                 updateBalanceDTO.setAddition(true);
                 walletService.updateBalance(refundRequest.getTransaction().getUser().getId(), updateBalanceDTO);
+
+                Map<String, Object> data = new HashMap<>();
+                data.put("fullName", refundRequest.getTransaction().getUser().getFullName());
+                data.put("transactionCode", refundRequest.getTransaction().getTransactionCode());
+                data.put("refundAmount", refundRequest.getTransaction().getTotalPrice());
+                mailService.sendMail(TemplateService.TEMPLATE_REFUND_NOTIFY_APPROVED, refundRequest.getTransaction().getUser().getEmail(), "Smashclub - Update Pengajuan Pengembalian Dana", data);
             } else {
                 action = "rejected";
+
+                Map<String, Object> data = new HashMap<>();
+                data.put("transactionCode", refundRequest.getTransaction().getTransactionCode());
+                data.put("fullName", refundRequest.getTransaction().getUser().getFullName());
+                data.put("refundNotes", refundRequest.getRefundNotes());
+                mailService.sendMail(TemplateService.TEMPLATE_REFUND_NOTIFY_REJECTED, refundRequest.getTransaction().getUser().getEmail(), "Smashclub - Update Pengajuan Pengembalian Dana", data);
             }
         } catch(Exception e) {
             Logging.handleException("AdminRefundRequestService", "process(long id, int refundStatus, String notes, HttpServletRequest request)", 59, generateErrorCode("01", "010"), e.getMessage());
