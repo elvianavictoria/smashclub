@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="id">
+<head>
+    <style>
+        body{
+            font-family: Arial,sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <h3>Email Berhasil Diubah</h3>
+    <p>Email akun Anda telah berhasil diubah menjadi:</p>
+    <p><strong th:text="${newEmail}"></strong></p>
+    <p>Sekarang Anda dapat login menggunakan email ini.</p>
+</body>
+</html>

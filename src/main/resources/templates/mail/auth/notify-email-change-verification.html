@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="id">
+<head>
+    <style>
+        body{
+            font-family: Arial,sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <h3>Verifikasi Perubahan Email</h3>
+    <p>Kami menerima permintaan untuk mengubah email akun Anda.</p>
+    <p>Email baru: <strong th:text="${newEmail}"></strong></p>
+    <p>Silakan klik link berikut untuk memverifikasi perubahan email:</p>
+    <p><a th:href="@{${verificationLink}}" th:text="${verificationLink}"></a></p>
+    <p>Link ini akan kadaluarsa dalam 24 jam.</p>
+    <p>Jika Anda tidak meminta perubahan email ini, abaikan email ini.</p>
+</body>
+</html>

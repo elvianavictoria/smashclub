@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="id">
+    <head>
+        <style>
+            body{
+                font-family: Arial,sans-serif;
+            }
+        </style>
+    </head>
+    <body>
+    <h2>Kode OTP Login</h2>
+    <p>Gunakan kode OTP berikut untuk login ke akun Smashclub Anda:</p>
+    <h1 style=\"background:#f0f0f0;padding:10px;display:inline-block;\" th:text="${otp}"></h1>
+    <p>Kode ini akan kadaluarsa dalam 10 menit.</p>
+    <p>Jangan berikan kode ini kepada siapapun.</p>
+    </body>
+</html>

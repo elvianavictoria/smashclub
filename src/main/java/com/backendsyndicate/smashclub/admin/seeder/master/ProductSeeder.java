@@ -15,9 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.Map;
 
-@Profile("dev")
 @Component
 @Transactional
+@Profile({"dev", "staging"})
 public class ProductSeeder implements DataSeeder {
     private ProductRepo productRepo;
     @Getter

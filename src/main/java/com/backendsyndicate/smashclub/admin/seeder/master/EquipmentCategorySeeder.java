@@ -15,7 +15,6 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
-@Profile("dev")
 @Component
 @Transactional
 public class EquipmentCategorySeeder implements DataSeeder {

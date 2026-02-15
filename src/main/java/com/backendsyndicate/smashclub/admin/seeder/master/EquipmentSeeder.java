@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
-@Profile("dev")
+@Profile({"dev", "staging"})
 @Component
 @Transactional
 public class EquipmentSeeder implements DataSeeder {

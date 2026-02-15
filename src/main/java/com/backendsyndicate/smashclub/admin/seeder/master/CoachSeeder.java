@@ -12,9 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalTime;
 
-@Profile("dev")
 @Component
 @Transactional
+@Profile({"dev", "staging"})
 public class CoachSeeder implements DataSeeder {
     private CoachRepo coachRepo;
 

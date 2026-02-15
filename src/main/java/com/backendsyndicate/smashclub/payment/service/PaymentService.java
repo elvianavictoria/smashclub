@@ -262,7 +262,6 @@ public class PaymentService implements IPayment {
                 refundRequestRepo.save(refundRequest);
             }
 
-
             response.setRequested(true);
         } catch(Exception e) {
             Logging.handleException("PaymentService", "refundTransaction", 147, generateErrorCode("03", "010"), e.getMessage());
