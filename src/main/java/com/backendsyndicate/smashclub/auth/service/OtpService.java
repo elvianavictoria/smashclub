@@ -2,7 +2,8 @@ package com.backendsyndicate.smashclub.auth.service;
 
 import com.backendsyndicate.smashclub.auth.dto.request.OtpVerificationRequest;
 import com.backendsyndicate.smashclub.auth.dto.request.ResendOtpRequest;
-import com.backendsyndicate.smashclub.auth.dto.response.LoginResponse;
+import com.backendsyndicate.smashclub.common.handler.ResponseHandler;
+import com.backendsyndicate.smashclub.common.constant.AuthenticationConstant;
 import com.backendsyndicate.smashclub.auth.model.LoginOtpTokens;
 import com.backendsyndicate.smashclub.auth.model.User;
 import com.backendsyndicate.smashclub.auth.repository.LoginOtpTokenRepository;
@@ -34,7 +35,7 @@ public class OtpService {
     private final JwtService jwtService;
 
     public ResponseEntity<Object> generateAndSendOtp(User user, String ipAddress,
-                                                     com.backendsyndicate.smashclub.common.handler.ResponseHandler responseHandler,
+                                                     ResponseHandler responseHandler,
                                                      HttpServletRequest httpRequest) {
         // Generate OTP untuk 2FA
         String otp = generateSecureOtp();
@@ -58,7 +59,7 @@ public class OtpService {
         responseData.put("userId", user.getId());
         responseData.put("email", user.getEmail());
         responseData.put("requiresOtp", true);
-        responseData.put("otpExpiresIn", com.backendsyndicate.smashclub.common.constant.AuthenticationConstant.OTP_EXPIRY_MINUTES);
+        responseData.put("otpExpiresIn", AuthenticationConstant.OTP_EXPIRY_MINUTES);
 
         log.info("Login successful (awaiting OTP) - userId: {}, email: {}, IP: {}",
                 user.getId(), user.getEmail(), ipAddress);
@@ -74,7 +75,7 @@ public class OtpService {
 
     @Transactional
     public ResponseEntity<Object> verifyOtp(OtpVerificationRequest request, HttpServletRequest httpRequest,
-                                            com.backendsyndicate.smashclub.common.handler.ResponseHandler responseHandler) {
+                                            ResponseHandler responseHandler) {
         String ipAddress = httpRequest.getRemoteAddr();
         log.info("OTP verification attempt - userId: {}, IP: {}", request.getUserId(), ipAddress);
 
@@ -129,7 +130,7 @@ public class OtpService {
                     return new RuntimeException("User tidak ditemukan");
                 });
 
-        if (user.getStatus() != com.backendsyndicate.smashclub.common.constant.AuthenticationConstant.ACTIVE) {
+        if (user.getStatus() != AuthenticationConstant.ACTIVE) {
             log.warn("User not active during OTP verification - userId: {}, status: {}",
                     request.getUserId(), user.getStatus());
             return responseHandler.handleResponse(
@@ -151,20 +152,9 @@ public class OtpService {
 
     @Transactional
     public ResponseEntity<Object> resendOtp(ResendOtpRequest request, HttpServletRequest httpRequest,
-                                            com.backendsyndicate.smashclub.common.handler.ResponseHandler responseHandler) {
+                                            ResponseHandler responseHandler) {
         String ipAddress = httpRequest.getRemoteAddr();
         log.info("Resend OTP request - userId: {}, IP: {}", request.getUserId(), ipAddress);
-
-        // Validasi input
-        if (request.getUserId() == null || request.getUserId().trim().isEmpty()) {
-            return responseHandler.handleResponse(
-                    "User ID harus diisi",
-                    HttpStatus.BAD_REQUEST,
-                    "AUTH_001",
-                    null,
-                    httpRequest
-            );
-        }
 
         // Cek user
         Optional<User> userOpt = userRepository.findById(request.getUserId());
@@ -181,7 +171,7 @@ public class OtpService {
         User user = userOpt.get();
 
         // Cek user status
-        if (user.getStatus() != com.backendsyndicate.smashclub.common.constant.AuthenticationConstant.ACTIVE) {
+        if (user.getStatus() != AuthenticationConstant.ACTIVE) {
             return responseHandler.handleResponse(
                     "Akun tidak aktif",
                     HttpStatus.BAD_REQUEST,
@@ -243,7 +233,7 @@ public class OtpService {
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("userId", user.getId());
         responseData.put("email", user.getEmail());
-        responseData.put("otpExpiresIn", com.backendsyndicate.smashclub.common.constant.AuthenticationConstant.OTP_EXPIRY_MINUTES);
+        responseData.put("otpExpiresIn", AuthenticationConstant.OTP_EXPIRY_MINUTES);
         responseData.put("nextResendAvailableIn", 60); // Bisa resend setelah 60 detik
 
         return responseHandler.handleResponse(
@@ -260,15 +250,15 @@ public class OtpService {
         otpToken.setUser(user);
         otpToken.setOtpCode(otp);
         otpToken.setExpiresAt(LocalDateTime.now()
-                .plusMinutes(com.backendsyndicate.smashclub.common.constant.AuthenticationConstant.OTP_EXPIRY_MINUTES));
+                .plusMinutes(AuthenticationConstant.OTP_EXPIRY_MINUTES));
         otpToken.setCreatedAt(LocalDateTime.now());
         return otpToken;
     }
 
     private String generateSecureOtp() {
-        // Generate 6-digit OTP
         java.security.SecureRandom random = new java.security.SecureRandom();
-        int num = random.nextInt(1000000);
-        return String.format("%06d", num);
+        // 100000 - 999999 (6 digit, tidak ada leading zero)
+        int num = 100000 + random.nextInt(900000);
+        return String.valueOf(num);  // Tidak perlu format, sudah 6 digit
     }
 }

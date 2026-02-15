@@ -8,6 +8,9 @@ import com.backendsyndicate.smashclub.auth.model.User;
 import com.backendsyndicate.smashclub.auth.repository.UserRepository;
 import com.backendsyndicate.smashclub.common.constant.BookingConstant;
 import com.backendsyndicate.smashclub.common.handler.ResponseHandler;
+import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransactionDTO;
+import com.backendsyndicate.smashclub.payment.service.PaymentService;
+
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +41,7 @@ public class BookingService {
     private final UserRepository userRepository;
     private final BookingCodeGenerator bookingCodeGenerator;
     private final ResponseHandler responseHandler;
+    private final PaymentService paymentService;
 
     // ============ GET ALL COURTS ============
     @Transactional(readOnly = true)
@@ -205,6 +209,16 @@ public class BookingService {
 
         log.info("Getting available equipment - date: {}, time: {} - {}, requiredQty: {}",
                 date, startTime, endTime, requiredQuantity);
+
+        if (startTime.isAfter(endTime) || startTime.equals(endTime)) {
+            return responseHandler.handleResponse(
+                    "Waktu mulai harus sebelum waktu selesai",
+                    HttpStatus.BAD_REQUEST,
+                    BookingConstant.ERROR_START_TIME_AFTER_END,
+                    null,
+                    httpRequest
+            );
+        }
 
         try {
             List<Equipment> availableEquipment = equipmentRepository
@@ -1148,6 +1162,69 @@ public class BookingService {
             return responseHandler.handleResponse(
                     "Failed to complete booking",
                     HttpStatus.INTERNAL_SERVER_ERROR,
+                    "BOOKING_500",
+                    null,
+                    httpRequest
+            );
+        }
+    }
+
+    // ============ CREATE PAYMENT FOR BOOKING ============
+    @Transactional
+    public ResponseEntity<Object> createBookingPayment(
+            String bookingCode,
+            int paymentMethodId,
+            HttpServletRequest httpRequest) {
+
+        log.info("Creating payment for booking - bookingCode: {}", bookingCode);
+
+        try {
+            // 1. Validasi booking
+            Booking booking = bookingRepository.findByBookingCode(bookingCode)
+                    .orElseThrow(() -> new RuntimeException("Booking tidak ditemukan"));
+
+            // 2. Validasi status booking (hanya PENDING yang bisa bayar)
+            if (booking.getStatus() != BookingConstant.BOOKING_PENDING) {
+                return responseHandler.handleResponse(
+                        "Only PENDING booking can be paid",
+                        HttpStatus.BAD_REQUEST,
+                        BookingConstant.ERROR_INVALID_STATUS_TRANSITION,
+                        null,
+                        httpRequest
+                );
+            }
+
+            // 3. Panggil payment service teman
+            RespCreateTransactionDTO paymentResponse = paymentService.createTransaction(
+                    booking.getUser().getId(),
+                    booking.getTotalPrice(),
+                    bookingCode,
+                    1,
+                    paymentMethodId
+            );
+
+            if (paymentResponse == null) {
+                throw new RuntimeException("Failed to create payment transaction");
+            }
+
+            // 4. Return response
+            Map<String, Object> response = new HashMap<>();
+            response.put("bookingCode", bookingCode);
+            response.put("paymentData", paymentResponse.getPaymentData());
+
+            return responseHandler.handleResponse(
+                    "Payment transaction created successfully",
+                    HttpStatus.CREATED,
+                    null,
+                    response,
+                    httpRequest
+            );
+
+        } catch (Exception e) {
+            log.error("Error creating payment for booking: {}", e.getMessage());
+            return responseHandler.handleResponse(
+                    "Failed to create payment: " + e.getMessage(),
+                    HttpStatus.BAD_REQUEST,
                     "BOOKING_500",
                     null,
                     httpRequest

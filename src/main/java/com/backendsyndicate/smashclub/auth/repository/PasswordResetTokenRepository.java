@@ -18,24 +18,20 @@ public interface PasswordResetTokenRepository extends JpaRepository<PasswordRese
     Optional<PasswordResetTokens> findByTokenAndUsedAtIsNull(String token);
     Optional<PasswordResetTokens> findByToken(String token);
 
-    // 1. FIX: Native query invalidate (yang sudah ada)
     @Modifying
     @Transactional
     @Query(value = "UPDATE password_reset_tokens SET UsedAt = :usedAt WHERE UserId = :userId AND UsedAt IS NULL",
             nativeQuery = true)
     int invalidateUserTokens(@Param("userId") String userId, @Param("usedAt") LocalDateTime usedAt);
 
-    // 2. TAMBAH Method countByUserAndUsedAtIsNull (DIBUTUHKAN!)
     @Query("SELECT COUNT(p) FROM PasswordResetTokens p WHERE p.user = :user AND p.usedAt IS NULL")
     Long countByUserAndUsedAtIsNull(@Param("user") User user);
 
-    // 3. TAMBAH Method invalidateByUser (DIBUTUHKAN!)
     @Modifying
     @Transactional
     @Query("UPDATE PasswordResetTokens p SET p.usedAt = :usedAt WHERE p.user = :user AND p.usedAt IS NULL")
     int invalidateByUser(@Param("user") User user, @Param("usedAt") LocalDateTime usedAt);
 
-    // 4. TAMBAH untuk debugging
     @Query("SELECT p FROM PasswordResetTokens p WHERE p.user = :user")
     List<PasswordResetTokens> findByUser(@Param("user") User user);
 }
