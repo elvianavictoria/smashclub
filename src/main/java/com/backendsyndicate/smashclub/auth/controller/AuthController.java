@@ -6,7 +6,7 @@ import com.backendsyndicate.smashclub.auth.dto.request.RegisterRequest;
 import com.backendsyndicate.smashclub.auth.dto.request.OtpVerificationRequest;
 import com.backendsyndicate.smashclub.auth.dto.request.ResendOtpRequest;
 import com.backendsyndicate.smashclub.auth.dto.request.ResetPasswordRequest;
-import com.backendsyndicate.smashclub.auth.service.AuthService2;
+import com.backendsyndicate.smashclub.auth.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthService2 authService2;
+    private final AuthService authService;
 
     // ============ REGISTRATION ============
     @PostMapping("/register")
@@ -26,7 +26,7 @@ public class AuthController {
             @Valid @RequestBody RegisterRequest request,
             HttpServletRequest httpRequest
     ) {
-        return authService2.register(request, httpRequest);
+        return authService.register(request, httpRequest);
     }
 
     // ============ LOGIN ============
@@ -35,7 +35,7 @@ public class AuthController {
             @Valid @RequestBody LoginRequest request,
             HttpServletRequest httpRequest
     ) {
-        return authService2.login(request, httpRequest);
+        return authService.login(request, httpRequest);
     }
 
     // ============ VERIFY OTP ============
@@ -44,7 +44,7 @@ public class AuthController {
             @Valid @RequestBody OtpVerificationRequest request,
             HttpServletRequest httpRequest
     ) {
-        return authService2.verifyOtp(request, httpRequest);
+        return authService.verifyOtp(request, httpRequest);
     }
 
     // ============ VERIFY EMAIL ============
@@ -53,7 +53,7 @@ public class AuthController {
             @RequestParam("token") String token,
             HttpServletRequest httpRequest
     ) {
-        return authService2.verifyEmail(token, httpRequest);
+        return authService.verifyEmail(token, httpRequest);
     }
 
     // ============ FORGOT PASSWORD ============
@@ -62,7 +62,7 @@ public class AuthController {
             @Valid @RequestBody ForgotPasswordRequest request,
             HttpServletRequest httpRequest
     ) {
-        return authService2.forgotPassword(request, httpRequest);
+        return authService.forgotPassword(request, httpRequest);
     }
 
     // ============ RESET PASSWORD ============
@@ -71,7 +71,7 @@ public class AuthController {
             @Valid @RequestBody ResetPasswordRequest request,
             HttpServletRequest httpRequest
     ) {
-        return authService2.resetPassword(request, httpRequest);
+        return authService.resetPassword(request, httpRequest);
     }
 
     // ============ VALIDATE RESET TOKEN ============
@@ -80,7 +80,7 @@ public class AuthController {
             @RequestParam("token") String token,
             HttpServletRequest httpRequest
     ) {
-        return authService2.validateResetToken(token, httpRequest);
+        return authService.validateResetToken(token, httpRequest);
     }
 
     // ============ RESEND VERIFICATION EMAIL ============
@@ -89,7 +89,7 @@ public class AuthController {
             @RequestParam("email") String email,
             HttpServletRequest httpRequest
     ) {
-        return authService2.resendVerificationEmail(email, httpRequest);
+        return authService.resendVerificationEmail(email, httpRequest);
     }
 
     // ============ RESEND OTP ============
@@ -98,7 +98,7 @@ public class AuthController {
             @Valid @RequestBody ResendOtpRequest request,
             HttpServletRequest httpRequest
     ) {
-        return authService2.resendOtp(request, httpRequest);
+        return authService.resendOtp(request, httpRequest);
     }
 
     // ============ LOGOUT ============
@@ -107,7 +107,7 @@ public class AuthController {
             @RequestParam("refreshToken") String refreshToken,
             HttpServletRequest httpRequest
     ) {
-        return authService2.logout(refreshToken, httpRequest);
+        return authService.logout(refreshToken, httpRequest);
     }
 
     // ============ LOGOUT ALL SESSIONS (Optional) ============
@@ -117,7 +117,7 @@ public class AuthController {
             HttpServletRequest httpRequest
     ) {
         // Note: Butuh authorization check
-        return authService2.logoutAll(userId, httpRequest);
+        return authService.logoutAll(userId, httpRequest);
     }
 
     // ============ CHECK SESSION ============
@@ -127,7 +127,7 @@ public class AuthController {
             HttpServletRequest httpRequest
     ) {
         String token = extractTokenFromHeader(authorizationHeader);
-        return authService2.checkSession(token, httpRequest);
+        return authService.checkSession(token, httpRequest);
     }
 
     // ============ REFRESH TOKEN ============
@@ -136,7 +136,7 @@ public class AuthController {
             @RequestParam("refreshToken") String refreshToken,
             HttpServletRequest httpRequest
     ) {
-        return authService2.refreshToken(refreshToken, httpRequest);
+        return authService.refreshToken(refreshToken, httpRequest);
     }
 
     // ============ HELPER METHOD ============

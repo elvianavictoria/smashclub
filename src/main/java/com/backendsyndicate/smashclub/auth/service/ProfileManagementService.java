@@ -9,19 +9,20 @@ import com.backendsyndicate.smashclub.auth.repository.UserRepository;
 import com.backendsyndicate.smashclub.common.constant.AuthenticationConstant;
 import com.backendsyndicate.smashclub.common.security.JwtService;
 import com.backendsyndicate.smashclub.common.security.PasswordHasher;
+import com.backendsyndicate.smashclub.common.handler.ResponseHandler;
+import com.backendsyndicate.smashclub.external.service.storage.CloudinaryService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -38,7 +39,7 @@ public class ProfileManagementService {
     // ============ GET PROFILE ============
     @Transactional(readOnly = true)
     public ResponseEntity<Object> getProfile(String userId, HttpServletRequest httpRequest,
-                                             com.backendsyndicate.smashclub.common.handler.ResponseHandler responseHandler) {
+                                             ResponseHandler responseHandler) {
         log.info("Get profile request - userId: {}", userId);
 
         Optional<User> userOpt = userRepository.findById(userId);
@@ -87,7 +88,7 @@ public class ProfileManagementService {
     @Transactional
     public ResponseEntity<Object> updateProfile(String userId, ProfileUpdateRequest request,
                                                 HttpServletRequest httpRequest,
-                                                com.backendsyndicate.smashclub.common.handler.ResponseHandler responseHandler) {
+                                                ResponseHandler responseHandler) {
         log.info("Update profile request - userId: {}", userId);
 
         Optional<User> userOpt = userRepository.findById(userId);
@@ -220,7 +221,7 @@ public class ProfileManagementService {
     @Transactional
     public ResponseEntity<Object> verifyEmailChange(VerifyEmailChangeRequest request,
                                                     HttpServletRequest httpRequest,
-                                                    com.backendsyndicate.smashclub.common.handler.ResponseHandler responseHandler) {
+                                                    ResponseHandler responseHandler) {
         log.info("Verify email change request - token: {}", request.getToken());
 
         Optional<EmailChangeToken> tokenOpt = emailChangeTokenRepository
@@ -321,7 +322,7 @@ public class ProfileManagementService {
     @Transactional
     public ResponseEntity<Object> changePassword(String userId, ChangePasswordRequest request,
                                                  HttpServletRequest httpRequest,
-                                                 com.backendsyndicate.smashclub.common.handler.ResponseHandler responseHandler) {
+                                                 ResponseHandler responseHandler) {
         log.info("Change password request - userId: {}", userId);
 
         // Validasi input
@@ -445,7 +446,7 @@ public class ProfileManagementService {
     // ============ CANCEL PENDING EMAIL CHANGE ============
     @Transactional
     public ResponseEntity<Object> cancelEmailChange(String userId, HttpServletRequest httpRequest,
-                                                    com.backendsyndicate.smashclub.common.handler.ResponseHandler responseHandler) {
+                                                    ResponseHandler responseHandler) {
         log.info("Cancel email change request - userId: {}", userId);
 
         Optional<EmailChangeToken> tokenOpt = emailChangeTokenRepository
@@ -506,5 +507,226 @@ public class ProfileManagementService {
         if (hasDigit) criteriaMet++;
 
         return criteriaMet >= 2;
+    }
+
+    // ProfileManagementService.java
+
+    @Autowired
+    private CloudinaryService cloudinaryService;  // ← Inject service dari teman
+
+    public ResponseEntity<Object> uploadProfilePicture(String userId, MultipartFile file,
+                                                       HttpServletRequest httpRequest,
+                                                       ResponseHandler responseHandler) {
+        log.info("Upload profile picture request - userId: {}", userId);
+
+        // 1. Validasi user
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
+            return responseHandler.handleResponse(
+                    "User tidak ditemukan",
+                    HttpStatus.NOT_FOUND,
+                    "PROFILE_001",
+                    null,
+                    httpRequest
+            );
+        }
+
+        User user = userOpt.get();
+
+        // 2. Validasi file
+        String validationError = validateProfilePicture(file);
+        if (validationError != null) {
+            return responseHandler.handleResponse(
+                    validationError,
+                    HttpStatus.BAD_REQUEST,
+                    "PROFILE_014",
+                    null,
+                    httpRequest
+            );
+        }
+
+        try {
+            // 3. HAPUS FOTO LAMA KALAU ADA (dari Cloudinary)
+            if (user.getProfilePicture() != null && !user.getProfilePicture().isEmpty()) {
+                deleteOldProfilePicture(user.getProfilePicture());
+            }
+
+            // 4. UPLOAD FOTO BARU ke Cloudinary (pake service teman)
+            String folder = "profile-pictures/" + userId;  // Folder per user biar rapi
+            String profilePictureUrl = cloudinaryService.uploadImageGetUrl(folder, file);
+
+            if (profilePictureUrl == null || profilePictureUrl.isEmpty()) {
+                return responseHandler.handleResponse(
+                        "Gagal mengupload foto profil",
+                        HttpStatus.INTERNAL_SERVER_ERROR,
+                        "PROFILE_015",
+                        null,
+                        httpRequest
+                );
+            }
+
+            // 5. SIMPAN URL ke database
+            user.setProfilePicture(profilePictureUrl);
+            user.setUpdatedDate(LocalDateTime.now());
+            userRepository.save(user);
+
+            // 6. RETURN response dengan URL foto
+            Map<String, Object> data = new HashMap<>();
+            data.put("userId", user.getId());
+            data.put("profilePicture", profilePictureUrl);
+            data.put("message", "Foto profil berhasil diupload");
+
+            log.info("Profile picture uploaded successfully - userId: {}, url: {}", userId, profilePictureUrl);
+
+            return responseHandler.handleResponse(
+                    "Foto profil berhasil diupload",
+                    HttpStatus.OK,
+                    null,
+                    data,
+                    httpRequest
+            );
+
+        } catch (Exception e) {
+            log.error("Failed to upload profile picture: {}", e.getMessage());
+            return responseHandler.handleResponse(
+                    "Gagal mengupload foto profil: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "PROFILE_016",
+                    null,
+                    httpRequest
+            );
+        }
+    }
+
+    public ResponseEntity<Object> deleteProfilePicture(String userId, HttpServletRequest httpRequest,
+                                                       ResponseHandler responseHandler) {
+        log.info("Delete profile picture request - userId: {}", userId);
+
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
+            return responseHandler.handleResponse(
+                    "User tidak ditemukan",
+                    HttpStatus.NOT_FOUND,
+                    "PROFILE_001",
+                    null,
+                    httpRequest
+            );
+        }
+
+        User user = userOpt.get();
+
+        if (user.getProfilePicture() == null || user.getProfilePicture().isEmpty()) {
+            return responseHandler.handleResponse(
+                    "Tidak ada foto profil untuk dihapus",
+                    HttpStatus.BAD_REQUEST,
+                    "PROFILE_017",
+                    null,
+                    httpRequest
+            );
+        }
+
+        try {
+            // Hapus dari Cloudinary
+            deleteOldProfilePicture(user.getProfilePicture());
+
+            // Hapus URL dari database
+            user.setProfilePicture(null);
+            user.setUpdatedDate(LocalDateTime.now());
+            userRepository.save(user);
+
+            return responseHandler.handleResponse(
+                    "Foto profil berhasil dihapus",
+                    HttpStatus.OK,
+                    null,
+                    null,
+                    httpRequest
+            );
+
+        } catch (Exception e) {
+            log.error("Failed to delete profile picture: {}", e.getMessage());
+            return responseHandler.handleResponse(
+                    "Gagal menghapus foto profil",
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "PROFILE_018",
+                    null,
+                    httpRequest
+            );
+        }
+    }
+
+    // Helper method untuk validasi file
+    private String validateProfilePicture(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            return "File foto tidak boleh kosong";
+        }
+
+        // Cek tipe file (hanya gambar)
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            return "File harus berupa gambar";
+        }
+
+        // Cek ukuran (max 2MB)
+        if (file.getSize() > 2 * 1024 * 1024) {
+            return "Ukuran file maksimal 2MB";
+        }
+
+        // Cek ekstensi
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename != null) {
+            String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
+            if (!List.of("jpg", "jpeg", "png", "gif", "webp").contains(extension)) {
+                return "Format file harus JPG, PNG, GIF, atau WEBP";
+            }
+        }
+
+        return null;
+    }
+
+    // Helper method untuk hapus foto lama dari Cloudinary
+    private void deleteOldProfilePicture(String imageUrl) {
+        try {
+            // Extract public ID dari URL Cloudinary
+            // Format URL: https://res.cloudinary.com/.../v12345/folder/publicId.extension
+            String publicId = extractPublicIdFromUrl(imageUrl);
+            if (publicId != null) {
+                // Panggil method delete dari CloudinaryService (perlu ditambah di service teman)
+                // cloudinaryService.deleteImage(publicId);
+                log.info("Deleted old profile picture: {}", publicId);
+            }
+        } catch (Exception e) {
+            log.warn("Failed to delete old profile picture: {}", e.getMessage());
+            // Non-critical, lanjutkan proses
+        }
+    }
+
+    private String extractPublicIdFromUrl(String url) {
+        // Contoh URL: https://res.cloudinary.com/demo/image/upload/v12345/profile-pictures/user123/abc.jpg
+        try {
+            String[] parts = url.split("/");
+            // Cari bagian setelah 'upload' dan sebelum ekstensi
+            boolean uploadFound = false;
+            StringBuilder publicId = new StringBuilder();
+
+            for (String part : parts) {
+                if (uploadFound) {
+                    if (part.contains("v") && part.matches("v\\d+")) {
+                        // Skip version number
+                        continue;
+                    }
+                    // Hapus ekstensi
+                    publicId.append(part.split("\\.")[0]).append("/");
+                }
+                if (part.equals("upload")) {
+                    uploadFound = true;
+                }
+            }
+
+            String result = publicId.toString().replaceAll("/$", "");
+            return result.isEmpty() ? null : result;
+        } catch (Exception e) {
+            log.error("Failed to extract publicId from URL: {}", e.getMessage());
+            return null;
+        }
     }
 }

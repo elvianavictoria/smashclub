@@ -13,8 +13,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LoginResponse {
-
-    // ✅ WAJIB: OAuth 2.0 Standard Fields
     @JsonProperty("access_token")
     private String accessToken;
 
@@ -27,7 +25,6 @@ public class LoginResponse {
     @JsonProperty("expires_in")
     private Long expiresIn;    // In seconds
 
-    // ✅ OPTIONAL: User Info
     @JsonProperty("user_id")
     private String userId;
 
@@ -36,7 +33,6 @@ public class LoginResponse {
     @JsonProperty("full_name")
     private String fullName;
 
-    // ✅ OPTIONAL: Additional Info
     @JsonProperty("scope")
     private String scope;      // "read write admin" etc
 

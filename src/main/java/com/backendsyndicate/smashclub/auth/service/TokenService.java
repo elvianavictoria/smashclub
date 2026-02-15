@@ -5,6 +5,8 @@ import com.backendsyndicate.smashclub.auth.model.Sessions;
 import com.backendsyndicate.smashclub.auth.model.User;
 import com.backendsyndicate.smashclub.auth.repository.SessionRepository;
 import com.backendsyndicate.smashclub.common.security.JwtService;
+import com.backendsyndicate.smashclub.common.handler.ResponseHandler;
+import com.backendsyndicate.smashclub.common.constant.AuthenticationConstant;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +27,7 @@ public class TokenService {
 
     @Transactional
     public ResponseEntity<Object> generateJwtTokensAfterOtpVerification(User user,
-                                                                        com.backendsyndicate.smashclub.common.handler.ResponseHandler responseHandler,
+                                                                        ResponseHandler responseHandler,
                                                                         HttpServletRequest httpRequest) {
         // 1. GENERATE JWT TOKENS
         String accessToken = jwtService.generateToken(user.getId(), user.getEmail(), user.getFullName());
@@ -35,19 +37,19 @@ public class TokenService {
         sessionRepository.invalidateUserTokens(user.getId(), LocalDateTime.now());
 
         // Save ACCESS token
-        saveTokenToSession(user, accessToken, com.backendsyndicate.smashclub.common.constant.AuthenticationConstant.TOKEN_TYPE_ACCESS,
-                com.backendsyndicate.smashclub.common.constant.AuthenticationConstant.ACCESS_TOKEN_EXPIRY_HOURS * 60L);
+        saveTokenToSession(user, accessToken, AuthenticationConstant.TOKEN_TYPE_ACCESS,
+                AuthenticationConstant.ACCESS_TOKEN_EXPIRY_HOURS * 60L);
 
         // Save REFRESH token
-        saveTokenToSession(user, refreshToken, com.backendsyndicate.smashclub.common.constant.AuthenticationConstant.TOKEN_TYPE_REFRESH,
-                com.backendsyndicate.smashclub.common.constant.AuthenticationConstant.REFRESH_TOKEN_EXPIRY_DAYS * 24L * 60L);
+        saveTokenToSession(user, refreshToken, AuthenticationConstant.TOKEN_TYPE_REFRESH,
+                AuthenticationConstant.REFRESH_TOKEN_EXPIRY_DAYS * 24L * 60L);
 
         // 3. Buat response
         LoginResponse loginResponse = LoginResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .tokenType("Bearer")
-                .expiresIn(com.backendsyndicate.smashclub.common.constant.AuthenticationConstant.ACCESS_TOKEN_EXPIRY_HOURS * 3600L)
+                .expiresIn(AuthenticationConstant.ACCESS_TOKEN_EXPIRY_HOURS * 3600L)
                 .userId(user.getId())
                 .email(user.getEmail())
                 .fullName(user.getFullName())
@@ -66,7 +68,7 @@ public class TokenService {
 
     @Transactional
     public ResponseEntity<Object> refreshToken(String refreshToken, HttpServletRequest httpRequest,
-                                               com.backendsyndicate.smashclub.common.handler.ResponseHandler responseHandler) {
+                                               ResponseHandler responseHandler) {
         log.info("Refresh token request");
 
         try {
@@ -97,7 +99,7 @@ public class TokenService {
             User user = refreshTokenSession.getUser();
 
             // 3. Cek user masih aktif
-            if (user.getStatus() != com.backendsyndicate.smashclub.common.constant.AuthenticationConstant.ACTIVE) {
+            if (user.getStatus() != AuthenticationConstant.ACTIVE) {
                 log.warn("User not active during token refresh - userId: {}", user.getId());
                 return responseHandler.handleResponse(
                         "Akun tidak aktif",
@@ -117,17 +119,17 @@ public class TokenService {
             String newRefreshToken = jwtService.generateRefreshToken(user.getId());
 
             // 6. Save new tokens
-            saveTokenToSession(user, newAccessToken, com.backendsyndicate.smashclub.common.constant.AuthenticationConstant.TOKEN_TYPE_ACCESS,
-                    com.backendsyndicate.smashclub.common.constant.AuthenticationConstant.ACCESS_TOKEN_EXPIRY_HOURS * 60L);
-            saveTokenToSession(user, newRefreshToken, com.backendsyndicate.smashclub.common.constant.AuthenticationConstant.TOKEN_TYPE_REFRESH,
-                    com.backendsyndicate.smashclub.common.constant.AuthenticationConstant.REFRESH_TOKEN_EXPIRY_DAYS * 24L * 60L);
+            saveTokenToSession(user, newAccessToken, AuthenticationConstant.TOKEN_TYPE_ACCESS,
+                    AuthenticationConstant.ACCESS_TOKEN_EXPIRY_HOURS * 60L);
+            saveTokenToSession(user, newRefreshToken, AuthenticationConstant.TOKEN_TYPE_REFRESH,
+                    AuthenticationConstant.REFRESH_TOKEN_EXPIRY_DAYS * 24L * 60L);
 
             // 7. Buat response
             var responseData = java.util.Map.of(
                     "accessToken", newAccessToken,
                     "refreshToken", newRefreshToken,
                     "tokenType", "Bearer",
-                    "expiresIn", com.backendsyndicate.smashclub.common.constant.AuthenticationConstant.ACCESS_TOKEN_EXPIRY_HOURS * 3600L
+                    "expiresIn", AuthenticationConstant.ACCESS_TOKEN_EXPIRY_HOURS * 3600L
             );
 
             log.info("Token refreshed successfully - userId: {}", user.getId());
@@ -155,7 +157,7 @@ public class TokenService {
     private Sessions validateRefreshTokenInDatabase(String refreshToken) {
         return sessionRepository.findBySessionTokenAndTokenTypeAndExpiresAtAfterAndInvalidatedAtIsNull(
                 refreshToken,
-                com.backendsyndicate.smashclub.common.constant.AuthenticationConstant.TOKEN_TYPE_REFRESH,
+                AuthenticationConstant.TOKEN_TYPE_REFRESH,
                 LocalDateTime.now()
         ).orElse(null);
     }

@@ -135,6 +135,22 @@ public class BookingController {
         return bookingService.completeBooking(bookingCode, httpRequest);
     }
 
+    // ============ CREATE PAYMENT FOR BOOKING ============
+    @PostMapping("/{bookingCode}/payment")
+    public ResponseEntity<Object> createBookingPayment(
+            @PathVariable String bookingCode,
+            @RequestParam int paymentMethodId,
+            @RequestHeader("Authorization") String authorizationHeader,
+            HttpServletRequest httpRequest) {
+
+        String userId = extractUserIdFromToken(authorizationHeader);
+        if (userId == null) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        return bookingService.createBookingPayment(bookingCode, paymentMethodId, httpRequest);
+    }
+
     // ============ HELPER METHOD ============
     private String extractUserIdFromToken(String authorizationHeader) {
         try {
