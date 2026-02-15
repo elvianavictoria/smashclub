@@ -1,17 +1,336 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="id">
-    <head>
-        <style>
-            body{
-                font-family: Arial,sans-serif;
-            }
-        </style>
-    </head>
-    <body>
-    <h2>Kode OTP Login</h2>
-    <p>Gunakan kode OTP berikut untuk login ke akun Smashclub Anda:</p>
-    <h1 style=\"background:#f0f0f0;padding:10px;display:inline-block;\" th:text="${otp}"></h1>
-    <p>Kode ini akan kadaluarsa dalam 10 menit.</p>
-    <p>Jangan berikan kode ini kepada siapapun.</p>
-    </body>
+
+<head>
+    <meta charset="utf-8" />
+    <title>SmashClub - Verifikasi OTP Email</title>
+    <style>
+        body {
+            background-color: #f5f8f8;
+            color: #1e293b;
+            min-height: 100vh;
+            font-family: 'Manrope', sans-serif;
+            padding: 0;
+        }
+
+        .main-container {
+            width: 100%;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .card {
+            display: inline-block;
+            width: 90%;
+            max-width: 600px;
+            background-color: #ffffff;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .card-header {
+            padding-top: 2.5rem;
+            padding-bottom: 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid #f8fafc;
+        }
+
+        .logo-container {
+            gap: 0.5rem;
+        }
+
+        .logo-box {
+            width: 2.5rem;
+            height: 2.5rem;
+            background-color: #00BBA7;
+            border-radius: 0.5rem;
+        }
+
+        .logo-icon {
+            color: #ffffff;
+        }
+
+        .brand-name {
+            font-size: 1.5rem;
+            line-height: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            color: #0f172a;
+            text-transform: uppercase;
+            padding-left: 0.5rem;
+        }
+
+        .card-body {
+            padding: 2.5rem 2rem;
+        }
+
+        /* Hero section */
+        .hero {
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        .status-icon-outer {
+            border-radius: 50%;
+            display: inline-block;
+            height: 60px;
+            line-height: 56px;
+            text-align: center;
+            width: 60px;
+        }
+
+        .status-icon-inner {
+            border-radius: 50%;
+            color: #ffffff;
+            font-size: 60px;
+            height: 40px;
+            line-height: 36px;
+            padding: 0 0;
+            width: 40px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .h1 {
+            font-size: 1.875rem;
+            line-height: 2.25rem;
+            font-weight: 700;
+            color: #0f172a;
+            padding: 0 0 2rem 0;
+        }
+
+        .greeting {
+            color: #475569;
+            padding: 0;
+        }
+
+        .greeting-name {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .description {
+            color: #64748b;
+            padding: 2rem;
+            padding-top: 0.25rem;
+            line-height: 1.625;
+        }
+
+        .summary-box {
+            background-color: #f8fafc;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            padding-bottom: 2rem;
+            border: 1px solid #f1f5f9;
+        }
+
+        .summary-title {
+            padding:10px;
+            display:inline-block;
+        }
+
+        .summary-list {
+            width: 100%;
+            text-align: left;
+            padding: 1rem 0;
+        }
+
+        .summary-item {
+            padding: 0.5rem 0;
+        }
+
+        .summary-label {
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            color: #64748b;
+        }
+
+        .summary-value {
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            font-weight: 600;
+            color: #0f172a;
+            text-align: right;
+        }
+
+        .summary-value-highlight {
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            font-weight: 700;
+            color: #00BBA7;
+        }
+
+        .cta-button {
+            display: inline-block;
+            width: 100%;
+            padding: 1rem 0;
+            background-color: #00BBA7;
+            color: #ffffff;
+            font-weight: 700;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            box-shadow: 0 4px 6px -1px rgba(0, 187, 167, 0.2);
+            padding-bottom: 1rem;
+            text-align: center;
+        }
+
+        .deadline-box {
+            padding: 1rem;
+            background-color: #fffbeb;
+            border: 1px solid #fef3c7;
+            border-radius: 0.5rem;
+        }
+
+        .deadline-title {
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            color: #b45309;
+            font-weight: 500;
+            padding: 0;
+        }
+
+        .deadline-icon {
+            font-size: 0.875rem;
+            vertical-align: middle;
+            padding-right: 0.25rem;
+        }
+
+        .deadline-desc {
+            font-size: 0.75rem;
+            line-height: 1rem;
+            color: rgba(217, 119, 6, 0.8);
+            padding-top: 0.25rem;
+            padding-bottom: 0;
+        }
+
+        .deadline-time {
+            font-weight: 700;
+            color: #b45309;
+        }
+
+        .disclaimer {
+            padding-top: 1.5rem;
+            font-size: 0.75rem;
+            line-height: 1rem;
+            color: #94a3b8;
+            padding-bottom: 0;
+        }
+
+        .card-footer {
+            background-color: #f8fafc;
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .social-container {
+            gap: 1rem;
+            padding-bottom: 1.5rem;
+        }
+
+        .social-link {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 9999px;
+            background-color: #e2e8f0;
+            color: #64748b;
+            text-decoration: none;
+        }
+
+        .social-icon {
+            width: 1rem;
+            height: 1rem;
+            fill: currentColor;
+        }
+
+        .help-text {
+            font-size: 0.75rem;
+            line-height: 1.625;
+            color: #64748b;
+            padding-bottom: 1rem;
+            padding-top: 0;
+        }
+
+        .help-link {
+            color: #00BBA7;
+            font-weight: 500;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #e2e8f0;
+            padding-top: 1.5rem;
+        }
+
+        .copyright {
+            font-size: 10px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 700;
+            padding: 0;
+        }
+
+        .footer-note {
+            font-size: 10px;
+            color: #94a3b8;
+            padding-top: 0.5rem;
+            font-style: italic;
+            padding-bottom: 0;
+        }
+    </style>
+</head>
+
+<body>
+<main class="main-container">
+    <div class="card">
+        <div class="card-header">
+            <div class="logo-container">
+                <span class="brand-name">SmashClub</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="text-center">
+                <div class="hero">
+                    <div class="status-icon-outer">
+                        <div class="status-icon-inner">🔒</div>
+                    </div>
+                </div>
+                <h1 class="h1">Kode OTP Login</h1>
+                <p class="description">
+                    Gunakan kode OTP berikut untuk login ke akun Smashclub Anda:
+                </p>
+            </div>
+            <div class="summary-box">
+                <h1 class="summary-title" th:text="${otp}">1234</h1>
+            </div>
+            <div class="text-center">
+                <div class="deadline-box">
+                    <p class="deadline-desc">
+                        Kode ini akan kadaluarsa dalam 10 menit. Jangan berikan kode ini kepada siapapun
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <p class="help-text">
+                Butuh bantuan? Hubungi kami melalui WhatsApp di <span class="help-link">+62 812-3456-7890</span>
+                atau
+                email ke <span class="help-link">support@smashclub.com</span>
+            </p>
+            <div class="footer-bottom">
+                <p class="copyright">
+                    © 2026 SMASHCLUB. SEMUA HAK DILINDUNGI.
+                </p>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+
 </html>
