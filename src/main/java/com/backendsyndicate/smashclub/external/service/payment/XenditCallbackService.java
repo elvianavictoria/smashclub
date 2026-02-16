@@ -44,7 +44,7 @@ public class XenditCallbackService implements IWebhook<XenditWebhookDTO> {
             Optional<Transaction> opt = transactionRepo.findByTransactionCode(dto.getExternalId());
             if( opt.isEmpty() ) {
                 Logging.handleException("XenditCallbackService", "callback(XenditWebhookDTO dto, HttpServletRequest request)", 43, generateErrorCode("01", "001"), "Transaction " + dto.getExternalId() + " not found!");
-                return GlobalResponse.failed("Failed to process payment notification!", generateErrorCode("01", "001"), null, request);
+                return GlobalResponse.success("Failed to process payment notification!",null, request);
             }
 
             Transaction trx = opt.get();
@@ -59,7 +59,7 @@ public class XenditCallbackService implements IWebhook<XenditWebhookDTO> {
 
         } catch(Exception e) {
             Logging.handleException("XenditCallbackService", "callback(XenditWebhookDTO dto, HttpServletRequest request)", 41, generateErrorCode("01", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to process payment notification!", generateErrorCode("01", "010"), null, request);
+            return GlobalResponse.success("Failed to process payment notification!",null, request);
         }
 
         return GlobalResponse.success("Payment notification has been processed!", null, request);

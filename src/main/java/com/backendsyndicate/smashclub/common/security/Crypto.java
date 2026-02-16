@@ -48,7 +48,7 @@ public class Crypto {
 
     // Remove later when compiling it to jar for production
     public static void main(String[] args) {
-        String strToEncrypt = "jdbc:sqlserver://localhost:1433;databaseName=BEB29";
+        String strToEncrypt = "jdbc:sqlserver://sqlserver-juara;databaseName=SMASHCLUB;schema=smashclub;trustServerCertificate=true";
         System.out.println("Encryption Result for " + strToEncrypt + ": " + performEncrypt(strToEncrypt));
 
         String strToDecrypt = "151b7fe2e506c17f503ecd4195592832663fe42eaa37ce7e32c71699b5056e16c4933750d266ce5cde08895ad7fd2bfeacbd42d5f144a9ce8212a5e5e6e2d36b54d1030a346f3a2b14dc200d8f40b304";
