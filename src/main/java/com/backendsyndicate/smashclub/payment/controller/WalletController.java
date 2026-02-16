@@ -1,5 +1,6 @@
 package com.backendsyndicate.smashclub.payment.controller;
 
+import com.backendsyndicate.smashclub.common.security.JwtService;
 import com.backendsyndicate.smashclub.payment.dto.request.ReqGetBalanceLogDTO;
 import com.backendsyndicate.smashclub.payment.service.WalletService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,23 +19,31 @@ import java.math.BigDecimal;
 public class WalletController {
     @Autowired
     private WalletService walletService;
+    @Autowired
+    private JwtService jwtService;
 
     @GetMapping("/balance")
     public ResponseEntity<Object> getBalance(HttpServletRequest request) {
-        String userId = "";
+        String accessToken = request.getHeader("Authorization");
+        String userId = jwtService.extractUserId(accessToken.replaceAll("Bearer ", ""));
+
         return walletService.getBalance(userId, request);
     }
 
     @GetMapping("/balance/log")
-    public ResponseEntity<Object> getBalanceLog(@Valid @RequestBody ReqGetBalanceLogDTO dto, HttpServletRequest request) {
-        String userId = "";
+    public ResponseEntity<Object> getBalanceLog(@Valid @RequestParam ReqGetBalanceLogDTO dto, HttpServletRequest request) {
+        String accessToken = request.getHeader("Authorization");
+        String userId = jwtService.extractUserId(accessToken.replaceAll("Bearer ", ""));
         Pageable page = PageRequest.of(dto.getPage(), dto.getSize(), Sort.by("CreatedAt").descending());
+
         return walletService.getBalanceLog(userId, dto.getStartDate(), dto.getEndDate(), page, request);
     }
 
     @PostMapping("/balance/topup")
     public ResponseEntity<Object> topupBalance(@RequestBody BigDecimal balance, HttpServletRequest request) {
-        String userId = "";
+        String accessToken = request.getHeader("Authorization");
+        String userId = jwtService.extractUserId(accessToken.replaceAll("Bearer ", ""));
+
         return walletService.topupBalance(userId, balance, request);
     }
 }

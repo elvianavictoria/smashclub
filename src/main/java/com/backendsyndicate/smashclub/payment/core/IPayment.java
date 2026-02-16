@@ -1,9 +1,10 @@
 package com.backendsyndicate.smashclub.payment.core;
 
 import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransactionDTO;
-import com.backendsyndicate.smashclub.payment.dto.response.RespRefundTransactionDTO;
+import com.backendsyndicate.smashclub.payment.dto.response.RespExpireTransactionDTO;
+import com.backendsyndicate.smashclub.payment.dto.response.RespPaymentTransactionDTO;
+import com.backendsyndicate.smashclub.payment.dto.response.RespCancelTransactionDTO;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
 
@@ -15,8 +16,7 @@ public interface IPayment {
     * */
 
     public RespCreateTransactionDTO createTransaction(String customerId, BigDecimal totalPrice, String referenceCode, int transactionType);
-    public ResponseEntity<Object> paymentTransaction(String transactionCode, HttpServletRequest request);
-    public RespRefundTransactionDTO cancelTransaction(String transactionCode, String notes);
-
-    public ResponseEntity<Object> paymentMethodList(HttpServletRequest request);
+    public RespPaymentTransactionDTO paymentTransaction(String transactionCode, HttpServletRequest request);
+    public RespCancelTransactionDTO cancelTransaction(String transactionCode, String notes);
+    public RespExpireTransactionDTO expireTransaction(String transactionCode);
 }

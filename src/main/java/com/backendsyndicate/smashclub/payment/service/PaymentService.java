@@ -2,10 +2,8 @@ package com.backendsyndicate.smashclub.payment.service;
 
 import com.backendsyndicate.smashclub.auth.model.User;
 import com.backendsyndicate.smashclub.auth.repository.UserRepository;
-import com.backendsyndicate.smashclub.common.constant.CommonConstant;
 import com.backendsyndicate.smashclub.common.service.TemplateService;
 import com.backendsyndicate.smashclub.common.util.DatetimeFormatting;
-import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.common.util.Util;
 import com.backendsyndicate.smashclub.common.constant.PaymentMethodConstant;
@@ -16,9 +14,11 @@ import com.backendsyndicate.smashclub.external.dto.XenditResponseDTO;
 import com.backendsyndicate.smashclub.external.service.notification.MailService;
 import com.backendsyndicate.smashclub.external.service.payment.XenditService;
 import com.backendsyndicate.smashclub.payment.core.IPayment;
+import com.backendsyndicate.smashclub.payment.dto.relation.RelTransactionUserDTO;
 import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransactionDTO;
+import com.backendsyndicate.smashclub.payment.dto.response.RespExpireTransactionDTO;
 import com.backendsyndicate.smashclub.payment.dto.response.RespPaymentTransactionDTO;
-import com.backendsyndicate.smashclub.payment.dto.response.RespRefundTransactionDTO;
+import com.backendsyndicate.smashclub.payment.dto.response.RespCancelTransactionDTO;
 import com.backendsyndicate.smashclub.payment.model.PaymentLog;
 import com.backendsyndicate.smashclub.payment.model.RefundRequest;
 import com.backendsyndicate.smashclub.payment.model.Transaction;
@@ -31,7 +31,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,7 +62,6 @@ public class PaymentService implements IPayment {
     private XenditService xenditService;
     @Autowired
     private MailService mailService;
-
 
     private ModelMapper modelMapper = new ModelMapper();
 
@@ -99,7 +97,7 @@ public class PaymentService implements IPayment {
             Optional<User> optUser = userRepo.findById(customerId);
             if( optUser.isEmpty() ) {
                 Logging.handleException("PaymentService", "createTransaction", 97, generateErrorCode("01", "001"), "Failed to get created transaction!");
-                return response;
+                return null;
             }
 
             User user = optUser.get();
@@ -145,11 +143,10 @@ public class PaymentService implements IPayment {
                 Map<String, Object> mailObject = Map.of(
                         "transactionCode", transaction.getTransactionCode(),
                         "fullName", transaction.getUser().getFullName(),
-                        "totalPrice", transaction.getTotalPrice(),
+                        "totalPrice", Util.formatCurrency(transaction.getTotalPrice()),
                         "expiredAt", DatetimeFormatting.getDatetimeFormat(expiredDt),
                         "url", pgResponse.getInvoiceUrl()
                 );
-                Logging.printConsole(mailObject.toString());
                 mailService.sendMail(TemplateService.TEMPLATE_PAYMENT_NOTIFY_UNPAID, transaction.getUser().getEmail(), "Smashclub - Pesanan Menunggu Pembayaran", mailObject);
 
                 response = new RespCreateTransactionDTO();
@@ -167,26 +164,29 @@ public class PaymentService implements IPayment {
     /**
      * Code: 02
      *
+     * (-) Controller
      * @param transactionCode
      * @param request
      * @return
      */
     @Override
-    public ResponseEntity<Object> paymentTransaction(String transactionCode, HttpServletRequest request) {
+    public RespPaymentTransactionDTO paymentTransaction(String transactionCode, HttpServletRequest request) {
         if( transactionCode == null ) {
-            return GlobalResponse.failed("Transaction code is required!", generateErrorCode("02", "001"), null, request);
+            Logging.handleException("PaymentService", "paymentTransaction(String transactionCode, HttpServletRequest request)", 177, generateErrorCode("02", "001"), "Transaction code is required!");
+
+            return null;
         }
 
         Transaction trx = null;
         RespPaymentTransactionDTO response = null;
 
         try {
-            Optional<Transaction> optionalTrx = transactionRepo.findByTransactionCode(transactionCode);
-            if( optionalTrx.isEmpty() ) {
-                return GlobalResponse.failed("Transaction not found!", generateErrorCode("02", "002"), null, request);
+            trx = getTransaction(transactionCode);
+            if( trx == null ) {
+                Logging.handleException("PaymentService", "paymentTransaction(String transactionCode, HttpServletRequest request)", 177, generateErrorCode("02", "002"), "Transaction not found!");
+                return null;
             }
 
-            trx = optionalTrx.get();
             Hibernate.initialize(trx.getUser());
             byte previousStatus = trx.getStatus();
             if( TransactionConstant.isStatusAllowed(previousStatus, TransactionConstant.PAYMENT_PAID) ) {
@@ -197,7 +197,7 @@ public class PaymentService implements IPayment {
                 Map<String, Object> mailObject = Map.of(
                         "transactionCode", trx.getTransactionCode(),
                         "fullName", trx.getUser().getFullName(),
-                        "totalPrice", trx.getTotalPrice(),
+                        "totalPrice", Util.formatCurrency(trx.getTotalPrice()),
                         "createdAt", DatetimeFormatting.getDatetimeFormat(trx.getCreatedAt()),
                         "url", "https://localhost:5173/transaction/" + trx.getTransactionCode()
                 );
@@ -206,13 +206,15 @@ public class PaymentService implements IPayment {
 
                 response = modelMapper.map(trx, RespPaymentTransactionDTO.class);
             } else {
-                return GlobalResponse.failed("This transaction has been paid!", generateErrorCode("02", "009"), null, request);
+                Logging.handleException("PaymentService", "paymentTransaction(String transactionCode, HttpServletRequest request)", 212, generateErrorCode("02", "009"), "This transaction has been paid!");
+                return null;
             }
         } catch(Exception e) {
-            return GlobalResponse.failed("Failed to process payment transaction!", generateErrorCode("02", "010"), null, request);
+            Logging.handleException("PaymentService", "paymentTransaction(String transactionCode, HttpServletRequest request)", 216, generateErrorCode("02", "010"), "Failed to process payment transaction!");
+            return null;
         }
 
-        return GlobalResponse.success("Successfully paid the transaction!", response, request);
+        return response;
     }
 
     /**
@@ -231,21 +233,25 @@ public class PaymentService implements IPayment {
      * @return
      */
     @Override
-    public RespRefundTransactionDTO cancelTransaction(String transactionCode, String refundReason) {
-        RespRefundTransactionDTO response = new RespRefundTransactionDTO();
-        response.setTransactionCode(transactionCode);
+    public RespCancelTransactionDTO cancelTransaction(String transactionCode, String refundReason) {
+        RespCancelTransactionDTO response = null;
 
         try {
-            Optional<Transaction> optionalTrx = transactionRepo.findByTransactionCode(transactionCode);
-            if( optionalTrx.isEmpty() ) {
-                Logging.handleException("PaymentService", "refundTransaction", 152, generateErrorCode("03", "001"), "Transaction not found!");
-                return response;
+            Transaction trx = getTransaction(transactionCode);
+            if( trx == null ) {
+                Logging.handleException("PaymentService", "cancelTransaction(String transactionCode, String refundReason)", 152, generateErrorCode("03", "001"), "Transaction not found!");
+                return null;
             }
-            Transaction trx = optionalTrx.get();
-            int previousStatus = trx.getStatus();
 
+            if( trx.getTransactionType() == TransactionTypeConstant.WALLET_TOPUP ) {
+                Logging.handleException("PaymentService", "cancelTransaction(String transactionCode, String refundReason)", 158, generateErrorCode("03", "002"), "Wallet topup cannot be refunded!");
+                return null;
+            }
+
+            int previousStatus = trx.getStatus();
             if( !TransactionConstant.isStatusAllowed(previousStatus, TransactionConstant.PAYMENT_CANCELLED) ) {
-                Logging.handleException("PaymentService", "refundTransaction", 158, generateErrorCode("03", "002"), "Status update is not allowed!");
+                Logging.handleException("PaymentService", "cancelTransaction(String transactionCode, String refundReason)", 158, generateErrorCode("03", "003"), "Status update is not allowed!");
+                return null;
             }
 
             trx.setStatus((byte) TransactionConstant.PAYMENT_CANCELLED);
@@ -262,9 +268,14 @@ public class PaymentService implements IPayment {
                 refundRequestRepo.save(refundRequest);
             }
 
+            response = new RespCancelTransactionDTO();
             response.setRequested(true);
+            response.setTransactionCode(transactionCode);
+            response.setTotalPrice(trx.getTotalPrice());
+            response.setTransactionType(trx.getTransactionType());
+            response.setUser(modelMapper.map(trx.getUser(), RelTransactionUserDTO.class));
         } catch(Exception e) {
-            Logging.handleException("PaymentService", "refundTransaction", 147, generateErrorCode("03", "010"), e.getMessage());
+            Logging.handleException("PaymentService", "cancelTransaction(String transactionCode, String refundReason)", 147, generateErrorCode("03", "010"), e.getMessage());
         }
 
         return response;
@@ -272,13 +283,48 @@ public class PaymentService implements IPayment {
 
     /**
      * Code: 04
+     * Desc: Expire Transaction
      *
-     * @param request
+     * (-) Controller
+     *
+     * @param transactionCode
      * @return
      */
     @Override
-    public ResponseEntity<Object> paymentMethodList(HttpServletRequest request) {
-        return GlobalResponse.success("Payment Method has been found!", PaymentMethodConstant.getPaymentMethods(), request);
+    public RespExpireTransactionDTO expireTransaction(String transactionCode) {
+        RespExpireTransactionDTO response = null;
+
+        try {
+            Transaction trx = getTransaction(transactionCode);
+            if( trx == null ) {
+                Logging.handleException("PaymentService", "expireTransaction(String transactionCode)", 152, generateErrorCode("04", "001"), "Transaction not found!");
+                return null;
+            }
+            int previousStatus = trx.getStatus();
+
+            if( !TransactionConstant.isStatusAllowed(previousStatus, TransactionConstant.PAYMENT_CANCELLED) ) {
+                Logging.handleException("PaymentService", "expireTransaction(String transactionCode)", 158, generateErrorCode("04", "002"), "Status update is not allowed!");
+                return null;
+            }
+
+            trx.setStatus((byte) TransactionConstant.PAYMENT_EXPIRED);
+            logTransactionUpdate(trx, previousStatus);
+
+            response = new RespExpireTransactionDTO();
+            response.setTransactionCode(transactionCode);
+            response.setTotalPrice(trx.getTotalPrice());
+            response.setTransactionType(trx.getTransactionType());
+            response.setUser(modelMapper.map(trx.getUser(), RelTransactionUserDTO.class));
+        } catch(Exception e) {
+            Logging.handleException("PaymentService", "expireTransaction(String transactionCode)", 147, generateErrorCode("04", "010"), e.getMessage());
+        }
+
+        return response;
+    }
+
+    protected Transaction getTransaction(String transactionCode) {
+        Optional<Transaction> optionalTrx = transactionRepo.findByTransactionCode(transactionCode);
+        return optionalTrx.orElse(null);
     }
 
     private String generateTransactionCode() {

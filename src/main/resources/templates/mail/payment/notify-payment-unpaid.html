@@ -11,12 +11,13 @@
             min-height: 100vh;
             font-family: 'Manrope', sans-serif;
             padding: 0;
+            width: 100%;
         }
 
         .main-container {
             width: 100%;
-            padding: 1.5rem;
             text-align: center;
+            padding: 3rem 0;
         }
 
         .card {
@@ -30,6 +31,7 @@
             border: 1px solid #e2e8f0;
             text-align: left;
             vertical-align: top;
+            border-top: 4px solid #00BBA7;
         }
 
         .card-header {
@@ -325,7 +327,7 @@
                         </tr>
                         <tr>
                             <th class="summary-item summary-label">Total Pembayaran</th>
-                            <td class="summary-item summary-value" th:text="${totalPrice}"></td>
+                            <td class="summary-item summary-value-highlight" th:text="${totalPrice}"></td>
                         </tr>
                         <tr>
                             <th class="summary-item summary-label">Metode Pembayaran</th>
@@ -334,10 +336,14 @@
                     </tbody>
                 </table>
             </div>
+            <br />
+            <br />
             <div class="text-center">
                 <a th:href="@{${url}}" class="cta-button">
                     Bayar Sekarang
                 </a>
+                <br />
+                <br />
                 <div class="deadline-box">
                     <p class="deadline-title">
                         Batas Waktu Pembayaran

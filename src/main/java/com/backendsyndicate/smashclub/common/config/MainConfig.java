@@ -20,18 +20,18 @@ public class MainConfig {
     private Environment env;
     private static int cacheLimit;
 
-    @Primary
-    @Bean
-    public DataSource getDataSource() {
-        DataSourceBuilder dBuild = DataSourceBuilder.create();
-
-        dBuild.driverClassName(env.getProperty("spring.datasource.driverClassName"));
-        dBuild.url(Crypto.performDecrypt(env.getProperty("spring.datasource.url")));
-        dBuild.username(Crypto.performDecrypt(env.getProperty("spring.datasource.username")));
-        dBuild.password(Crypto.performDecrypt(env.getProperty("spring.datasource.password")));
-
-        return dBuild.build();
-    }
+//    @Primary
+//    @Bean
+//    public DataSource getDataSource() {
+//        DataSourceBuilder dBuild = DataSourceBuilder.create();
+//
+//        dBuild.driverClassName(env.getProperty("spring.datasource.driverClassName"));
+//        dBuild.url(Crypto.performDecrypt(env.getProperty("spring.datasource.url")));
+//        dBuild.username(Crypto.performDecrypt(env.getProperty("spring.datasource.username")));
+//        dBuild.password(Crypto.performDecrypt(env.getProperty("spring.datasource.password")));
+//
+//        return dBuild.build();
+//    }
 
     public static int getCacheLimit() {
         return cacheLimit;

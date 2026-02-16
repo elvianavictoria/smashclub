@@ -2,6 +2,7 @@ package com.backendsyndicate.smashclub.common.security;
 
 import com.backendsyndicate.smashclub.admin.security.jwt.AdminJwtFilter;
 import com.backendsyndicate.smashclub.admin.service.AdminAuthService;
+import com.backendsyndicate.smashclub.common.config.OtherConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -120,8 +121,9 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+
         configuration.setAllowedOrigins(
-                Arrays.asList("http://localhost:5173", "https://smashclub-fe.vercel.app", "https://smashclub-cms.vercel.app"));
+                Arrays.asList(OtherConfig.getCorsUrlAllowed().split(",")));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

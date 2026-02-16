@@ -5,8 +5,8 @@ import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.payment.dto.request.ReqCreateTransactionDTO;
 import com.backendsyndicate.smashclub.payment.dto.request.ReqPaymentTransactionDTO;
 import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransactionDTO;
-import com.backendsyndicate.smashclub.payment.dto.response.RespRefundTransactionDTO;
-import com.backendsyndicate.smashclub.payment.service.PaymentService;
+import com.backendsyndicate.smashclub.payment.dto.response.RespPaymentTransactionDTO;
+import com.backendsyndicate.smashclub.payment.dto.response.RespCancelTransactionDTO;
 import com.backendsyndicate.smashclub.payment.service.TransactionService;
 import com.backendsyndicate.smashclub.payment.service.helper.PaymentHelper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -55,18 +55,14 @@ public class TransactionController {
     }
 
     @PostMapping("/payment/{transactionCode}")
-    public ResponseEntity<Object> transactionPayment(@PathVariable String transactionCode, @RequestBody ReqPaymentTransactionDTO dto, HttpServletRequest request) {
-        return paymentService.paymentTransaction(transactionCode, request);
+    public ResponseEntity<Object> transactionPayment(@PathVariable String transactionCode, HttpServletRequest request) {
+        RespPaymentTransactionDTO payment = paymentService.paymentTransaction(transactionCode, request);
+        return GlobalResponse.success("Successfully paid transaction!", payment, request);
     }
 
     @PostMapping("/cancel/{transactionCode}")
     public ResponseEntity<Object> transactionCancel(@PathVariable String transactionCode, @RequestBody String refundReason, HttpServletRequest request) {
-        RespRefundTransactionDTO refund = paymentService.cancelTransaction(transactionCode, refundReason);
-        return GlobalResponse.success("Successfully request refund transaction!", refund, request);
-    }
-
-    @GetMapping("/payment-method")
-    public ResponseEntity<Object> paymentMethodList(HttpServletRequest request) {
-        return paymentService.paymentMethodList(request);
+        RespCancelTransactionDTO refund = paymentService.cancelTransaction(transactionCode, refundReason);
+        return GlobalResponse.success("Successfully cancel transaction!", refund, request);
     }
 }

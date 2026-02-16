@@ -8,6 +8,7 @@ import com.backendsyndicate.smashclub.external.core.IWebhook;
 import com.backendsyndicate.smashclub.external.dto.XenditWebhookDTO;
 import com.backendsyndicate.smashclub.payment.model.Transaction;
 import com.backendsyndicate.smashclub.payment.repo.TransactionRepo;
+import com.backendsyndicate.smashclub.payment.service.helper.PaymentHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,8 @@ import java.util.Optional;
 public class XenditCallbackService implements IWebhook<XenditWebhookDTO> {
     @Autowired
     private TransactionRepo transactionRepo;
+    @Autowired
+    private PaymentHelper paymentService;
 
     private String generateErrorCode(String methodNo, String errorNo) {
         return "CLBK-XEN-" + methodNo + "E" + errorNo;
@@ -47,9 +50,7 @@ public class XenditCallbackService implements IWebhook<XenditWebhookDTO> {
             Transaction trx = opt.get();
             switch(dto.getStatus()) {
                 case XenditPaymentStatusConstant.PAID_STATUS:
-                    if( trx.getStatus() == TransactionConstant.PAYMENT_UNPAID ) {
-                        trx.setStatus((byte) TransactionConstant.PAYMENT_PAID);
-                    }
+                    paymentService.paymentTransaction(trx.getTransactionCode(), request);
                     break;
                 case XenditPaymentStatusConstant.EXPIRED_STATUS:
                     trx.setStatus((byte) TransactionConstant.PAYMENT_EXPIRED);

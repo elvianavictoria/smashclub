@@ -8,6 +8,7 @@ import com.backendsyndicate.smashclub.common.service.TemplateService;
 import com.backendsyndicate.smashclub.common.util.DatetimeFormatting;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
+import com.backendsyndicate.smashclub.common.util.Util;
 import com.backendsyndicate.smashclub.external.service.notification.MailService;
 import com.backendsyndicate.smashclub.payment.dto.request.ReqUpdateBalanceDTO;
 import com.backendsyndicate.smashclub.payment.model.RefundRequest;
@@ -109,7 +110,7 @@ public class AdminRefundRequestService {
                 Map<String, Object> data = new HashMap<>();
                 data.put("fullName", refundRequest.getTransaction().getUser().getFullName());
                 data.put("transactionCode", refundRequest.getTransaction().getTransactionCode());
-                data.put("refundAmount", refundRequest.getTransaction().getTotalPrice());
+                data.put("refundAmount", Util.formatCurrency(refundRequest.getTransaction().getTotalPrice()));
                 mailService.sendMail(TemplateService.TEMPLATE_REFUND_NOTIFY_APPROVED, refundRequest.getTransaction().getUser().getEmail(), "Smashclub - Update Pengajuan Pengembalian Dana", data);
             } else {
                 action = "rejected";

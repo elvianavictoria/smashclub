@@ -2,6 +2,9 @@ package com.backendsyndicate.smashclub.common.util;
 
 import tools.jackson.databind.ObjectMapper;
 
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
@@ -42,5 +45,11 @@ public class Util {
             Logging.handleException("Util", "mapToModel(Map<String, Object> map, Class<T> cls)", 38, "UTLMTME020", e.getMessage());
             return null;
         }
+    }
+
+    public static String formatCurrency(BigDecimal value) {
+        // Using locale-specific currency format
+        NumberFormat nf = NumberFormat.getNumberInstance(Locale.US);
+        return nf.format(value);
     }
 }
