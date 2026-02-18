@@ -1,7 +1,7 @@
 package com.backendsyndicate.smashclub.common.security;
 
 import com.backendsyndicate.smashclub.admin.security.jwt.AdminJwtFilter;
-import com.backendsyndicate.smashclub.admin.security.request.AdminRateLimitFilter;
+import com.backendsyndicate.smashclub.admin.security.ratelimit.AdminRateLimitFilter;
 import com.backendsyndicate.smashclub.admin.service.AdminAuthService;
 import com.backendsyndicate.smashclub.common.config.OtherConfig;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;

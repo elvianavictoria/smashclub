@@ -1,4 +1,4 @@
-package com.backendsyndicate.smashclub.admin.security.request;
+package com.backendsyndicate.smashclub.admin.security.ratelimit;
 
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
