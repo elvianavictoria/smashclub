@@ -16,8 +16,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SessionResponse {
-
-    // ✅ WAJIB: Untuk basic functionality
     @JsonProperty("user_id")
     private String userId;
 
@@ -29,9 +27,8 @@ public class SessionResponse {
     private LocalDateTime expiresAt;
 
     @JsonProperty("remaining_minutes")
-    private Long remainingMinutes;  // ⭐️ SANGAT PENTING!
+    private Long remainingMinutes;
 
-    // ✅ RECOMMENDED: Untuk better UX
     @JsonProperty("requires_renewal")
     private Boolean requiresRenewal;
 
@@ -42,7 +39,6 @@ public class SessionResponse {
     @JsonProperty("device_info")
     private String deviceInfo;
 
-    // ✅ OPTIONAL: Jika butuh lebih detail
     private String email;
 
     @JsonProperty("full_name")

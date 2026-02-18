@@ -7,6 +7,8 @@ import com.backendsyndicate.smashclub.auth.model.User;
 import com.backendsyndicate.smashclub.auth.repository.PasswordResetTokenRepository;
 import com.backendsyndicate.smashclub.auth.repository.UserRepository;
 import com.backendsyndicate.smashclub.common.security.PasswordHasher;
+import com.backendsyndicate.smashclub.common.handler.ResponseHandler;
+import com.backendsyndicate.smashclub.common.constant.AuthenticationConstant;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +33,7 @@ public class PasswordService {
 
     @Transactional
     public ResponseEntity<Object> forgotPassword(ForgotPasswordRequest request, HttpServletRequest httpRequest,
-                                                 com.backendsyndicate.smashclub.common.handler.ResponseHandler responseHandler) {
+                                                 ResponseHandler responseHandler) {
         String ipAddress = httpRequest.getRemoteAddr();
         log.info("=== FORGOT PASSWORD START ===");
         log.info("Email: {}, IP: {}", request.getEmail(), ipAddress);
@@ -56,7 +58,7 @@ public class PasswordService {
                     user.getId(), user.getEmail(), user.getStatus());
 
             // 2. Cek status user
-            if (user.getStatus() == com.backendsyndicate.smashclub.common.constant.AuthenticationConstant.PENDING) {
+            if (user.getStatus() == AuthenticationConstant.PENDING) {
                 log.warn("Account pending, cannot reset password");
                 return responseHandler.handleResponse(
                         "Akun belum aktif. Silakan verifikasi email terlebih dahulu",
@@ -67,7 +69,7 @@ public class PasswordService {
                 );
             }
 
-            if (user.getStatus() == com.backendsyndicate.smashclub.common.constant.AuthenticationConstant.LOCKED) {
+            if (user.getStatus() == AuthenticationConstant.LOCKED) {
                 log.warn("Account locked, cannot reset password");
                 return responseHandler.handleResponse(
                         "Akun terkunci. Tidak dapat reset password",
@@ -114,7 +116,7 @@ public class PasswordService {
             // 6. Save token
             try {
                 PasswordResetTokens savedToken = passwordResetTokenRepository.save(resetToken);
-                log.info("✅ Token saved successfully! ID: {}, Token: {}",
+                log.info(" Token saved successfully! ID: {}, Token: {}",
                         savedToken.getId(), savedToken.getToken());
 
                 // Verify save
@@ -138,7 +140,7 @@ public class PasswordService {
             log.info("Sending reset password email...");
             try {
                 emailServiceImpl.sendResetPasswordEmail(user.getEmail(), token);
-                log.info("✅ Email sent to {}", user.getEmail());
+                log.info(" Email sent to {}", user.getEmail());
             } catch (Exception e) {
                 log.error("Failed to send email: {}", e.getMessage());
                 // Continue, email is secondary
@@ -171,7 +173,7 @@ public class PasswordService {
 
     @Transactional
     public ResponseEntity<Object> resetPassword(ResetPasswordRequest request, HttpServletRequest httpRequest,
-                                                com.backendsyndicate.smashclub.common.handler.ResponseHandler responseHandler) {
+                                                ResponseHandler responseHandler) {
         log.info("Reset password attempt - token: {}", request.getToken());
 
         Optional<PasswordResetTokens> tokenOpt = passwordResetTokenRepository
@@ -241,7 +243,7 @@ public class PasswordService {
 
     @Transactional(readOnly = true)
     public ResponseEntity<Object> validateResetToken(String token, HttpServletRequest httpRequest,
-                                                     com.backendsyndicate.smashclub.common.handler.ResponseHandler responseHandler) {
+                                                     ResponseHandler responseHandler) {
         log.info("Validate reset token - token: {}", token);
 
         Optional<PasswordResetTokens> tokenOpt = passwordResetTokenRepository
@@ -290,7 +292,7 @@ public class PasswordService {
         resetToken.setToken(token);
         resetToken.setUser(user);
         resetToken.setExpiresAt(LocalDateTime.now()
-                .plusHours(com.backendsyndicate.smashclub.common.constant.AuthenticationConstant.RESET_TOKEN_EXPIRY_HOURS));
+                .plusHours(AuthenticationConstant.RESET_TOKEN_EXPIRY_HOURS));
         resetToken.setCreatedAt(LocalDateTime.now());
         return resetToken;
     }

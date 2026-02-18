@@ -87,14 +87,67 @@ public class ProfileController {
     // ============ HELPER METHOD ============
     private String extractUserIdFromToken(String authorizationHeader) {
         try {
-            if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-                String token = authorizationHeader.substring(7);
-                // Extract user ID from JWT token
-                return authService.getUserIdFromToken(token); // Butuh method di AuthService
+            // Cek format header
+            if (authorizationHeader == null) {
+                log.warn("Authorization header is null");
+                return null;
             }
+
+            if (!authorizationHeader.startsWith("Bearer ")) {
+                log.warn("Authorization header does not start with Bearer");
+                return null;
+            }
+
+            // Extract token
+            String token = authorizationHeader.substring(7);
+            if (token.trim().isEmpty()) {
+                log.warn("Token is empty after Bearer prefix");
+                return null;
+            }
+
+            // Dapatkan user ID
+            String userId = authService.getUserIdFromToken(token);
+
+            // LOG UNTUK TRACKING
+            if (userId == null) {
+                log.warn("getUserIdFromToken returned null for token: {}", token);
+            } else {
+                log.debug("Successfully extracted userId: {}", userId);
+            }
+            return userId;
+
         } catch (Exception e) {
-            log.error("Error extracting user ID from token: {}", e.getMessage());
+            log.error("Unexpected error extracting user ID: {}", e.getMessage());
+            return null;
         }
-        return null;
+    }
+
+    // ProfileController.java
+
+    @PostMapping("/profile-picture")
+    public ResponseEntity<Object> uploadProfilePicture(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @ModelAttribute ProfilePictureRequest request,  // ← Pakai @ModelAttribute untuk multipart
+            HttpServletRequest httpRequest
+    ) {
+        String userId = extractUserIdFromToken(authorizationHeader);
+        if (userId == null) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        return authService.uploadProfilePicture(userId, request.getProfilePicture(), httpRequest);
+    }
+
+    @DeleteMapping("/profile-picture")
+    public ResponseEntity<Object> deleteProfilePicture(
+            @RequestHeader("Authorization") String authorizationHeader,
+            HttpServletRequest httpRequest
+    ) {
+        String userId = extractUserIdFromToken(authorizationHeader);
+        if (userId == null) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        return authService.deleteProfilePicture(userId, httpRequest);
     }
 }

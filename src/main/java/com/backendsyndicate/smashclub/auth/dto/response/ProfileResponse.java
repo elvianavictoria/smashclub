@@ -20,6 +20,7 @@ public class ProfileResponse {
     private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String profilePicture;
 
     public static ProfileResponse fromUser(User user) {
         return ProfileResponse.builder()

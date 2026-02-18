@@ -5,7 +5,9 @@ import com.backendsyndicate.smashclub.auth.model.EmailVerificationTokens;
 import com.backendsyndicate.smashclub.auth.model.User;
 import com.backendsyndicate.smashclub.auth.repository.EmailVerificationTokenRepository;
 import com.backendsyndicate.smashclub.auth.repository.UserRepository;
+import com.backendsyndicate.smashclub.common.handler.ResponseHandler;
 import com.backendsyndicate.smashclub.common.security.PasswordHasher;
+import com.backendsyndicate.smashclub.common.constant.AuthenticationConstant;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +34,7 @@ public class RegistrationService {
 
     @Transactional
     public ResponseEntity<Object> register(RegisterRequest request, HttpServletRequest httpRequest,
-                                           com.backendsyndicate.smashclub.common.handler.ResponseHandler responseHandler) {
+                                           ResponseHandler responseHandler) {
         log.info("Registration attempt - email: {}", request.getEmail());
 
         // 1. Validasi format data
@@ -84,7 +86,7 @@ public class RegistrationService {
 
     @Transactional
     public ResponseEntity<Object> verifyEmail(String token, HttpServletRequest httpRequest,
-                                              com.backendsyndicate.smashclub.common.handler.ResponseHandler responseHandler) {
+                                              ResponseHandler responseHandler) {
         log.info("Email verification attempt - token: {}", token);
 
         Optional<EmailVerificationTokens> tokenOpt = emailVerificationTokenRepository
@@ -121,7 +123,7 @@ public class RegistrationService {
 
         // Update user status to ACTIVE
         User user = verificationToken.getUser();
-        user.setStatus(com.backendsyndicate.smashclub.common.constant.AuthenticationConstant.ACTIVE);
+        user.setStatus(AuthenticationConstant.ACTIVE);
         user.setUpdatedDate(LocalDateTime.now());
         userRepository.save(user);
 
@@ -138,7 +140,7 @@ public class RegistrationService {
 
     @Transactional
     public ResponseEntity<Object> resendVerificationEmail(String email, HttpServletRequest httpRequest,
-                                                          com.backendsyndicate.smashclub.common.handler.ResponseHandler responseHandler) {
+                                                          ResponseHandler responseHandler) {
         String ipAddress = httpRequest.getRemoteAddr();
         log.info("Resend verification email request - email: {}, IP: {}", email, ipAddress);
 
@@ -157,7 +159,7 @@ public class RegistrationService {
 
         User user = userOpt.get();
 
-        if (user.getStatus() != com.backendsyndicate.smashclub.common.constant.AuthenticationConstant.PENDING) {
+        if (user.getStatus() != AuthenticationConstant.PENDING) {
             log.warn("Resend blocked - account not pending - email: {}, status: {}", email, user.getStatus());
             return responseHandler.handleResponse(
                     "Akun sudah aktif atau tidak memerlukan verifikasi",
@@ -225,7 +227,7 @@ public class RegistrationService {
         user.setFullName(request.getFullName().trim());
         user.setEmail(request.getEmail().toLowerCase().trim());
         user.setPasswordHash(passwordHasher.hash(request.getPassword()));
-        user.setStatus(com.backendsyndicate.smashclub.common.constant.AuthenticationConstant.PENDING);
+        user.setStatus(AuthenticationConstant.PENDING);
         user.setFailedLoginAttempt(0);
         user.setCreatedDate(LocalDateTime.now());
         return user;
@@ -235,14 +237,15 @@ public class RegistrationService {
         return createVerificationToken(user, UUID.randomUUID().toString());
     }
 
+    // RegistrationService.java
     private EmailVerificationTokens createVerificationToken(User user, String token) {
-        EmailVerificationTokens verificationToken = new EmailVerificationTokens();
-        verificationToken.setUser(user);
-        verificationToken.setToken(token);
-        verificationToken.setExpiresAt(LocalDateTime.now()
-                .plusHours(com.backendsyndicate.smashclub.common.constant.AuthenticationConstant.VERIFICATION_TOKEN_EXPIRY_HOURS));
-        verificationToken.setCreatedAt(LocalDateTime.now());
-        return verificationToken;
+        return EmailVerificationTokens.builder()
+                .user(user)
+                .token(token)
+                .expiresAt(LocalDateTime.now()
+                        .plusHours(AuthenticationConstant.VERIFICATION_TOKEN_EXPIRY_HOURS))
+                .createdAt(LocalDateTime.now())
+                .build();  // ← usedAt otomatis null (default)
     }
 
     private void sendVerificationEmail(User user, String token) {

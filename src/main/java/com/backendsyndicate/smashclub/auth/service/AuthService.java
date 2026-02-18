@@ -2,12 +2,14 @@ package com.backendsyndicate.smashclub.auth.service;
 
 import com.backendsyndicate.smashclub.auth.dto.request.*;
 import com.backendsyndicate.smashclub.common.security.JwtService;
+import com.backendsyndicate.smashclub.common.handler.ResponseHandler;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +23,8 @@ public class AuthService {
     private final TokenService tokenService;
     private final SessionService sessionService;
     private final JwtService jwtService;
-    private final com.backendsyndicate.smashclub.common.handler.ResponseHandler responseHandler;
+    private final ProfileManagementService profileManagementService;
+    private final ResponseHandler responseHandler;
 
     // ============ REGISTRATION ============
     @Transactional
@@ -101,9 +104,6 @@ public class AuthService {
         return passwordService.validateResetToken(token, httpRequest, responseHandler);
     }
 
-    // Tambahkan di AuthService.java
-    private final ProfileManagementService profileManagementService;
-
     // ============ PROFILE MANAGEMENT ============
     @Transactional(readOnly = true)
     public ResponseEntity<Object> getProfile(String userId, HttpServletRequest httpRequest) {
@@ -130,9 +130,25 @@ public class AuthService {
         return profileManagementService.cancelEmailChange(userId, httpRequest, responseHandler);
     }
 
+    @Transactional
+    public ResponseEntity<Object> uploadProfilePicture(String userId, MultipartFile file,
+                                                       HttpServletRequest httpRequest) {
+        return profileManagementService.uploadProfilePicture(userId, file, httpRequest, responseHandler);
+    }
+
+    @Transactional
+    public ResponseEntity<Object> deleteProfilePicture(String userId, HttpServletRequest httpRequest) {
+        return profileManagementService.deleteProfilePicture(userId, httpRequest, responseHandler);
+    }
+
     public String getUserIdFromToken(String token) {
         try {
-            return jwtService.extractUserId(token);
+            String userId = jwtService.extractUserId(token);
+
+            if (userId == null) {
+                log.warn("Token valid but no user ID found in claims");
+            }
+            return userId;
         } catch (Exception e) {
             log.error("Error extracting user ID from token: {}", e.getMessage());
             return null;

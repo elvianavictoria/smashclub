@@ -6,6 +6,8 @@ import com.backendsyndicate.smashclub.auth.model.User;
 import com.backendsyndicate.smashclub.auth.repository.SessionRepository;
 import com.backendsyndicate.smashclub.auth.repository.UserRepository;
 import com.backendsyndicate.smashclub.common.security.JwtService;
+import com.backendsyndicate.smashclub.common.handler.ResponseHandler;
+import com.backendsyndicate.smashclub.common.constant.AuthenticationConstant;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +32,7 @@ public class SessionService {
 
     @Transactional
     public ResponseEntity<Object> checkSession(String accessToken, HttpServletRequest httpRequest,
-                                               com.backendsyndicate.smashclub.common.handler.ResponseHandler responseHandler) {
+                                               ResponseHandler responseHandler) {
         log.debug("Check session request");
 
         try {
@@ -49,7 +51,7 @@ public class SessionService {
             // 2. Cek di database apakah token belum di-invalidate
             Optional<Sessions> sessionOpt = sessionRepository.findBySessionTokenAndTokenTypeAndExpiresAtAfterAndInvalidatedAtIsNull(
                     accessToken,
-                    com.backendsyndicate.smashclub.common.constant.AuthenticationConstant.TOKEN_TYPE_ACCESS,
+                    AuthenticationConstant.TOKEN_TYPE_ACCESS,
                     LocalDateTime.now()
             );
 
@@ -77,7 +79,7 @@ public class SessionService {
 
             // 5. Cek user masih aktif
             Optional<User> userOpt = userRepository.findById(userId);
-            if (userOpt.isEmpty() || userOpt.get().getStatus() != com.backendsyndicate.smashclub.common.constant.AuthenticationConstant.ACTIVE) {
+            if (userOpt.isEmpty() || userOpt.get().getStatus() != AuthenticationConstant.ACTIVE) {
                 return responseHandler.handleResponse(
                         "User tidak aktif",
                         HttpStatus.BAD_REQUEST,
@@ -122,7 +124,7 @@ public class SessionService {
 
     @Transactional
     public ResponseEntity<Object> logout(String refreshToken, HttpServletRequest httpRequest,
-                                         com.backendsyndicate.smashclub.common.handler.ResponseHandler responseHandler) {
+                                         ResponseHandler responseHandler) {
         log.info("Logout request");
 
         try {
@@ -157,7 +159,7 @@ public class SessionService {
 
     @Transactional
     public ResponseEntity<Object> logoutAll(String userId, HttpServletRequest httpRequest,
-                                            com.backendsyndicate.smashclub.common.handler.ResponseHandler responseHandler) {
+                                            ResponseHandler responseHandler) {
         log.info("Logout all sessions request - userId: {}", userId);
 
         // Cek user exists

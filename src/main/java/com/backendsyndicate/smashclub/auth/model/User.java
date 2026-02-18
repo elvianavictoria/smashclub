@@ -26,6 +26,9 @@ public class User {
     @Column(name = "Email", unique = true, nullable = false)
     private String email;
 
+    @Column(name = "ProfilePicture", length = 500)
+    private String profilePicture;
+
     @Column(name = "PasswordHash", nullable = false)
     private String passwordHash;
 
