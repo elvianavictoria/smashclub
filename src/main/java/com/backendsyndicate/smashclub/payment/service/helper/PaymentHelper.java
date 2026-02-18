@@ -4,8 +4,10 @@ import com.backendsyndicate.smashclub.booking.dto.request.BookingStatusUpdateReq
 import com.backendsyndicate.smashclub.booking.service.BookingService;
 import com.backendsyndicate.smashclub.booking.service.helper.BookingHelper;
 import com.backendsyndicate.smashclub.common.constant.BookingConstant;
+import com.backendsyndicate.smashclub.common.constant.OrderStatusConstant;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.common.constant.TransactionTypeConstant;
+import com.backendsyndicate.smashclub.ecommerce.service.OrderService;
 import com.backendsyndicate.smashclub.payment.dto.request.ReqUpdateBalanceDTO;
 import com.backendsyndicate.smashclub.payment.dto.response.RespPaymentTransactionDTO;
 import com.backendsyndicate.smashclub.payment.dto.response.RespCancelTransactionDTO;
@@ -22,6 +24,8 @@ public class PaymentHelper extends PaymentService {
     private WalletService walletService;
     @Autowired
     private BookingHelper bookingService;
+    @Autowired
+    private OrderService orderService;
 
     @Override
     public RespPaymentTransactionDTO paymentTransaction(String transactionCode) {
@@ -39,6 +43,7 @@ public class PaymentHelper extends PaymentService {
                     break;
                 case TransactionTypeConstant.ECOMMERCE_SHOPPING:
                     // Update order status
+                    orderService.updateOrderStatus(Long.parseLong(trx.getReferenceCode()), OrderStatusConstant.ORDER_PAID);
                     break;
                 case TransactionTypeConstant.WALLET_TOPUP:
                     // Update balance
@@ -81,6 +86,7 @@ public class PaymentHelper extends PaymentService {
                     break;
                 case TransactionTypeConstant.ECOMMERCE_SHOPPING:
                     // Update order status
+                    orderService.cancelOrder(Long.parseLong(response.getReferenceCode()));
                     break;
                 case TransactionTypeConstant.WALLET_TOPUP:
                     // Do nothing, since wallet is the refund container

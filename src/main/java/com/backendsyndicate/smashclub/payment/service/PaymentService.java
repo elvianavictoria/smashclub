@@ -114,13 +114,10 @@ public class PaymentService implements IPayment {
             logTransactionUpdate(trx, -1);
 
             // Create payment link
-            Optional<Transaction> opt = transactionRepo.findByTransactionCode(trxCode);
-            if( opt.isEmpty() ) {
+            Transaction transaction = getTransaction(trx.getTransactionCode());
+            if( transaction == null ) {
                 Logging.handleException("PaymentService", "createTransaction", 97, generateErrorCode("01", "002"), "Failed to get created transaction!");
             } else {
-                Transaction transaction = opt.get();
-                Hibernate.initialize(transaction.getUser());
-
                 XenditResponseDTO pgResponse = new XenditResponseDTO();
                 if(XenditConfig.getUseInvoice() == 'y') {
                     pgResponse = xenditService.createPayment(trxCode, totalPrice, transaction.getUser().getEmail(), transaction.getTransactionLabel());
@@ -166,7 +163,6 @@ public class PaymentService implements IPayment {
      *
      * (-) Controller
      * @param transactionCode
-     * @param request
      * @return
      */
     @Override
@@ -187,7 +183,6 @@ public class PaymentService implements IPayment {
                 return null;
             }
 
-            Hibernate.initialize(trx.getUser());
             byte previousStatus = trx.getStatus();
             if( TransactionConstant.isStatusAllowed(previousStatus, TransactionConstant.PAYMENT_PAID) ) {
                 trx.setStatus((byte) TransactionConstant.PAYMENT_PAID);
@@ -325,7 +320,11 @@ public class PaymentService implements IPayment {
 
     protected Transaction getTransaction(String transactionCode) {
         Optional<Transaction> optionalTrx = transactionRepo.findByTransactionCode(transactionCode);
-        return optionalTrx.orElse(null);
+        if( optionalTrx.isEmpty() ) return null;
+        Transaction trx = optionalTrx.get();
+        Hibernate.initialize(trx.getUser());
+
+        return trx;
     }
 
     private String generateTransactionCode() {
