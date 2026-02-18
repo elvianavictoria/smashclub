@@ -1,6 +1,7 @@
 package com.backendsyndicate.smashclub.common.security;
 
 import com.backendsyndicate.smashclub.admin.security.jwt.AdminJwtFilter;
+import com.backendsyndicate.smashclub.admin.security.request.AdminRateLimitFilter;
 import com.backendsyndicate.smashclub.admin.service.AdminAuthService;
 import com.backendsyndicate.smashclub.common.config.OtherConfig;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,8 @@ import java.util.List;
 public class SecurityConfiguration {
     @Autowired
     private AdminJwtFilter adminJwtFilter;
+    @Autowired
+    private AdminRateLimitFilter adminRateLimitFilter;
 
     @Autowired
     private AdminAuthService adminAuthService;
@@ -79,10 +82,10 @@ public class SecurityConfiguration {
                         auth -> auth
                                 // Endpoints that open for public
                                 .requestMatchers(
-                                        "/api/v1/admin/auth/login",
+                                        "/api/v1/admin/auth/login"
                                         // Test
-                                        "/api/v1/admin/sales/**",
-                                        "/api/v1/admin/refund-request/**"
+//                                        "/api/v1/admin/sales/**",
+//                                        "/api/v1/admin/refund-request/**"
                                 )
                                 .permitAll()
                                 .anyRequest().authenticated()
@@ -92,6 +95,7 @@ public class SecurityConfiguration {
         exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint)).
                 sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).
                 authenticationProvider(cmsAuthenticationProvider()).
+                addFilterBefore(adminRateLimitFilter, UsernamePasswordAuthenticationFilter.class).
                 addFilterBefore(adminJwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
