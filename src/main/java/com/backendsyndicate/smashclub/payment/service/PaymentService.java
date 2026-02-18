@@ -170,9 +170,9 @@ public class PaymentService implements IPayment {
      * @return
      */
     @Override
-    public RespPaymentTransactionDTO paymentTransaction(String transactionCode, HttpServletRequest request) {
+    public RespPaymentTransactionDTO paymentTransaction(String transactionCode) {
         if( transactionCode == null ) {
-            Logging.handleException("PaymentService", "paymentTransaction(String transactionCode, HttpServletRequest request)", 177, generateErrorCode("02", "001"), "Transaction code is required!");
+            Logging.handleException("PaymentService", "paymentTransaction(String transactionCode)", 177, generateErrorCode("02", "001"), "Transaction code is required!");
 
             return null;
         }
@@ -183,7 +183,7 @@ public class PaymentService implements IPayment {
         try {
             trx = getTransaction(transactionCode);
             if( trx == null ) {
-                Logging.handleException("PaymentService", "paymentTransaction(String transactionCode, HttpServletRequest request)", 177, generateErrorCode("02", "002"), "Transaction not found!");
+                Logging.handleException("PaymentService", "paymentTransaction(String transactionCode)", 177, generateErrorCode("02", "002"), "Transaction not found!");
                 return null;
             }
 
@@ -206,11 +206,11 @@ public class PaymentService implements IPayment {
 
                 response = modelMapper.map(trx, RespPaymentTransactionDTO.class);
             } else {
-                Logging.handleException("PaymentService", "paymentTransaction(String transactionCode, HttpServletRequest request)", 212, generateErrorCode("02", "009"), "This transaction has been paid!");
+                Logging.handleException("PaymentService", "paymentTransaction(String transactionCode)", 212, generateErrorCode("02", "009"), "This transaction has been paid!");
                 return null;
             }
         } catch(Exception e) {
-            Logging.handleException("PaymentService", "paymentTransaction(String transactionCode, HttpServletRequest request)", 216, generateErrorCode("02", "010"), "Failed to process payment transaction!");
+            Logging.handleException("PaymentService", "paymentTransaction(String transactionCode)", 216, generateErrorCode("02", "010"), "Failed to process payment transaction!");
             return null;
         }
 

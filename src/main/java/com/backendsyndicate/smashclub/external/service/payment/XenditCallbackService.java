@@ -41,19 +41,12 @@ public class XenditCallbackService implements IWebhook<XenditWebhookDTO> {
      */
     public ResponseEntity<Object> callback(XenditWebhookDTO dto, HttpServletRequest request) {
         try {
-            Optional<Transaction> opt = transactionRepo.findByTransactionCode(dto.getExternalId());
-            if( opt.isEmpty() ) {
-                Logging.handleException("XenditCallbackService", "callback(XenditWebhookDTO dto, HttpServletRequest request)", 43, generateErrorCode("01", "001"), "Transaction " + dto.getExternalId() + " not found!");
-                return GlobalResponse.success("Failed to process payment notification!",null, request);
-            }
-
-            Transaction trx = opt.get();
             switch(dto.getStatus()) {
                 case XenditPaymentStatusConstant.PAID_STATUS:
-                    paymentService.paymentTransaction(trx.getTransactionCode(), request);
+                    paymentService.paymentTransaction(dto.getExternalId());
                     break;
                 case XenditPaymentStatusConstant.EXPIRED_STATUS:
-                    trx.setStatus((byte) TransactionConstant.PAYMENT_EXPIRED);
+                    paymentService.expireTransaction(dto.getExternalId());
                     break;
             }
 

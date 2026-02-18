@@ -17,7 +17,7 @@ public class PaymentHelper extends PaymentService {
     @Autowired
     private WalletService walletService;
 
-    public RespPaymentTransactionDTO paymentTransaction(String transactionCode, HttpServletRequest request) {
+    public RespPaymentTransactionDTO paymentTransaction(String transactionCode) {
         RespPaymentTransactionDTO response = null;
 
         try {
@@ -44,7 +44,7 @@ public class PaymentHelper extends PaymentService {
                     break;
             }
 
-            response = super.paymentTransaction(transactionCode, request);
+            response = super.paymentTransaction(transactionCode);
         } catch(Exception e) {
             Logging.handleException("PaymentHelper", "paymentTransaction", 27, "PYMTCH-01E010", e.getMessage());
             return null;

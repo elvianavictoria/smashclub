@@ -56,7 +56,7 @@ public class TransactionController {
 
     @PostMapping("/payment/{transactionCode}")
     public ResponseEntity<Object> transactionPayment(@PathVariable String transactionCode, HttpServletRequest request) {
-        RespPaymentTransactionDTO payment = paymentService.paymentTransaction(transactionCode, request);
+        RespPaymentTransactionDTO payment = paymentService.paymentTransaction(transactionCode);
         return GlobalResponse.success("Successfully paid transaction!", payment, request);
     }
 

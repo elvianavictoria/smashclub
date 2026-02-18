@@ -16,7 +16,7 @@ public interface IPayment {
     * */
 
     public RespCreateTransactionDTO createTransaction(String customerId, BigDecimal totalPrice, String referenceCode, int transactionType);
-    public RespPaymentTransactionDTO paymentTransaction(String transactionCode, HttpServletRequest request);
+    public RespPaymentTransactionDTO paymentTransaction(String transactionCode);
     public RespCancelTransactionDTO cancelTransaction(String transactionCode, String notes);
     public RespExpireTransactionDTO expireTransaction(String transactionCode);
 }
