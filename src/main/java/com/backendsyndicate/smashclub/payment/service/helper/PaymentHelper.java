@@ -1,5 +1,9 @@
 package com.backendsyndicate.smashclub.payment.service.helper;
 
+import com.backendsyndicate.smashclub.booking.dto.request.BookingStatusUpdateRequest;
+import com.backendsyndicate.smashclub.booking.service.BookingService;
+import com.backendsyndicate.smashclub.booking.service.helper.BookingHelper;
+import com.backendsyndicate.smashclub.common.constant.BookingConstant;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.common.constant.TransactionTypeConstant;
 import com.backendsyndicate.smashclub.payment.dto.request.ReqUpdateBalanceDTO;
@@ -16,7 +20,10 @@ import org.springframework.stereotype.Service;
 public class PaymentHelper extends PaymentService {
     @Autowired
     private WalletService walletService;
+    @Autowired
+    private BookingHelper bookingService;
 
+    @Override
     public RespPaymentTransactionDTO paymentTransaction(String transactionCode) {
         RespPaymentTransactionDTO response = null;
 
@@ -26,6 +33,9 @@ public class PaymentHelper extends PaymentService {
             switch( trx.getTransactionType() ) {
                 case TransactionTypeConstant.COURT_BOOKING:
                     // Update booking status
+                    BookingStatusUpdateRequest statusUpdateData = new BookingStatusUpdateRequest();
+                    statusUpdateData.setStatus(BookingConstant.BOOKING_CONFIRMED);
+                    bookingService.updateBookingStatus(trx.getReferenceCode(), statusUpdateData);
                     break;
                 case TransactionTypeConstant.ECOMMERCE_SHOPPING:
                     // Update order status
@@ -46,20 +56,14 @@ public class PaymentHelper extends PaymentService {
 
             response = super.paymentTransaction(transactionCode);
         } catch(Exception e) {
-            Logging.handleException("PaymentHelper", "paymentTransaction", 27, "PYMTCH-01E010", e.getMessage());
+            Logging.handleException("PaymentHelper", "paymentTransaction(String transactionCode)", 27, "PYMTCH-01E010", e.getMessage());
             return null;
         }
 
         return response;
     }
 
-    /**
-     * Code: 03
-     *
-     * @param transactionCode
-     * @param refundReason
-     * @return
-     */
+    @Override
     public RespCancelTransactionDTO cancelTransaction(String transactionCode, String refundReason) {
         RespCancelTransactionDTO response = super.cancelTransaction(transactionCode, refundReason);
 
@@ -71,6 +75,9 @@ public class PaymentHelper extends PaymentService {
             switch( response.getTransactionType() ) {
                 case TransactionTypeConstant.COURT_BOOKING:
                     // Update booking status
+                    BookingStatusUpdateRequest statusUpdateData = new BookingStatusUpdateRequest();
+                    statusUpdateData.setStatus(BookingConstant.BOOKING_CANCELLED);
+                    bookingService.updateBookingStatus(response.getReferenceCode(), statusUpdateData);
                     break;
                 case TransactionTypeConstant.ECOMMERCE_SHOPPING:
                     // Update order status

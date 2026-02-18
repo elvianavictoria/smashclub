@@ -7,6 +7,7 @@ import com.backendsyndicate.smashclub.booking.repository.*;
 import com.backendsyndicate.smashclub.auth.model.User;
 import com.backendsyndicate.smashclub.auth.repository.UserRepository;
 import com.backendsyndicate.smashclub.common.constant.BookingConstant;
+import com.backendsyndicate.smashclub.common.constant.TransactionTypeConstant;
 import com.backendsyndicate.smashclub.common.handler.ResponseHandler;
 import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransactionDTO;
 import com.backendsyndicate.smashclub.payment.service.PaymentService;
@@ -1024,7 +1025,7 @@ public class BookingService {
                 .build();
     }
 
-    private boolean isValidStatusTransition(byte currentStatus, byte newStatus) {
+    protected boolean isValidStatusTransition(byte currentStatus, byte newStatus) {
         Map<Byte, List<Byte>> validTransitions = Map.of(
                 BookingConstant.BOOKING_CANCELLED, List.of(), // Tidak bisa berubah
 
@@ -1199,8 +1200,7 @@ public class BookingService {
                     booking.getUser().getId(),
                     booking.getTotalPrice(),
                     bookingCode,
-                    1,
-                    paymentMethodId
+                    TransactionTypeConstant.COURT_BOOKING
             );
 
             if (paymentResponse == null) {

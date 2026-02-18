@@ -15,5 +15,6 @@ public class RespCancelTransactionDTO {
     private boolean requested = false;
     private int transactionType;
     private BigDecimal totalPrice;
+    private String referenceCode;
     private RelTransactionUserDTO user;
 }

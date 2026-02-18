@@ -273,6 +273,7 @@ public class PaymentService implements IPayment {
             response.setTransactionCode(transactionCode);
             response.setTotalPrice(trx.getTotalPrice());
             response.setTransactionType(trx.getTransactionType());
+            response.setReferenceCode(trx.getReferenceCode());
             response.setUser(modelMapper.map(trx.getUser(), RelTransactionUserDTO.class));
         } catch(Exception e) {
             Logging.handleException("PaymentService", "cancelTransaction(String transactionCode, String refundReason)", 147, generateErrorCode("03", "010"), e.getMessage());
