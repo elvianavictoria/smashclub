@@ -2,7 +2,6 @@ package com.backendsyndicate.smashclub.payment.service;
 
 import com.backendsyndicate.smashclub.auth.model.User;
 import com.backendsyndicate.smashclub.auth.repository.UserRepository;
-import com.backendsyndicate.smashclub.common.constant.CommonConstant;
 import com.backendsyndicate.smashclub.common.service.TemplateService;
 import com.backendsyndicate.smashclub.common.util.DatetimeFormatting;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
@@ -31,6 +30,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.stereotype.Service;
@@ -45,6 +45,7 @@ import java.util.Optional;
 /**
  * Module Code: PYMT
  */
+@Primary
 @Service
 @Transactional
 public class PaymentService implements IPayment {
@@ -165,7 +166,6 @@ public class PaymentService implements IPayment {
     }
 
     /**
-     * Code: 02
      *
      * @param transactionCode
      * @param request

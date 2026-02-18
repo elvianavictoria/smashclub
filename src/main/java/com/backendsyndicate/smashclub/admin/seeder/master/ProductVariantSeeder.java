@@ -2,19 +2,15 @@ package com.backendsyndicate.smashclub.admin.seeder.master;
 
 import com.backendsyndicate.smashclub.admin.core.DataSeeder;
 import com.backendsyndicate.smashclub.common.constant.AdminConstant;
-import com.backendsyndicate.smashclub.common.constant.CommonConstant;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.ecommerce.model.Product;
 import com.backendsyndicate.smashclub.ecommerce.model.ProductVariant;
 import com.backendsyndicate.smashclub.ecommerce.repo.ProductVariantRepo;
-import lombok.Getter;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
 
 @Profile("dev")
 @Component
@@ -50,15 +46,15 @@ public class ProductVariantSeeder implements DataSeeder {
         generateProductVariantItem(10L, "KCRI-002", "Completed Package", 55, BigDecimal.valueOf(30000), AdminConstant.PRODUCT_IMG_KATSURICE_VAR_1, productSeeder.getProducts().get(AdminConstant.PRODUCT_KATSURICE));
     }
 
-    private void generateProductVariantItem(Long id, String sku, String name, int stock, BigDecimal price, String defaultImgLink, Product product) {
+    private void generateProductVariantItem(Long id, String sku, String name, int stock, BigDecimal price, String variantImgLink, Product product) {
         ProductVariant productVariant = productVariantRepo.findById(id).orElseGet( () -> {
             ProductVariant x = new ProductVariant();
 //            x.setId(id);
             x.setSku(sku);
-            x.setName(name);
+            x.setVariantName(name);
             x.setStock(stock);
             x.setPrice(price);
-            x.setVariantImgLink(defaultImgLink);
+            x.setVariantImgLink(variantImgLink);
             x.setProduct(product);
 
             return productVariantRepo.save(x);

@@ -7,6 +7,7 @@ import com.backendsyndicate.smashclub.booking.model.Coach;
 import com.backendsyndicate.smashclub.booking.repo.CoachRepo;
 import com.backendsyndicate.smashclub.common.constant.CommonConstant;
 import com.backendsyndicate.smashclub.common.security.PasswordHasher;
+import com.backendsyndicate.smashclub.ecommerce.service.CartService;
 import com.backendsyndicate.smashclub.payment.service.WalletService;
 import jakarta.persistence.Column;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,12 +23,14 @@ import java.time.LocalDateTime;
 public class UserSeeder implements DataSeeder {
     private UserRepository userRepo;
     private WalletService walletService;
+    private CartService cartService;
     private PasswordHasher passwordHasher;
 
-    public UserSeeder(UserRepository userRepo, WalletService walletService, PasswordHasher passwordHasher) {
+    public UserSeeder(UserRepository userRepo, WalletService walletService, PasswordHasher passwordHasher, CartService cartService) {
         this.userRepo = userRepo;
         this.passwordHasher = passwordHasher;
         this.walletService = walletService;
+        this.cartService = cartService;
     }
 
     @Override
@@ -52,5 +55,6 @@ public class UserSeeder implements DataSeeder {
         } );
 
         walletService.createWallet(user.getId());
+        cartService.getOrCreateActiveCart(user.getId());
     }
 }

@@ -65,6 +65,6 @@ public class Transaction {
     @JoinColumn(name = "UserId", foreignKey = @ForeignKey(name = "fk_transaction_to_user"), nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "transaction", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "transactionId", fetch = FetchType.LAZY)
     private List<Order> orders;
 }

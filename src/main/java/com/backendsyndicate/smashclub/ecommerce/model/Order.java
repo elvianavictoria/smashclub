@@ -15,30 +15,33 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(exclude = {"user", "transaction"})
+@ToString(exclude = {"user", "transactionId"})
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
     private Long id;
 
-    @Column(name = "TotalAmount", precision = 17, scale = 2,nullable = false)
-    private BigDecimal totalAmount;
+    @Column(name = "SubTotal", precision = 17, scale = 2, nullable = false)
+    private BigDecimal subTotal = BigDecimal.ZERO;
+
+    @Column(name = "TotalPrice", precision = 17, scale = 2,nullable = false)
+    private BigDecimal totalPrice = BigDecimal.ZERO;
 
     @Column(name = "Status", nullable = false)
     private byte status = 0;
 
-    @Column(name = "CreatedAt", nullable = false)
-    private LocalDateTime createdAt;
+    @Column(name = "OrderDate", nullable = false)
+    private LocalDateTime orderDate;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "UserId", foreignKey = @ForeignKey(name = "fk_order_to_user"), nullable = false)
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "TransactionID", foreignKey = @ForeignKey(name = "fk_order_to_trans"), nullable = false)
-    private Transaction transaction;
+    @JoinColumn(name = "TransactionID", foreignKey = @ForeignKey(name = "fk_order_to_trx"), nullable = false)
+    private Transaction transactionId;
 
-    @OneToMany(mappedBy = "order")
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItem;
 }

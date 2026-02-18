@@ -7,6 +7,7 @@ import com.backendsyndicate.smashclub.common.constant.PermissionConstant;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.common.util.Util;
+import com.backendsyndicate.smashclub.ecommerce.dto.response.RespProductDTO;
 import com.backendsyndicate.smashclub.ecommerce.model.Product;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;

@@ -1199,8 +1199,7 @@ public class BookingService {
                     booking.getUser().getId(),
                     booking.getTotalPrice(),
                     bookingCode,
-                    1,
-                    paymentMethodId
+                    1
             );
 
             if (paymentResponse == null) {
