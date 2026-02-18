@@ -4,7 +4,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
-public interface IProduct {
-    public ResponseEntity<Object> findAll(Pageable pageable, HttpServletRequest request);
-    public ResponseEntity<Object> findByProductId(Long productId);
+public interface IProduct<Object> {
+    public ResponseEntity<Object> findAll(String keyword, Pageable pageable, HttpServletRequest request);
+//    public ResponseEntity<Object> findAllByProductNameContainsIgnoreCaseOrCategoryContainsIgnoreCaseAndIsActiveTrue(Pageable pageable, String name, String category, HttpServletRequest request );
+    ResponseEntity<Object> findById(Long id, HttpServletRequest request);
 }

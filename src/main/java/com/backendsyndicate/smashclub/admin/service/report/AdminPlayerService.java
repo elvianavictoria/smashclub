@@ -113,8 +113,12 @@ public class AdminPlayerService implements IRUD<User, String> {
         if( player.getCreatedDate() != null ) {
             result.setCreatedAt(DatetimeFormatting.getDatetimeFormat(player.getCreatedDate()));
         }
-        if( player.getUpdatedDate() != null ) {
+        if( player.getLockedUntil() != null ) {
             result.setLockedUntil(DatetimeFormatting.getDatetimeFormat(player.getLockedUntil()));
+        }
+
+        if( player.getUpdatedDate() != null ) {
+            result.setUpdatedAt(DatetimeFormatting.getDatetimeFormat(player.getUpdatedDate()));
         }
 
         return result;

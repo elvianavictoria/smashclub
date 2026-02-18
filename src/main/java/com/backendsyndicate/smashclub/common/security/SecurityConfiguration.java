@@ -83,7 +83,8 @@ public class SecurityConfiguration {
                                         // Test
                                         "/api/v1/admin/sales/**",
                                         "/api/v1/admin/refund-request/**"
-                                ).permitAll()
+                                )
+                                .permitAll()
                                 .anyRequest().authenticated()
                 ).
 //            headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable())). // Allow H2 console to run in a frame

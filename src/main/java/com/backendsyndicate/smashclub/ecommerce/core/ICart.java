@@ -1,9 +1,13 @@
 package com.backendsyndicate.smashclub.ecommerce.core;
 
-import org.springframework.http.ResponseEntity;
+import com.backendsyndicate.smashclub.ecommerce.dto.request.ReqAddCartItemDTO;
+import com.backendsyndicate.smashclub.ecommerce.dto.request.ReqUpdateCartItemDTO;
+import com.backendsyndicate.smashclub.ecommerce.dto.response.RespCartDTO;
 
 public interface ICart {
-    public ResponseEntity<Object> updateCartItem(String userId, Long productId, Long productVariantId, int quantity);
-    public ResponseEntity<Object> deleteCartItem(String userId, Long productId, Long productVariantId);
-    public ResponseEntity<Object> clearCart(String userId);
+    public RespCartDTO getOrCreateActiveCart(String userId);
+    public RespCartDTO addToCart(String userId, ReqAddCartItemDTO request);
+    public RespCartDTO updateCartItem(String userId, ReqUpdateCartItemDTO request);
+    public String deleteCartItem(String userId, Long cartItemId);
+    public String clearCart(String userId);
 }

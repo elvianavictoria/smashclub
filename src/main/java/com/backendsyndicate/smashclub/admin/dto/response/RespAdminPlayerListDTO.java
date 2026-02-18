@@ -14,4 +14,5 @@ public class RespAdminPlayerListDTO {
     private byte status;
     private String createdAt;
     private String lockedUntil;
+    private String updatedAt;
 }

@@ -16,11 +16,12 @@ import java.math.BigDecimal;
 public class ProductVariant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID")
     @EqualsAndHashCode.Include
     private Long id;
 
-    @Column(name = "Name", length = 100, nullable = false)
-    private String name;
+    @Column(name = "VariantName", length = 100, nullable = false)
+    private String variantName;
 
     @Column(name = "VariantImgLink", length = 500)
     private String variantImgLink;
@@ -29,10 +30,10 @@ public class ProductVariant {
     private String sku;
 
     @Column(name = "Price", precision = 17, scale = 2,nullable = false)
-    private BigDecimal price;
+    private BigDecimal price = BigDecimal.ZERO;
 
     @Column(name = "Stock", nullable = false)
-    private int stock = 0;
+    private Integer stock = 0;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "ProductID", foreignKey = @ForeignKey(name = "fk_productVar_to_product"), nullable = false)

@@ -19,13 +19,13 @@
         </RollingFile>
     </Appenders>
     <Loggers>
-<!--        <Logger name="com.backendsyndicate.smashclub" level="debug" additivity="false">-->
-<!--            <AppenderRef ref="DailyRollingFileAppender" />-->
-<!--        </Logger>-->
+        <Logger name="com.backendsyndicate.smashclub" level="debug" additivity="false">
+            <AppenderRef ref="DailyRollingFileAppender" />
+        </Logger>
         <Logger name="com.backendsyndicate.smashclub" level="info" additivity="false">
             <AppenderRef ref="Console" />
         </Logger>
-        <Root level="debug">
+        <Root level="info">
             <AppenderRef ref="DailyRollingFileAppender" />
         </Root>
     </Loggers>
