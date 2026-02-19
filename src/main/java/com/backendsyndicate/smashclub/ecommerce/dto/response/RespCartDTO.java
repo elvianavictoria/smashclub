@@ -13,7 +13,6 @@ import java.util.ArrayList;
 @Getter
 @Setter
 public class RespCartDTO {
-    private Long cartId;
     private String userId;
     private ArrayList<RespCartItemDTO> items;
     private BigDecimal totalPrice;

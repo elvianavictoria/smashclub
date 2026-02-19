@@ -6,7 +6,6 @@ import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.ecommerce.dto.request.ReqBuyNowDTO;
 import com.backendsyndicate.smashclub.ecommerce.dto.response.RespCreateOrderDTO;
 import com.backendsyndicate.smashclub.ecommerce.dto.response.RespOrderDetailDTO;
-import com.backendsyndicate.smashclub.ecommerce.dto.response.RespOrderLogDTO;
 import com.backendsyndicate.smashclub.ecommerce.dto.response.RespOrderSummaryDTO;
 import com.backendsyndicate.smashclub.ecommerce.service.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,14 +32,14 @@ public class OrderController {
         String userId = extractUserIdFromToken(authorizationHeader);
         RespCreateOrderDTO order = orderService.createOrder(userId);
         return GlobalResponse.success("Created order from cart", order, request);
-    };
+    }
 
     @PostMapping("/buy-now")
     public ResponseEntity<Object> buyNow(@Valid @RequestBody ReqBuyNowDTO requestBody, @RequestHeader("Authorization") String authorizationHeader, HttpServletRequest request) {
         String userId = extractUserIdFromToken(authorizationHeader);
         RespCreateOrderDTO order = orderService.buyNow(userId, requestBody);
         return GlobalResponse.success("Buy now order created", order, request);
-    };
+    }
 
     @GetMapping("/{orderId}")
     public ResponseEntity<Object> getOrderSummary(@PathVariable Long orderId, @RequestHeader("Authorization") String authorizationHeader,HttpServletRequest request) {
@@ -53,7 +52,7 @@ public class OrderController {
     @GetMapping("/history")
     public ResponseEntity<Object> getOrderHistory(@RequestParam(defaultValue = "0") int page,
                                                   @RequestHeader("Authorization") String authorizationHeader,
-                                                  @RequestParam(defaultValue = "10") int size, HttpServletRequest request) {
+                                                  @RequestParam(defaultValue = "25") int size, HttpServletRequest request) {
 
         String userId = extractUserIdFromToken(authorizationHeader);
 
@@ -62,10 +61,16 @@ public class OrderController {
         return GlobalResponse.success("Order history retrieved", response, request);
     }
 
-    @PatchMapping("/{orderId}/status")
+    @PatchMapping("/{orderId}/update")
     public ResponseEntity<Object> updateOrderStatus(@PathVariable Long orderId, @RequestParam byte status, HttpServletRequest request) {
         orderService.updateOrderStatus(orderId, status);
         return GlobalResponse.success("Order status updated", null, request);
+    }
+
+    @PatchMapping("/{orderId}/cancel")
+    public ResponseEntity<Object> cancelOrder(@PathVariable Long orderId, @RequestHeader("Authorization") String authorizationHeader, HttpServletRequest request) {
+        orderService.cancelOrder(orderId);
+        return GlobalResponse.success("Order cancelled", null, request);
     }
 
     private String extractUserIdFromToken(String authorizationHeader) {
