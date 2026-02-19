@@ -9,7 +9,7 @@
 <!--        </File>-->
         <RollingFile name="DailyRollingFileAppender"
                      fileName="logs/app.log"
-                     filePattern="logs/app-%d{yyy-MM-dd_HH}.log.gz"
+                     filePattern="logs/app-%d{yyy-MM-dd}.log.gz"
         >
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n" />
             <Policies>

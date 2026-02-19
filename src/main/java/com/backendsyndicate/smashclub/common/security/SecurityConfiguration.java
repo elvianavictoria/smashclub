@@ -3,6 +3,7 @@ package com.backendsyndicate.smashclub.common.security;
 import com.backendsyndicate.smashclub.admin.security.jwt.AdminJwtFilter;
 import com.backendsyndicate.smashclub.admin.security.ratelimit.AdminRateLimitFilter;
 import com.backendsyndicate.smashclub.admin.service.AdminAuthService;
+import com.backendsyndicate.smashclub.auth.service.AuthUserDetailsService;
 import com.backendsyndicate.smashclub.common.security.JwtService;
 import com.backendsyndicate.smashclub.auth.service.AuthService;
 import com.backendsyndicate.smashclub.common.config.OtherConfig;
@@ -46,7 +47,7 @@ public class SecurityConfiguration {
     private JwtFilter jwtFilter;
 
     @Autowired
-    private AuthService authService;
+    private AuthUserDetailsService authUserDetailsService;
 
     @Autowired
     private UserDetailsService userDetailsService;
@@ -79,7 +80,7 @@ public class SecurityConfiguration {
 
     @Bean
     public AuthenticationProvider communityAuthenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(authService);
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(authUserDetailsService);
         return authProvider;
     }
 

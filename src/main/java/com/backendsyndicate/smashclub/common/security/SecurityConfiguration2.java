@@ -24,9 +24,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
-@Configuration
+/*@Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
+@EnableMethodSecurity*/
 public class SecurityConfiguration2 {
     @Autowired
     private AdminJwtFilter adminJwtFilter;

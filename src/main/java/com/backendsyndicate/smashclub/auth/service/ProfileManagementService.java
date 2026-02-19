@@ -54,23 +54,24 @@ public class ProfileManagementService {
         }
 
         User user = userOpt.get();
-        ProfileResponse profileResponse = ProfileResponse.fromUser(user);
 
         // Check if there's pending email change
         Optional<EmailChangeToken> pendingEmailChange = emailChangeTokenRepository
                 .findByUserIdAndUsedAtIsNull(userId);
+        String newEmail = pendingEmailChange.get().getNewEmail();
+        ProfileResponse profileResponse = ProfileResponse.fromUser(user, newEmail);
 
         if (pendingEmailChange.isPresent()) {
-            Map<String, Object> data = new HashMap<>();
+            /*Map<String, Object> data = new HashMap<>();
             data.put("profile", profileResponse);
             data.put("pendingEmailChange", true);
-            data.put("pendingNewEmail", pendingEmailChange.get().getNewEmail());
+            data.put("pendingNewEmail", pendingEmailChange.get().getNewEmail());*/
 
             return responseHandler.handleResponse(
                     "Profile berhasil diambil. Ada perubahan email yang belum diverifikasi",
                     HttpStatus.OK,
                     null,
-                    data,
+                    profileResponse,
                     httpRequest
             );
         }
@@ -119,8 +120,9 @@ public class ProfileManagementService {
         }
 
         // Update email jika ada perubahan (butuh verification)
+        String newEmail="";
         if (request.getEmail() != null && !request.getEmail().trim().isEmpty()) {
-            String newEmail = request.getEmail().toLowerCase().trim();
+            newEmail = request.getEmail().toLowerCase().trim();
 
             // Cek apakah email sama dengan yang sekarang
             if (newEmail.equals(user.getEmail())) {
@@ -206,7 +208,7 @@ public class ProfileManagementService {
         user.setUpdatedDate(LocalDateTime.now());
         userRepository.save(user);
 
-        ProfileResponse profileResponse = ProfileResponse.fromUser(user);
+        ProfileResponse profileResponse = ProfileResponse.fromUser(user, newEmail);
 
         return responseHandler.handleResponse(
                 "Profil berhasil diperbarui",
