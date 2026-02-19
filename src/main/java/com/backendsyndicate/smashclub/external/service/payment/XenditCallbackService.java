@@ -8,6 +8,7 @@ import com.backendsyndicate.smashclub.external.core.IWebhook;
 import com.backendsyndicate.smashclub.external.dto.XenditWebhookDTO;
 import com.backendsyndicate.smashclub.payment.model.Transaction;
 import com.backendsyndicate.smashclub.payment.repo.TransactionRepo;
+import com.backendsyndicate.smashclub.payment.service.helper.PaymentHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,8 @@ import java.util.Optional;
 public class XenditCallbackService implements IWebhook<XenditWebhookDTO> {
     @Autowired
     private TransactionRepo transactionRepo;
+    @Autowired
+    private PaymentHelper paymentService;
 
     private String generateErrorCode(String methodNo, String errorNo) {
         return "CLBK-XEN-" + methodNo + "E" + errorNo;
@@ -38,27 +41,18 @@ public class XenditCallbackService implements IWebhook<XenditWebhookDTO> {
      */
     public ResponseEntity<Object> callback(XenditWebhookDTO dto, HttpServletRequest request) {
         try {
-            Optional<Transaction> opt = transactionRepo.findByTransactionCode(dto.getExternalId());
-            if( opt.isEmpty() ) {
-                Logging.handleException("XenditCallbackService", "callback(XenditWebhookDTO dto, HttpServletRequest request)", 43, generateErrorCode("01", "001"), "Transaction " + dto.getExternalId() + " not found!");
-                return GlobalResponse.failed("Failed to process payment notification!", generateErrorCode("01", "001"), null, request);
-            }
-
-            Transaction trx = opt.get();
             switch(dto.getStatus()) {
                 case XenditPaymentStatusConstant.PAID_STATUS:
-                    if( trx.getStatus() == TransactionConstant.PAYMENT_UNPAID ) {
-                        trx.setStatus((byte) TransactionConstant.PAYMENT_PAID);
-                    }
+                    paymentService.paymentTransaction(dto.getExternalId());
                     break;
                 case XenditPaymentStatusConstant.EXPIRED_STATUS:
-                    trx.setStatus((byte) TransactionConstant.PAYMENT_EXPIRED);
+                    paymentService.expireTransaction(dto.getExternalId());
                     break;
             }
 
         } catch(Exception e) {
             Logging.handleException("XenditCallbackService", "callback(XenditWebhookDTO dto, HttpServletRequest request)", 41, generateErrorCode("01", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to process payment notification!", generateErrorCode("01", "010"), null, request);
+            return GlobalResponse.success("Failed to process payment notification!",null, request);
         }
 
         return GlobalResponse.success("Payment notification has been processed!", null, request);

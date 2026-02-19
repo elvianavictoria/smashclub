@@ -53,7 +53,7 @@ public class Transaction {
     private int transactionType;
 
     @Column(name = "PaymentMethodID")
-    private int paymentMethodID;
+    private int paymentMethodID = 0;
 
     @Column(name = "CreatedAt", updatable = false, nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -65,6 +65,6 @@ public class Transaction {
     @JoinColumn(name = "UserId", foreignKey = @ForeignKey(name = "fk_transaction_to_user"), nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "transaction", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "transactionId", fetch = FetchType.LAZY)
     private List<Order> orders;
 }

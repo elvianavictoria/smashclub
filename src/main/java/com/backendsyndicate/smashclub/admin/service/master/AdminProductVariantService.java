@@ -1,6 +1,5 @@
 package com.backendsyndicate.smashclub.admin.service.master;
 
-import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.ecommerce.model.Product;
 import com.backendsyndicate.smashclub.ecommerce.model.ProductVariant;
@@ -54,7 +53,7 @@ public class AdminProductVariantService {
                 if( variantMappedById.containsKey(existingVariant.getId()) ) {
                     Logging.printConsole("Updating variant with ID: " + existingVariant.getId());
                     existingVariant.setSku(variantMappedById.get(existingVariant.getId()).getSku());
-                    existingVariant.setName(variantMappedById.get(existingVariant.getId()).getName());
+                    existingVariant.setVariantName(variantMappedById.get(existingVariant.getId()).getVariantName());
                     existingVariant.setPrice(variantMappedById.get(existingVariant.getId()).getPrice());
                     existingVariant.setStock(variantMappedById.get(existingVariant.getId()).getStock());
                     if(variantMappedById.get(existingVariant.getId()).getVariantImgLink() != null) existingVariant.setVariantImgLink(variantMappedById.get(existingVariant.getId()).getVariantImgLink());

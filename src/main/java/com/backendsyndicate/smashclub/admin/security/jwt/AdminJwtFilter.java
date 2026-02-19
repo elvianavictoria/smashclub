@@ -80,7 +80,7 @@ public class AdminJwtFilter extends OncePerRequestFilter {
                 }
             }
         }catch (Exception e){
-            Logging.handleException("JwtFilter","doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) ", 42, "JWT-010", e.getMessage() + "; Request: " + RequestCapture.allRequest(request));
+            Logging.handleException("AdminJwtFilter","doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) ", 42, "JWT-010", e.getMessage() + "; Request: " + RequestCapture.allRequest(request));
         }
         filterChain.doFilter(request, response);
     }

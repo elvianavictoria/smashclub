@@ -20,10 +20,13 @@ public class OrderItem {
     private Long id;
 
     @Column(name = "Quantity", nullable = false)
-    private int quantity;
+    private int quantity = 0;
 
     @Column(name = "Price", precision = 17, scale = 2,nullable = false)
-    private BigDecimal price;
+    private BigDecimal priceAtPurchase = BigDecimal.ZERO;
+
+    @Column(name = "TotalPrice", precision = 17, scale = 2,nullable = false)
+    private BigDecimal totalPrice = BigDecimal.ZERO;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "OrderID", foreignKey = @ForeignKey(name = "fk_orderItem_to_order"), nullable = false)

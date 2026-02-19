@@ -14,7 +14,7 @@ import java.time.LocalTime;
 
 @Component
 @Transactional
-@Profile("dev")
+@Profile({"dev", "staging"})
 public class CoachSeeder implements DataSeeder {
     private CoachRepo coachRepo;
 

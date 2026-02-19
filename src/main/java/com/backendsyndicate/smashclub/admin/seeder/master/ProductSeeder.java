@@ -17,7 +17,7 @@ import java.util.Map;
 
 @Component
 @Transactional
-@Profile("dev")
+@Profile({"dev", "staging"})
 public class ProductSeeder implements DataSeeder {
     private ProductRepo productRepo;
     @Getter

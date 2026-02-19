@@ -31,4 +31,7 @@ public class TransactionLog {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "TransactionID", nullable = false)
     private Transaction transaction;
+
+    @Column(name = "ProcessedBy", nullable = false)
+    private Long processedBy = 0L;
 }

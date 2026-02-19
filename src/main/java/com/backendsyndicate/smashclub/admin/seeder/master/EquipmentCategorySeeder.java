@@ -17,7 +17,6 @@ import java.util.Map;
 
 @Component
 @Transactional
-@Profile("dev")
 public class EquipmentCategorySeeder implements DataSeeder {
     private EquipmentCategoryRepo equipmentCategoryRepo;
     @Getter

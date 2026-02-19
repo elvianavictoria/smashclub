@@ -49,7 +49,7 @@ public class AdminProductService implements ICRUD<Product, Long>, IUploadWithVar
 
         try {
             if( !keyword.isEmpty() ) {
-                page = productRepo.findAllByProductNameContainsOrCategoryContainsIgnoreCase(keyword, keyword, pageable);
+                page = productRepo. findAllByProductNameContainsIgnoreCaseOrCategoryContainsIgnoreCase(pageable, keyword, keyword, request);
             } else {
                 page = productRepo.findAll(pageable);
             }

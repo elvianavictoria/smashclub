@@ -5,8 +5,8 @@ import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.payment.dto.request.ReqCreateTransactionDTO;
 import com.backendsyndicate.smashclub.payment.dto.request.ReqPaymentTransactionDTO;
 import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransactionDTO;
-import com.backendsyndicate.smashclub.payment.dto.response.RespRefundTransactionDTO;
-import com.backendsyndicate.smashclub.payment.service.PaymentService;
+import com.backendsyndicate.smashclub.payment.dto.response.RespPaymentTransactionDTO;
+import com.backendsyndicate.smashclub.payment.dto.response.RespCancelTransactionDTO;
 import com.backendsyndicate.smashclub.payment.service.TransactionService;
 import com.backendsyndicate.smashclub.payment.service.helper.PaymentHelper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -50,23 +50,19 @@ public class TransactionController {
 
     @PostMapping("/create")
     public ResponseEntity<Object> transactionOrder(@Valid @RequestBody ReqCreateTransactionDTO dto, HttpServletRequest request) {
-        RespCreateTransactionDTO payment = paymentService.createTransaction(dto.getCustomerId(), dto.getTotalPrice(), dto.getReferenceCode(), dto.getTransactionType(), dto.getPaymentMethodId());
+        RespCreateTransactionDTO payment = paymentService.createTransaction(dto.getCustomerId(), dto.getTotalPrice(), dto.getReferenceCode(), dto.getTransactionType());
         return GlobalResponse.success("Successfully create transaction!", payment, request);
     }
 
     @PostMapping("/payment/{transactionCode}")
-    public ResponseEntity<Object> transactionPayment(@PathVariable String transactionCode, @RequestBody ReqPaymentTransactionDTO dto, HttpServletRequest request) {
-        return paymentService.paymentTransaction(transactionCode, dto.getPaymentMethodId(), request);
+    public ResponseEntity<Object> transactionPayment(@PathVariable String transactionCode, HttpServletRequest request) {
+        RespPaymentTransactionDTO payment = paymentService.paymentTransaction(transactionCode);
+        return GlobalResponse.success("Successfully paid transaction!", payment, request);
     }
 
     @PostMapping("/cancel/{transactionCode}")
-    public ResponseEntity<Object> transactionCancel(@PathVariable String transactionCode, @RequestBody String refundReason, @RequestBody Integer isRefund, HttpServletRequest request) {
-        RespRefundTransactionDTO refund = paymentService.cancelTransaction(transactionCode, refundReason, isRefund.byteValue());
-        return GlobalResponse.success("Successfully request refund transaction!", refund, request);
-    }
-
-    @GetMapping("/payment-method")
-    public ResponseEntity<Object> paymentMethodList(HttpServletRequest request) {
-        return paymentService.paymentMethodList(request);
+    public ResponseEntity<Object> transactionCancel(@PathVariable String transactionCode, @RequestBody String refundReason, HttpServletRequest request) {
+        RespCancelTransactionDTO refund = paymentService.cancelTransaction(transactionCode, refundReason);
+        return GlobalResponse.success("Successfully cancel transaction!", refund, request);
     }
 }

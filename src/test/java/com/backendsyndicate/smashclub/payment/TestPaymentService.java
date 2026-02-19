@@ -5,9 +5,8 @@ import com.backendsyndicate.smashclub.common.constant.PaymentMethodConstant;
 import com.backendsyndicate.smashclub.common.constant.TransactionTypeConstant;
 import com.backendsyndicate.smashclub.payment.dto.request.ReqPaymentTransactionDTO;
 import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransactionDTO;
-import com.backendsyndicate.smashclub.payment.dto.response.RespRefundTransactionDTO;
+import com.backendsyndicate.smashclub.payment.dto.response.RespCancelTransactionDTO;
 import com.backendsyndicate.smashclub.payment.service.PaymentService;
-import com.backendsyndicate.smashclub.util.DataGenerator;
 import io.restassured.RestAssured;
 import io.restassured.http.Method;
 import io.restassured.path.json.JsonPath;
@@ -27,7 +26,6 @@ import static io.restassured.RestAssured.given;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class TestPaymentService extends AbstractTestNGSpringContextTests {
     private Random rand;
-    private DataGenerator dataGenerator;
     private PaymentService paymentService;
 
     // Create Trx
@@ -50,7 +48,6 @@ public class TestPaymentService extends AbstractTestNGSpringContextTests {
     public void init() {
         RestAssured.baseURI = "http://localhost:8080";
         rand = new Random();
-        dataGenerator = new DataGenerator();
         isContinue = false;
 
         customerId = "123";
@@ -68,7 +65,7 @@ public class TestPaymentService extends AbstractTestNGSpringContextTests {
         RespCreateTransactionDTO response;
 
         try {
-            response = paymentService.createTransaction(customerId, totalPrice, referenceCode, transactionType, 0);
+            response = paymentService.createTransaction(customerId, totalPrice, referenceCode, transactionType);
             transactionCode = response.getTransactionCode();
             paymentData = response.getPaymentData();
 
@@ -112,10 +109,10 @@ public class TestPaymentService extends AbstractTestNGSpringContextTests {
             Assert.assertNotNull(null);
         }
 
-        RespRefundTransactionDTO response;
+        RespCancelTransactionDTO response;
 
         try {
-            response = paymentService.cancelTransaction(transactionCode, notes, (byte) 1);
+            response = paymentService.cancelTransaction(transactionCode, notes);
             isContinue = response.isRequested();
 
             Assert.assertTrue(isContinue, "Transaction code is required!");

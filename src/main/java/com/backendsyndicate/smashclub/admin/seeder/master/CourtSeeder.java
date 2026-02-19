@@ -13,7 +13,7 @@ import java.time.LocalTime;
 
 @Component
 @Transactional
-@Profile("dev")
+@Profile({"dev", "staging"})
 public class CourtSeeder implements DataSeeder {
     private CourtRepo courtRepo;
 

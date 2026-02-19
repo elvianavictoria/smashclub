@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="id">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>SmashClub - Pengembalian Dana Disetujui</title>
+    <style>
+        /* Base styles */
+        body {
+            background-color: #f5f8f8;
+            color: #1e293b;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+
+        table {
+            border-spacing: 0;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        img {
+            border: 0;
+            -ms-interpolation-mode: bicubic;
+        }
+
+        .main-wrapper {
+            background-color: #f5f8f8;
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-top: 4px solid #00BBA7;
+            border-radius: 12px;
+            display: inline-block;
+            margin: 0 auto;
+            max-width: 600px;
+            text-align: left;
+            vertical-align: top;
+            width: 100%;
+        }
+
+        /* Branding */
+        .header {
+            padding: 40px 0 20px 0;
+            text-align: center;
+        }
+
+        .brand-logo {
+            display: inline-block;
+            vertical-align: middle;
+            width: 32px;
+            height: 32px;
+            background-color: #00BBA7;
+            border-radius: 8px;
+            color: #ffffff;
+            line-height: 32px;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .brand-name {
+            color: #0f172a;
+            display: inline-block;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            padding-left: 8px;
+            text-transform: uppercase;
+            vertical-align: middle;
+            line-height: 1;
+        }
+
+        /* Hero section */
+        .hero {
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        .status-icon-outer {
+            background-color: #ecfdf5;
+            border-radius: 50%;
+            display: inline-block;
+            height: 56px;
+            line-height: 56px;
+            text-align: center;
+            width: 56px;
+        }
+
+        .status-icon-inner {
+            background-color: #00BBA7;
+            border-radius: 50%;
+            color: #ffffff;
+            display: inline-block;
+            font-size: 24px;
+            height: 36px;
+            line-height: 36px;
+            vertical-align: middle;
+            width: 36px;
+        }
+
+        .h1 {
+            color: #0f172a;
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+            padding: 24px 0 8px 0;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 16px;
+            margin: 0;
+            padding-bottom: 30px;
+            text-align: center;
+        }
+
+        /* Content body */
+        .content {
+            padding: 0 40px 40px 40px;
+        }
+
+        .greeting {
+            color: #1e293b;
+            font-size: 16px;
+            font-weight: 500;
+            padding-bottom: 16px;
+        }
+
+        .body-text {
+            color: #475569;
+            font-size: 15px;
+            line-height: 1.6;
+            padding-bottom: 30px;
+        }
+
+        /* Details block */
+        .details-box {
+            background-color: #f8fafc;
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .details-title {
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            padding-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .detail-row {
+            border-bottom: 1px solid #f1f5f9;
+            padding: 12px 0;
+        }
+
+        .detail-row-last {
+            padding: 12px 0 0 0;
+        }
+
+        .detail-label {
+            color: #64748b;
+            font-size: 14px;
+            text-align: left;
+            padding: 0.5rem 0;
+        }
+
+        .detail-value {
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: right;
+            padding: 0.5rem 0;
+        }
+
+        .refund-amount {
+            color: #00BBA7;
+            font-size: 18px;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        /* Notice section */
+        .notice-box {
+            background-color: #f0fdfa;
+            border: 1px solid #ccfbf1;
+            border-radius: 8px;
+            margin-top: 30px;
+            padding: 16px;
+        }
+
+        .notice-icon {
+            color: #00BBA7;
+            font-weight: bold;
+            padding-right: 12px;
+            vertical-align: center;
+        }
+
+        .notice-text {
+            color: #0d9488;
+            font-size: 13px;
+            line-height: 1.5;
+            max-width: 480px;
+            vertical-align: center;
+        }
+
+        .closing-text {
+            color: #64748b;
+            font-size: 14px;
+            font-style: italic;
+            line-height: 1.6;
+            padding-top: 30px;
+            text-align: center;
+        }
+
+        /* Footer sections */
+        .support-container {
+            background-color: #f8fafc;
+            padding: 30px 40px;
+            text-align: center;
+        }
+
+        .support-title {
+            color: #64748b;
+            font-size: 14px;
+            padding-bottom: 15px;
+        }
+
+        .support-links {
+            color: #00BBA7;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .link-separator {
+            color: #cbd5e1;
+            padding: 0 10px;
+        }
+
+        .footer {
+            padding: 30px 40px;
+            text-align: center;
+        }
+
+        .social-links {
+            padding-bottom: 24px;
+        }
+
+        .social-icon {
+            background-color: #e2e8f0;
+            border-radius: 50%;
+            color: #64748b;
+            display: inline-block;
+            height: 32px;
+            line-height: 32px;
+            margin: 0 4px;
+            text-decoration: none;
+            width: 32px;
+        }
+
+        .copyright-text {
+            color: #94a3b8;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin: 0;
+            padding-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .address-text {
+            color: #94a3b8;
+            font-size: 10px;
+            margin: 0;
+            padding-bottom: 20px;
+        }
+
+        .footer-nav {
+            color: #94a3b8;
+            font-size: 10px;
+            text-decoration: underline;
+        }
+
+        .nav-item {
+            padding: 0 8px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="main-wrapper">
+    <div class="card">
+        <!-- Header Brand -->
+        <div class="header">
+            <div>
+                <span class="brand-name">SmashClub</span>
+            </div>
+        </div>
+
+        <!-- Hero Status -->
+        <div class="hero">
+            <div class="status-icon-outer">
+                <div class="status-icon-inner">✓</div>
+            </div>
+            <h1 class="h1">Pengembalian Dana Disetujui</h1>
+            <p class="subtitle">Permintaan refund Anda telah kami proses.</p>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content">
+            <div class="greeting">Halo, <span th:text="${fullName}"></span>!</div>
+            <div class="body-text">
+                Kabar baik! Permintaan pengembalian dana untuk pesanan Anda di SmashClub telah disetujui dan sedang
+                dalam proses pengiriman ke rekening/e-wallet Anda.
+            </div>
+
+            <!-- Details Section -->
+            <div class="details-box">
+                <div class="details-title">Detail Pengembalian</div>
+                <table>
+                    <tr class="detail-row">
+                        <td class="detail-label">Nomor Transaksi</td>
+                        <td class="detail-value" th:text="'#' + ${transactionCode}"></td>
+                    </tr>
+                    <tr class="detail-row">
+                        <td class="detail-label">Metode Pengembalian</td>
+                        <td class="detail-value">Saldo Wallet</td>
+                    </tr>
+                    <tr>
+                        <td class="detail-label" style="padding-top: 15px;">Jumlah Refund</td>
+                        <td class="refund-amount" style="padding-top: 15px;" th:text="${refundAmount}"></td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Info Notice -->
+            <div class="notice-box">
+                <table>
+                    <tr>
+                        <td class="notice-icon">i</td>
+                        <td class="notice-text">
+                            Dana biasanya akan masuk ke rekening Anda dalam waktu <strong>1-3 hari kerja</strong>,
+                            tergantung pada kebijakan penyedia layanan pembayaran yang Anda gunakan.
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="closing-text">
+                Terima kasih telah menggunakan layanan SmashClub. Kami berharap dapat melihat Anda kembali di
+                lapangan segera!
+            </div>
+        </div>
+
+        <!-- Support Footer -->
+        <div class="support-container">
+            <div class="support-title">Butuh bantuan lebih lanjut?</div>
+            <div class="support-links">
+                <a href="#" style="color: #00BBA7; text-decoration: none;">Hubungi CS</a>
+                <span class="link-separator">|</span>
+                <a href="#" style="color: #00BBA7; text-decoration: none;">Pusat Bantuan</a>
+            </div>
+        </div>
+
+        <!-- Main Footer -->
+        <div class="footer">
+            <p class="copyright-text">© 2026 SMASHCLUB INDONESIA. SELURUH HAK CIPTA DILINDUNGI.</p>
+            <div class="footer-nav">
+                <a href="#" style="color: #94a3b8;" class="nav-item">Ketentuan Layanan</a>
+                <a href="#" style="color: #94a3b8;" class="nav-item">Kebijakan Privasi</a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>
