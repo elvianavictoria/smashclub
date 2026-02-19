@@ -52,7 +52,7 @@ public class Court {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();  // ✅ SET VALUE SAAT INSERT!
+        updatedAt = LocalDateTime.now();
         if (status == 0) {
             status = BookingConstant.RESOURCE_ACTIVE;
         }

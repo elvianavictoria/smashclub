@@ -2,6 +2,8 @@ package com.backendsyndicate.smashclub.common.security;
 
 import com.backendsyndicate.smashclub.admin.security.jwt.AdminJwtFilter;
 import com.backendsyndicate.smashclub.admin.service.AdminAuthService;
+import com.backendsyndicate.smashclub.common.security.JwtService;
+import com.backendsyndicate.smashclub.auth.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -9,12 +11,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -23,12 +25,12 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfiguration {
+
     @Autowired
     private AdminJwtFilter adminJwtFilter;
 
@@ -36,9 +38,19 @@ public class SecurityConfiguration {
     private AdminAuthService adminAuthService;
 
     @Autowired
+    private JwtFilter jwtFilter;
+
+    @Autowired
+    private AuthService authService;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+    @Autowired
     @Qualifier("customAuthenticationEntryPoint")
     private AuthenticationEntryPoint authenticationEntryPoint;
 
+<<<<<<< Updated upstream
 //    @Autowired
 //    private JwtFilter jwtFilter;
 //
@@ -54,21 +66,27 @@ public class SecurityConfiguration {
 //        403 -> Forbiden / Otorisasi
 //     */
 //
+=======
+>>>>>>> Stashed changes
     @Bean
     public AuthenticationProvider cmsAuthenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(adminAuthService);
         return authProvider;
     }
 
+    @Bean
+    public AuthenticationProvider communityAuthenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(authService);
+        return authProvider;
+    }
+
     /**
-     * CMS security procedure here
-     * @param http
-     * @return
-     * @throws Exception
+     * CMS Admin Security Configuration
      */
     @Bean
     @Order(1)
     public SecurityFilterChain cmsSecurityFilterChain(HttpSecurity http) throws Exception {
+<<<<<<< Updated upstream
         http.
                 csrf(AbstractHttpConfigurer::disable).
                 cors(cors -> cors.configurationSource(corsConfigurationSource())).
@@ -105,26 +123,145 @@ public class SecurityConfiguration {
     @Bean
     @Order(2)
     public SecurityFilterChain appSecurityFilterChain(HttpSecurity http) throws Exception {
+=======
+>>>>>>> Stashed changes
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-//                .securityMatcher("/api/v1/**")
-//                .authorizeHttpRequests(authz -> authz.requestMatchers(
-//                        "/api/v1/login",
-//                        "/api/v1/register"
-//                ).permitAll().anyRequest().authenticated())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .securityMatcher("/api/v1/admin/**")
+                .authorizeHttpRequests(auth -> auth
+                        // Public admin endpoints
+                        .requestMatchers(
+                                "/api/v1/admin/auth/login"
+                        ).permitAll()
+                        .anyRequest().authenticated()
+                )
+                .exceptionHandling(exception ->
+                        exception.authenticationEntryPoint(authenticationEntryPoint))
+                .sessionManagement(manager ->
+                        manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(cmsAuthenticationProvider())
+                .addFilterBefore(adminJwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
+    }
+
+    /**
+     * Community App Security Configuration
+     * Lengkap dengan auth module Anda
+     */
+    @Bean
+    @Order(2)
+    public SecurityFilterChain communitySecurityFilterChain(HttpSecurity http) throws Exception {
+        return http
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .securityMatcher("/api/v1/**")
+                .authorizeHttpRequests(auth -> auth
+
+                        // ============ PUBLIC ENDPOINTS (TANPA LOGIN) ============
+
+                        // 1. AUTH MODULE - Registrasi, Login, dll
+                        .requestMatchers(
+                                "/api/v1/auth/register",
+                                "/api/v1/auth/login",
+                                "/api/v1/auth/verify-otp",
+                                "/api/v1/auth/verify-email",
+                                "/api/v1/auth/forgot-password",
+                                "/api/v1/auth/reset-password",
+                                "/api/v1/auth/validate-reset-token",
+                                "/api/v1/auth/resend-verification",
+                                "/api/v1/auth/resend-otp",
+                                "/api/v1/auth/refresh-token"
+                        ).permitAll()
+
+                        // 2. BOOKING MODULE - Lihat lapangan & ketersediaan
+                        .requestMatchers(
+                                "/api/v1/booking/courts",
+                                "/api/v1/booking/availability/**",
+                                "/api/v1/booking/summary",
+                                "/api/v1/booking/{bookingCode}"
+                        ).permitAll()
+
+                        // 3. PUBLIC UTILITIES
+                        .requestMatchers(
+                                "/api/v1/public/**",
+                                "/error"
+                        ).permitAll()
+
+                        // ============ PROTECTED ENDPOINTS (PERLU LOGIN) ============
+
+                        // AUTH MODULE - Endpoint yang butuh login
+                        .requestMatchers(
+                                "/api/v1/auth/logout",
+                                "/api/v1/auth/logout-all",
+                                "/api/v1/auth/check-session"
+                        ).authenticated()
+
+                        // PROFILE MODULE - Semua butuh login
+                        .requestMatchers(
+                                "/api/v1/profile",
+                                "/api/v1/profile/**"
+                        ).authenticated()
+
+                        // BOOKING MODULE - Transaksi butuh login
+                        .requestMatchers(
+                                "/api/v1/booking",
+                                "/api/v1/booking/my-bookings",
+                                "/api/v1/booking/{bookingCode}/payment",
+                                "/api/v1/booking/{bookingCode}/start",
+                                "/api/v1/booking/{bookingCode}/complete"
+                        ).authenticated()
+
+                        // Sisanya butuh login
+                        .anyRequest().authenticated()
+                )
+                .exceptionHandling(exception ->
+                        exception.authenticationEntryPoint(authenticationEntryPoint))
+                .sessionManagement(manager ->
+                        manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .userDetailsService(userDetailsService) // Tambahkan UserDetailsService
+                .authenticationProvider(communityAuthenticationProvider())
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
+    }
+
+    /**
+     * Fallback untuk static resources
+     */
+    @Bean
+    @Order(3)
+    public SecurityFilterChain fallbackSecurityFilterChain(HttpSecurity http) throws Exception {
+        return http
+                .securityMatcher("/static/**", "/css/**", "/js/**", "/images/**")
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
                 .build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(
-                Arrays.asList("http://localhost:5173", "https://smashclub-fe.vercel.app", "https://smashclub-cms.vercel.app"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
-        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowedOrigins(Arrays.asList(
+                "http://localhost:5173",
+                "https://smashclub-fe.vercel.app",
+                "https://smashclub-cms.vercel.app"
+        ));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        configuration.setAllowedHeaders(Arrays.asList(
+                "Authorization",
+                "Content-Type",
+                "X-Requested-With",
+                "Accept",
+                "Origin",
+                "Access-Control-Request-Method",
+                "Access-Control-Request-Headers"
+        ));
+        configuration.setExposedHeaders(Arrays.asList(
+                "Authorization",
+                "Content-Disposition"
+        ));
         configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
