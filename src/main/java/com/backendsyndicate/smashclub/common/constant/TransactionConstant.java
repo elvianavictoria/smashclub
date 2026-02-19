@@ -21,6 +21,40 @@ public class TransactionConstant {
     public static final int REFUND_APPROVED = 1;
     public static final int REFUND_REJECTED = 2;
 
+    public static final String TRANSACTION_SERVICE_ERROR_LIST_EMPTY = "TRX-01E001";
+    public static final String TRANSACTION_SERVICE_ERROR_LIST_EXCEPTION = "TRX-01E010";
+    public static final String TRANSACTION_SERVICE_ERROR_DETAIL_CODE_REQUIRED = "TRX-02E001";
+    public static final String TRANSACTION_SERVICE_ERROR_DETAIL_NOT_FOUND = "TRX-02E002";
+    public static final String TRANSACTION_SERVICE_ERROR_DETAIL_EXCEPTION = "TRX-02E010";
+
+    public static final String WALLET_SERVICE_ERROR_BALANCE_USERID_REQUIRED = "WLLT-01E001";
+    public static final String WALLET_SERVICE_ERROR_BALANCE_WALLET_NOT_FOUND = "WLLT-01E002";
+    public static final String WALLET_SERVICE_ERROR_BALANCE_EXCEPTION = "WLLT-01E010";
+    public static final String WALLET_SERVICE_ERROR_LOG_EMPTY = "WLLT-02E001";
+    public static final String WALLET_SERVICE_ERROR_LOG_EXCEPTION = "WLLT-02E010";
+    public static final String WALLET_SERVICE_ERROR_TOPUP_USERID_REQUIRED = "WLLT-03E001";
+    public static final String WALLET_SERVICE_ERROR_TOPUP_EXCEPTION = "WLLT-03E010";
+    public static final String WALLET_SERVICE_ERROR_UPDATE_USERID_REQUIRED = "WLLT-04E001";
+    public static final String WALLET_SERVICE_ERROR_UPDATE_REQUEST_INVALID = "WLLT-04E002";
+    public static final String WALLET_SERVICE_ERROR_UPDATE_WALLET_NOT_FOUND = "WLLT-04E003";
+    public static final String WALLET_SERVICE_ERROR_UPDATE_EXCEPTION = "WLLT-04E010";
+    public static final String WALLET_SERVICE_ERROR_CREATE_USERID_REQUIRED = "WLLT-05E001";
+    public static final String WALLET_SERVICE_ERROR_CREATE_WALLET_EXISTS = "WLLT-05E002";
+    public static final String WALLET_SERVICE_ERROR_CREATE_EXCEPTION = "WLLT-05E010";
+
+    public static final String PAYMENT_SERVICE_ERROR_CREATE_USER_NOT_FOUND = "PYMT-01E001";
+    public static final String PAYMENT_SERVICE_ERROR_CREATE_TRX_NOT_FOUND = "PYMT-01E002";
+    public static final String PAYMENT_SERVICE_ERROR_CREATE_EXCEPTION = "PYMT-01E010";
+    public static final String PAYMENT_SERVICE_ERROR_PAYMENT_CODE_REQUIRED = "PYMT-02E001";
+    public static final String PAYMENT_SERVICE_ERROR_PAYMENT_TRX_NOT_FOUND = "PYMT-02E002";
+    public static final String PAYMENT_SERVICE_ERROR_PAYMENT_PAID = "PYMT-02E009";
+    public static final String PAYMENT_SERVICE_ERROR_PAYMENT_EXCEPTION = "PYMT-02E010";
+    public static final String PAYMENT_SERVICE_ERROR_CANCEL_TRX_NOT_FOUND = "PYMT-03E001";
+    public static final String PAYMENT_SERVICE_ERROR_CANCEL_WALLET_TOPUP = "PYMT-03E002";
+    public static final String PAYMENT_SERVICE_ERROR_CANCEL_CANCELLED = "PYMT-03E003";
+    public static final String PAYMENT_SERVICE_ERROR_CANCEL_EXCEPTION = "PYMT-03E010";
+//    public static final String PAYMENT_SERVICE_ERROR_EXPIRE_
+
     public static void initLoad() {
         loadStatus();
         loadRefundStatus();

@@ -1,8 +1,10 @@
 package com.backendsyndicate.smashclub.common.util;
 
+import com.backendsyndicate.smashclub.admin.service.log.LogService;
 import com.backendsyndicate.smashclub.common.config.LogConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.Timestamp;
 

@@ -1,5 +1,7 @@
 package com.backendsyndicate.smashclub.payment.service;
 
+import com.backendsyndicate.smashclub.admin.service.log.LogService;
+import com.backendsyndicate.smashclub.common.constant.TransactionConstant;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.payment.core.IHistory;
@@ -27,11 +29,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class TransactionService implements IHistory {
     @Autowired
     private TransactionRepo transactionRepo;
+    @Autowired
+    private LogService logService;
     private ModelMapper modelMapper = new ModelMapper();
-
-    private String generateErrorCode(String methodNo, String errorNo) {
-        return "TRX-" + methodNo + "E" + errorNo;
-    }
 
     /**
      * Code: 01
@@ -49,11 +49,12 @@ public class TransactionService implements IHistory {
         try {
             page = transactionRepo.findAllByCreatedAtBetween(startDate.atStartOfDay(), endDate.atStartOfDay(), pageable);
             if( page.isEmpty() ) {
-                return GlobalResponse.failed("Transaction data not found!", generateErrorCode("01", "001"), null, request);
+                return GlobalResponse.failed("Transaction data not found!", TransactionConstant.TRANSACTION_SERVICE_ERROR_LIST_EMPTY, null, request);
             }
         } catch(Exception e) {
-            Logging.handleException("TransactionService", "findAll(Pageable pageable, LocalDate startDate, LocalDate endDate, HttpServletRequest request)", 51, generateErrorCode("01", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to get transaction list!", generateErrorCode("01", "010"), null, request);
+            Logging.handleException("TransactionService", "findAll(Pageable pageable, LocalDate startDate, LocalDate endDate, HttpServletRequest request)", 51, TransactionConstant.TRANSACTION_SERVICE_ERROR_LIST_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(TransactionConstant.TRANSACTION_SERVICE_ERROR_LIST_EXCEPTION, "TransactionService@findAll()", e.getMessage());
+            return GlobalResponse.failed("Failed to get transaction list!", TransactionConstant.TRANSACTION_SERVICE_ERROR_LIST_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Transaction list found!", page, request);
@@ -71,19 +72,20 @@ public class TransactionService implements IHistory {
         Transaction trx = null;
 
         if( code == null ) {
-            return GlobalResponse.failed("Transaction code is required!", generateErrorCode("02", "001"), null, request);
+            return GlobalResponse.failed("Transaction code is required!", TransactionConstant.TRANSACTION_SERVICE_ERROR_DETAIL_CODE_REQUIRED, null, request);
         }
 
         try {
             Optional<Transaction> optionalTrx = transactionRepo.findByTransactionCode(code);
             if( optionalTrx.isEmpty() ) {
-                return GlobalResponse.failed("Transaction not found!", generateErrorCode("02", "002"), null, request);
+                return GlobalResponse.failed("Transaction not found!", TransactionConstant.TRANSACTION_SERVICE_ERROR_DETAIL_NOT_FOUND, null, request);
             }
 
             trx = optionalTrx.get();
         } catch(Exception e) {
-            Logging.handleException("TransactionService", "findByCode(String code, HttpServletRequest request)", 79, generateErrorCode("02", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to get transaction data!", generateErrorCode("02", "010"), null, request);
+            Logging.handleException("TransactionService", "findByCode(String code, HttpServletRequest request)", 79, TransactionConstant.TRANSACTION_SERVICE_ERROR_DETAIL_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(TransactionConstant.TRANSACTION_SERVICE_ERROR_DETAIL_EXCEPTION, "TransactionService@findByCode()", e.getMessage());
+            return GlobalResponse.failed("Failed to get transaction data!", TransactionConstant.TRANSACTION_SERVICE_ERROR_DETAIL_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Transaction data found!", trx, request);

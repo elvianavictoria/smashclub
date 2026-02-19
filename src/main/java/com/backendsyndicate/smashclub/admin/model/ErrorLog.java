@@ -29,5 +29,5 @@ public class ErrorLog {
     private String description;
 
     @Column(name = "CreatedAt", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 }

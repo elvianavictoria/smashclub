@@ -1,6 +1,8 @@
 package com.backendsyndicate.smashclub.payment.service;
 
+import com.backendsyndicate.smashclub.admin.service.log.LogService;
 import com.backendsyndicate.smashclub.auth.model.User;
+import com.backendsyndicate.smashclub.common.constant.TransactionConstant;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.common.constant.TransactionTypeConstant;
@@ -37,12 +39,10 @@ public class WalletService implements IWallet {
     private WalletLogRepo walletLogRepo;
     @Autowired
     private PaymentService paymentService;
+    @Autowired
+    private LogService logService;
 
     private ModelMapper modelMapper = new ModelMapper();
-
-    private String generateErrorCode(String methodNo, String errorNo) {
-        return "WLLT-" + methodNo + "E" + errorNo;
-    }
 
     /**
      * Code: 01
@@ -54,7 +54,7 @@ public class WalletService implements IWallet {
     @Override
     public ResponseEntity<Object> getBalance(String userId, HttpServletRequest request) {
         if( userId == null ) {
-            return GlobalResponse.failed("Auth Token is invalid!", generateErrorCode("01", "001"), null, request);
+            return GlobalResponse.failed("Auth Token is invalid!", TransactionConstant.WALLET_SERVICE_ERROR_BALANCE_USERID_REQUIRED, null, request);
         }
 
         Wallet wallet = null;
@@ -62,13 +62,15 @@ public class WalletService implements IWallet {
         try {
             Optional<Wallet> optionalWallet = walletRepo.findByUserId(userId);
             if( optionalWallet.isEmpty() ) {
-                return GlobalResponse.failed("Wallet data not found!", generateErrorCode("01", "002"), null, request);
+                return GlobalResponse.failed("Wallet data not found!", TransactionConstant.WALLET_SERVICE_ERROR_BALANCE_WALLET_NOT_FOUND, null, request);
             }
 
             wallet = optionalWallet.get();
 
         } catch(Exception e) {
-            return GlobalResponse.failed("Wallet info not found!", generateErrorCode("01", "010"), null, request);
+            Logging.handleException("Wallet Service", "getBalance(String userId, HttpServletRequest request)", 74, TransactionConstant.WALLET_SERVICE_ERROR_BALANCE_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(TransactionConstant.WALLET_SERVICE_ERROR_BALANCE_EXCEPTION, "WalletService@getBalance()", e.getMessage());
+            return GlobalResponse.failed("Wallet info not found!", TransactionConstant.WALLET_SERVICE_ERROR_BALANCE_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Successfully get wallet info!", wallet, request);
@@ -91,10 +93,12 @@ public class WalletService implements IWallet {
         try {
             page = walletLogRepo.findByWallet_UserIdAndCreatedAtBetween(userId, startDate, endDate, pageable);
             if( page.isEmpty() ) {
-                return GlobalResponse.failed("Wallet log not found!", generateErrorCode("02", "001"), null, request);
+                return GlobalResponse.failed("Wallet log not found!", TransactionConstant.WALLET_SERVICE_ERROR_LOG_EMPTY, null, request);
             }
         } catch(Exception e) {
-            return GlobalResponse.failed("Failed to get wallet log!", generateErrorCode("02", "010"), null, request);
+            Logging.handleException("Wallet Service", "getBalanceLog(String userId, LocalDate startDate, LocalDate endDate, Pageable pageable,  HttpServletRequest request)", 97, TransactionConstant.WALLET_SERVICE_ERROR_LOG_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(TransactionConstant.WALLET_SERVICE_ERROR_LOG_EXCEPTION, "WalletService@getBalanceLog()", e.getMessage());
+            return GlobalResponse.failed("Failed to get wallet log!", TransactionConstant.WALLET_SERVICE_ERROR_LOG_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Wallet log found!", page, request);
@@ -110,7 +114,7 @@ public class WalletService implements IWallet {
     @Override
     public ResponseEntity<Object> topupBalance(String userId, BigDecimal balance, HttpServletRequest request) {
         if( userId == null ) {
-            return GlobalResponse.failed("Auth Token is invalid!", generateErrorCode("03", "001"), null, request);
+            return GlobalResponse.failed("Auth Token is invalid!", TransactionConstant.WALLET_SERVICE_ERROR_TOPUP_USERID_REQUIRED, null, request);
         }
 
         RespCreateTransactionDTO response = null;
@@ -118,7 +122,9 @@ public class WalletService implements IWallet {
         try {
             response = paymentService.createTransaction(userId, balance, "", TransactionTypeConstant.WALLET_TOPUP);
         } catch(Exception e) {
-            return GlobalResponse.failed("Failed to request topup balance!", generateErrorCode("03", "010"), null, request);
+            Logging.handleException("Wallet Service", "topupBalance(String userId, BigDecimal balance, HttpServletRequest request)", 125, TransactionConstant.WALLET_SERVICE_ERROR_TOPUP_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(TransactionConstant.WALLET_SERVICE_ERROR_TOPUP_EXCEPTION, "WalletService@topupBalance()", e.getMessage());
+            return GlobalResponse.failed("Failed to request topup balance!", TransactionConstant.WALLET_SERVICE_ERROR_TOPUP_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Successfully request topup balance", response, request);
@@ -136,12 +142,12 @@ public class WalletService implements IWallet {
     @Override
     public boolean updateBalance(String userId, ReqUpdateBalanceDTO reqUpdateBalanceDTO) {
         if( userId == null ) {
-            Logging.handleException("WalletService", "updateBalance", 133, generateErrorCode("04", "001"), "User ID is required!");
+            Logging.handleException("WalletService", "updateBalance", 145, TransactionConstant.WALLET_SERVICE_ERROR_UPDATE_USERID_REQUIRED, "User ID is required!");
             return false;
         }
 
         if( reqUpdateBalanceDTO == null ) {
-            Logging.handleException("WalletService", "updateBalance", 138, generateErrorCode("04", "002"), "Update balance DTO is null!");
+            Logging.handleException("WalletService", "updateBalance", 150, TransactionConstant.WALLET_SERVICE_ERROR_UPDATE_REQUEST_INVALID, "Update balance DTO is null!");
             return false;
         }
 
@@ -151,7 +157,7 @@ public class WalletService implements IWallet {
         try {
             Optional<Wallet> optionalWallet = walletRepo.findByUserId(userId);
             if( optionalWallet.isEmpty() ) {
-                Logging.handleException("WalletService", "updateBalance", 148, generateErrorCode("04", "003"), "User ID is required!");
+                Logging.handleException("WalletService", "updateBalance", 160, TransactionConstant.WALLET_SERVICE_ERROR_UPDATE_WALLET_NOT_FOUND, "Wallet not found!");
                 return false;
             }
 
@@ -169,7 +175,8 @@ public class WalletService implements IWallet {
             response.setBalanceDiff(reqUpdateBalanceDTO.getValue());
 
         } catch(Exception e) {
-            Logging.handleException("WalletService", "updateBalance", 146, generateErrorCode("04", "010"), e.getMessage());
+            Logging.handleException("WalletService", "updateBalance(String userId, ReqUpdateBalanceDTO reqUpdateBalanceDTO)", 161, TransactionConstant.WALLET_SERVICE_ERROR_UPDATE_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(TransactionConstant.WALLET_SERVICE_ERROR_UPDATE_EXCEPTION, "WalletService@updateBalance()", e.getMessage());
             return false;
         }
 
@@ -178,14 +185,14 @@ public class WalletService implements IWallet {
 
     public boolean createWallet(String userId) {
         if( userId == null ) {
-            Logging.handleException("WalletService", "createWallet(String userId)", 180, generateErrorCode("05", "001"), "User ID is required!");
+            Logging.handleException("WalletService", "createWallet(String userId)", 180, TransactionConstant.WALLET_SERVICE_ERROR_CREATE_USERID_REQUIRED, "User ID is required!");
             return false;
         }
 
         try {
             Optional<Wallet> optionalWallet = walletRepo.findByUserId(userId);
             if( optionalWallet.isPresent() ) {
-                Logging.handleException("WalletService", "createWallet(String userId)", 189, generateErrorCode("05", "002"), "This user wallet already exists!");
+                Logging.handleException("WalletService", "createWallet(String userId)", 189, TransactionConstant.WALLET_SERVICE_ERROR_CREATE_WALLET_EXISTS, "This user wallet already exists!");
                 return false;
             }
 
@@ -196,7 +203,8 @@ public class WalletService implements IWallet {
 
             walletRepo.save(wallet);
         } catch(Exception e) {
-            Logging.handleException("WalletService", "createWallet(String userId)", 186, generateErrorCode("05", "010"), e.getMessage());
+            Logging.handleException("WalletService", "createWallet(String userId)", 186, TransactionConstant.WALLET_SERVICE_ERROR_CREATE_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(TransactionConstant.WALLET_SERVICE_ERROR_CREATE_EXCEPTION, "WalletService@createWallet()", e.getMessage());
             return false;
         }
 

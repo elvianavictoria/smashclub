@@ -1,5 +1,6 @@
 package com.backendsyndicate.smashclub.payment.service;
 
+import com.backendsyndicate.smashclub.admin.service.log.LogService;
 import com.backendsyndicate.smashclub.auth.model.User;
 import com.backendsyndicate.smashclub.auth.repository.UserRepository;
 import com.backendsyndicate.smashclub.common.service.TemplateService;
@@ -59,15 +60,15 @@ public class PaymentService implements IPayment {
     private UserRepository userRepo;
 
     @Autowired
+    private LogService logService;
+    @Autowired
     private XenditService xenditService;
     @Autowired
     private MailService mailService;
 
     private ModelMapper modelMapper = new ModelMapper();
 
-    private String generateErrorCode(String methodNo, String errorNo) {
-        return "PYMT-" + methodNo + "E" + errorNo;
-    }
+    private String generateErrorCode(String a, String b) { return ""; }
 
     /**
      * Code: 01
@@ -96,7 +97,7 @@ public class PaymentService implements IPayment {
             Transaction trx = new Transaction();
             Optional<User> optUser = userRepo.findById(customerId);
             if( optUser.isEmpty() ) {
-                Logging.handleException("PaymentService", "createTransaction", 97, generateErrorCode("01", "001"), "Failed to get created transaction!");
+                Logging.handleException("PaymentService", "createTransaction", 97, TransactionConstant.PAYMENT_SERVICE_ERROR_CREATE_USER_NOT_FOUND, "Failed to get created transaction!");
                 return null;
             }
 
@@ -116,7 +117,7 @@ public class PaymentService implements IPayment {
             // Create payment link
             Transaction transaction = getTransaction(trx.getTransactionCode());
             if( transaction == null ) {
-                Logging.handleException("PaymentService", "createTransaction", 97, generateErrorCode("01", "002"), "Failed to get created transaction!");
+                Logging.handleException("PaymentService", "createTransaction", 97, TransactionConstant.PAYMENT_SERVICE_ERROR_CREATE_TRX_NOT_FOUND, "Failed to get created transaction!");
             } else {
                 XenditResponseDTO pgResponse = new XenditResponseDTO();
                 if(XenditConfig.getUseInvoice() == 'y') {
@@ -151,7 +152,8 @@ public class PaymentService implements IPayment {
                 response.setPaymentData(pgResponse.asMap());
             }
         } catch(Exception e) {
-            Logging.handleException("PaymentService", "createTransaction", 107, generateErrorCode("01", "010"), e.getMessage());
+            Logging.handleException("PaymentService", "createTransaction(String customerId, BigDecimal totalPrice, String referenceCode, int transactionType)", 107, TransactionConstant.PAYMENT_SERVICE_ERROR_CREATE_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(TransactionConstant.PAYMENT_SERVICE_ERROR_CREATE_EXCEPTION, "PaymentService@createTransaction()", e.getMessage());
             return null;
         }
 
@@ -168,7 +170,7 @@ public class PaymentService implements IPayment {
     @Override
     public RespPaymentTransactionDTO paymentTransaction(String transactionCode) {
         if( transactionCode == null ) {
-            Logging.handleException("PaymentService", "paymentTransaction(String transactionCode)", 177, generateErrorCode("02", "001"), "Transaction code is required!");
+            Logging.handleException("PaymentService", "paymentTransaction(String transactionCode)", 177, TransactionConstant.PAYMENT_SERVICE_ERROR_PAYMENT_CODE_REQUIRED, "Transaction code is required!");
 
             return null;
         }
@@ -179,7 +181,7 @@ public class PaymentService implements IPayment {
         try {
             trx = getTransaction(transactionCode);
             if( trx == null ) {
-                Logging.handleException("PaymentService", "paymentTransaction(String transactionCode)", 177, generateErrorCode("02", "002"), "Transaction not found!");
+                Logging.handleException("PaymentService", "paymentTransaction(String transactionCode)", 177, TransactionConstant.PAYMENT_SERVICE_ERROR_PAYMENT_TRX_NOT_FOUND, "Transaction not found!");
                 return null;
             }
 
@@ -201,11 +203,12 @@ public class PaymentService implements IPayment {
 
                 response = modelMapper.map(trx, RespPaymentTransactionDTO.class);
             } else {
-                Logging.handleException("PaymentService", "paymentTransaction(String transactionCode)", 212, generateErrorCode("02", "009"), "This transaction has been paid!");
+                Logging.handleException("PaymentService", "paymentTransaction(String transactionCode)", 212, TransactionConstant.PAYMENT_SERVICE_ERROR_PAYMENT_PAID, "This transaction has been paid!");
                 return null;
             }
         } catch(Exception e) {
-            Logging.handleException("PaymentService", "paymentTransaction(String transactionCode)", 216, generateErrorCode("02", "010"), "Failed to process payment transaction!");
+            Logging.handleException("PaymentService", "paymentTransaction(String transactionCode)", 216, TransactionConstant.PAYMENT_SERVICE_ERROR_PAYMENT_EXCEPTION, "Failed to process payment transaction!");
+            logService.writeErrorLog(TransactionConstant.PAYMENT_SERVICE_ERROR_PAYMENT_EXCEPTION, "PaymentService@paymentTransaction()", e.getMessage());
             return null;
         }
 
@@ -234,18 +237,18 @@ public class PaymentService implements IPayment {
         try {
             Transaction trx = getTransaction(transactionCode);
             if( trx == null ) {
-                Logging.handleException("PaymentService", "cancelTransaction(String transactionCode, String refundReason)", 152, generateErrorCode("03", "001"), "Transaction not found!");
+                Logging.handleException("PaymentService", "cancelTransaction(String transactionCode, String refundReason)", 238, TransactionConstant.PAYMENT_SERVICE_ERROR_CANCEL_TRX_NOT_FOUND, "Transaction not found!");
                 return null;
             }
 
             if( trx.getTransactionType() == TransactionTypeConstant.WALLET_TOPUP ) {
-                Logging.handleException("PaymentService", "cancelTransaction(String transactionCode, String refundReason)", 158, generateErrorCode("03", "002"), "Wallet topup cannot be refunded!");
+                Logging.handleException("PaymentService", "cancelTransaction(String transactionCode, String refundReason)", 243, TransactionConstant.PAYMENT_SERVICE_ERROR_CANCEL_WALLET_TOPUP, "Wallet topup cannot be refunded!");
                 return null;
             }
 
             int previousStatus = trx.getStatus();
             if( !TransactionConstant.isStatusAllowed(previousStatus, TransactionConstant.PAYMENT_CANCELLED) ) {
-                Logging.handleException("PaymentService", "cancelTransaction(String transactionCode, String refundReason)", 158, generateErrorCode("03", "003"), "Status update is not allowed!");
+                Logging.handleException("PaymentService", "cancelTransaction(String transactionCode, String refundReason)", 249, TransactionConstant.PAYMENT_SERVICE_ERROR_CANCEL_CANCELLED, "Status update is not allowed!");
                 return null;
             }
 
@@ -271,7 +274,8 @@ public class PaymentService implements IPayment {
             response.setReferenceCode(trx.getReferenceCode());
             response.setUser(modelMapper.map(trx.getUser(), RelTransactionUserDTO.class));
         } catch(Exception e) {
-            Logging.handleException("PaymentService", "cancelTransaction(String transactionCode, String refundReason)", 147, generateErrorCode("03", "010"), e.getMessage());
+            Logging.handleException("PaymentService", "cancelTransaction(String transactionCode, String refundReason)", 147, TransactionConstant.PAYMENT_SERVICE_ERROR_CANCEL_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(TransactionConstant.PAYMENT_SERVICE_ERROR_CANCEL_EXCEPTION, "PaymentService@cancelTransaction()", e.getMessage());
         }
 
         return response;
@@ -298,7 +302,7 @@ public class PaymentService implements IPayment {
             }
             int previousStatus = trx.getStatus();
 
-            if( !TransactionConstant.isStatusAllowed(previousStatus, TransactionConstant.PAYMENT_CANCELLED) ) {
+            if( !TransactionConstant.isStatusAllowed(previousStatus, TransactionConstant.PAYMENT_EXPIRED) ) {
                 Logging.handleException("PaymentService", "expireTransaction(String transactionCode)", 158, generateErrorCode("04", "002"), "Status update is not allowed!");
                 return null;
             }

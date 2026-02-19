@@ -1,5 +1,6 @@
 package com.backendsyndicate.smashclub.common.security;
 
+import com.backendsyndicate.smashclub.admin.provider.AdminAuthenticationProvider;
 import com.backendsyndicate.smashclub.admin.security.jwt.AdminJwtFilter;
 import com.backendsyndicate.smashclub.admin.security.ratelimit.AdminRateLimitFilter;
 import com.backendsyndicate.smashclub.admin.service.AdminAuthService;
@@ -12,8 +13,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -40,8 +43,8 @@ public class SecurityConfiguration {
     @Autowired
     private AdminRateLimitFilter adminRateLimitFilter;
 
-    @Autowired
-    private AdminAuthService adminAuthService;
+//    @Autowired
+//    private AdminAuthService adminAuthService;
 
     @Autowired
     private JwtFilter jwtFilter;
@@ -50,38 +53,32 @@ public class SecurityConfiguration {
     private AuthUserDetailsService authUserDetailsService;
 
     @Autowired
-    private UserDetailsService userDetailsService;
-
-    @Autowired
     @Qualifier("customAuthenticationEntryPoint")
     private AuthenticationEntryPoint authenticationEntryPoint;
 
-    //    @Autowired
-//    @Autowired
-//    private JwtFilter jwtFilter;
-//
-//    @Autowired
-//    @Qualifier("customAuthenticationEntryPoint")
-//    private AuthenticationEntryPoint authenticationEntryPoint;
-//
-//    @Autowired
-//    private AuthService2 authService;
-//
-//    /*
-//        401 -> Otentikasi
-//        403 -> Forbiden / Otorisasi
-//     */
-//
-    @Bean
-    public AuthenticationProvider cmsAuthenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(adminAuthService);
-        return authProvider;
-    }
+    @Autowired
+    private AdminAuthenticationProvider adminAuthenticationProvider;
+
+//    @Bean
+//    public AuthenticationProvider cmsAuthenticationProvider() {
+//        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(adminAuthService);
+//        return authProvider;
+//    }
 
     @Bean
     public AuthenticationProvider communityAuthenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(authUserDetailsService);
         return authProvider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(HttpSecurity http, DaoAuthenticationProvider daoAuthenticationProvider) {
+        AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
+
+        builder.authenticationProvider(adminAuthenticationProvider);
+        builder.authenticationProvider(communityAuthenticationProvider());
+
+        return builder.build();
     }
 
     /**
@@ -96,7 +93,6 @@ public class SecurityConfiguration {
         http.
                 csrf(AbstractHttpConfigurer::disable).
                 cors(cors -> cors.configurationSource(corsConfigurationSource())).
-                // Endpoints that need authorization
                         securityMatcher("/api/v1/admin/**").
                 authorizeHttpRequests(
                         auth -> auth
@@ -108,47 +104,20 @@ public class SecurityConfiguration {
 //                                        "/api/v1/admin/refund-request/**"
                                 )
                                 .permitAll()
-                                .anyRequest().authenticated()
+                                // Endpoints that need authorization
+                                .requestMatchers(
+                                        "/api/v1/admin/**"
+                                ).authenticated()
                 ).
 //            headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable())). // Allow H2 console to run in a frame
 //                httpBasic(basic -> basic.authenticationEntryPoint(authenticationEntryPoint)).
         exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint)).
                 sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).
-                authenticationProvider(cmsAuthenticationProvider()).
+//                authenticationProvider(cmsAuthenticationProvider()).
                 addFilterBefore(adminRateLimitFilter, UsernamePasswordAuthenticationFilter.class).
                 addFilterBefore(adminJwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
-    }
-
-    /**
-     * App security procedure here
-     *
-     * @param http
-     * @return
-     * @throws Exception
-     */
-    @Bean
-    @Order(2)
-    public SecurityFilterChain appSecurityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .securityMatcher("/api/v1/admin/**")
-                .authorizeHttpRequests(auth -> auth
-                        // Public admin endpoints
-                        .requestMatchers(
-                                "/api/v1/admin/auth/login"
-                        ).permitAll()
-                        .anyRequest().authenticated()
-                )
-                .exceptionHandling(exception ->
-                        exception.authenticationEntryPoint(authenticationEntryPoint))
-                .sessionManagement(manager ->
-                        manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(cmsAuthenticationProvider())
-                .addFilterBefore(adminJwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
     }
 
     /**
@@ -177,12 +146,14 @@ public class SecurityConfiguration {
                                 "/api/v1/auth/validate-reset-token",
                                 "/api/v1/auth/resend-verification",
                                 "/api/v1/auth/resend-otp",
-                                "/api/v1/auth/refresh-token"
+                                "/api/v1/auth/refresh-token",
+                                "/api/v1/products/**"
                         ).permitAll()
 
                         // 2. BOOKING MODULE - Lihat lapangan & ketersediaan
                         .requestMatchers(
                                 "/api/v1/booking/courts",
+                                "/api/v1/booking/coaches",
                                 "/api/v1/booking/availability/**",
                                 "/api/v1/booking/summary",
                                 "/api/v1/booking/{bookingCode}"
@@ -225,7 +196,6 @@ public class SecurityConfiguration {
                         exception.authenticationEntryPoint(authenticationEntryPoint))
                 .sessionManagement(manager ->
                         manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .userDetailsService(userDetailsService) // Tambahkan UserDetailsService
                 .authenticationProvider(communityAuthenticationProvider())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
@@ -235,7 +205,7 @@ public class SecurityConfiguration {
      * Fallback untuk static resources
      */
     @Bean
-    @Order(3)
+    @Order(2)
     public SecurityFilterChain fallbackSecurityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .securityMatcher("/static/**", "/css/**", "/js/**", "/images/**")

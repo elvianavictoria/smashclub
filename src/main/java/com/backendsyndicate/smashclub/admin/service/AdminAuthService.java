@@ -38,7 +38,7 @@ import java.util.Optional;
  */
 @Service
 @Transactional
-public class AdminAuthService implements IAuth, UserDetailsService {
+public class AdminAuthService implements IAuth {
     @Autowired
     private AdminUserRepo adminUserRepo;
     @Autowired
