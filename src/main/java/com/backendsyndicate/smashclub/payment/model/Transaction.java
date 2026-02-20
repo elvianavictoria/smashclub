@@ -68,3 +68,4 @@ public class Transaction {
     @OneToMany(mappedBy = "transactionId", fetch = FetchType.LAZY)
     private List<Order> orders;
 }
+

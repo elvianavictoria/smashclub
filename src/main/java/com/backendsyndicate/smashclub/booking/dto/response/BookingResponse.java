@@ -51,7 +51,6 @@ public class BookingResponse {
                 .endTime(booking.getEndTime())
                 .durationHour(booking.getDurationHour())
                 .basePrice(booking.getBasePrice())
-                .respCreateTransactionDTO(respCreateTransactionDTO.getPaymentData())
                 .totalPrice(booking.getTotalPrice())
                 .status(booking.getStatus())
                 .createdAt(booking.getCreatedAt())
