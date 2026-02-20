@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -29,5 +30,5 @@ public class RespAdminTransactionDetailDTO {
     private RelAdminTransactionPlayerDTO user;
     private String createdAt;
     private String updatedAt;
-    private List<ExtAdminTransactionItemDTO> items;
+    private List<ExtAdminTransactionItemDTO> items = new ArrayList<>();
 }

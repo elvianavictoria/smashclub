@@ -959,7 +959,7 @@ public class BookingService {
                 .build();
     }
 
-    private BookingResponse buildBookingResponse(
+    protected BookingResponse buildBookingResponse(
             Booking booking,
             List<CoachDetail> coachDetails,
             List<EquipmentDetail> equipmentDetails) {
