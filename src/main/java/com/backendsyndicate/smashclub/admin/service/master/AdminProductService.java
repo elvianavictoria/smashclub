@@ -5,6 +5,8 @@ import com.backendsyndicate.smashclub.admin.core.IUploadWithVariants;
 import com.backendsyndicate.smashclub.admin.dto.request.CustomRequestValidation;
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminProductDetailDTO;
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminProductListDTO;
+import com.backendsyndicate.smashclub.admin.service.log.LogService;
+import com.backendsyndicate.smashclub.common.constant.AdminConstant;
 import com.backendsyndicate.smashclub.ecommerce.model.Product;
 import com.backendsyndicate.smashclub.ecommerce.model.ProductVariant;
 import com.backendsyndicate.smashclub.ecommerce.repo.ProductRepo;
@@ -37,11 +39,10 @@ public class AdminProductService implements ICRUD<Product, Long>, IUploadWithVar
     private CloudinaryService cloudinaryService;
     @Autowired
     private ProductRepo productRepo;
-    private ModelMapper modelMapper = new ModelMapper();
+    @Autowired
+    private LogService logService;
 
-    private String generateErrorCode(String methodNo, String errorNo) {
-        return "ADM-PRD" + "-" + methodNo + "-" + errorNo;
-    }
+    private ModelMapper modelMapper = new ModelMapper();
 
     @Override
     public ResponseEntity<Object> findAll(String keyword, Integer status, Pageable pageable, HttpServletRequest request) {
@@ -55,7 +56,7 @@ public class AdminProductService implements ICRUD<Product, Long>, IUploadWithVar
             }
 
             if( page.isEmpty() ) {
-                return GlobalResponse.failed("Product list is empty!", generateErrorCode("01", "001"), null, request);
+                return GlobalResponse.failed("Product list is empty!", AdminConstant.ADMIN_PRODUCT_SERVICE_LIST_EMPTY, null, request);
             }
 
             page = page.map(new Function<Product, RespAdminProductListDTO>() {
@@ -65,8 +66,9 @@ public class AdminProductService implements ICRUD<Product, Long>, IUploadWithVar
                 }
             });
         } catch(Exception e) {
-            Logging.handleException("AdminProductService", "findAll(Pageable pageable, HttpServletRequest request)", 33, generateErrorCode("01", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to get product list!", generateErrorCode("01", "010"), null, request);
+            Logging.handleException("AdminProductService", "findAll(Pageable pageable, HttpServletRequest request)", 33, AdminConstant.ADMIN_PRODUCT_SERVICE_LIST_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_PRODUCT_SERVICE_LIST_EXCEPTION, "AdminProductService@findAll()", e.getMessage());
+            return GlobalResponse.failed("Failed to get product list!", AdminConstant.ADMIN_PRODUCT_SERVICE_LIST_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Successfully get product list!", page, request);
@@ -77,19 +79,21 @@ public class AdminProductService implements ICRUD<Product, Long>, IUploadWithVar
         RespAdminProductDetailDTO response = null;
 
         if( id == null ) {
-            return GlobalResponse.failed("Product ID is required!", generateErrorCode("02", "001"), null, request);
+            return GlobalResponse.failed("Product ID is required!", AdminConstant.ADMIN_PRODUCT_SERVICE_DETAIL_ID_REQUIRED, null, request);
         }
 
         try {
             Optional<Product> optionalProduct = productRepo.findById(id);
             if( optionalProduct.isEmpty() ) {
-                return GlobalResponse.failed("Product not found!", generateErrorCode("02", "002"), null, request);
+                return GlobalResponse.failed("Product not found!", AdminConstant.ADMIN_PRODUCT_SERVICE_DETAIL_NOT_FOUND, null, request);
             }
 
             Product product = optionalProduct.get();
             response = modelMapper.map(product, RespAdminProductDetailDTO.class);
         } catch(Exception e) {
-            return GlobalResponse.failed("Failed to get product data!", generateErrorCode("02", "010"), null, request);
+            Logging.handleException("AdminProductService", "findById(Long id, HttpServletRequest request)", 86, AdminConstant.ADMIN_PRODUCT_SERVICE_DETAIL_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_PRODUCT_SERVICE_DETAIL_EXCEPTION, "AdminProductService@findById()", e.getMessage());
+            return GlobalResponse.failed("Failed to get product data!", AdminConstant.ADMIN_PRODUCT_SERVICE_DETAIL_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Product data found!", response, request);
@@ -98,14 +102,16 @@ public class AdminProductService implements ICRUD<Product, Long>, IUploadWithVar
     @Override
     public ResponseEntity<Object> save(Product product, HttpServletRequest request) {
         if( product == null ) {
-            return GlobalResponse.failed("Product data is required!", generateErrorCode("03", "001"), null, request);
+            return GlobalResponse.failed("Product data is required!", AdminConstant.ADMIN_PRODUCT_SERVICE_SAVE_REQUEST_INVALID, null, request);
         }
 
         try {
             productRepo.save(product);
         } catch(Exception e) {
-            Logging.handleException("AdminProductService", "save(Product product, HttpServletRequest request)", 73, generateErrorCode("03", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to save product data!", generateErrorCode("03", "010"), null, request);
+            Logging.handleException("AdminProductService", "save(Product product, HttpServletRequest request)", 73, AdminConstant.ADMIN_PRODUCT_SERVICE_SAVE_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_PRODUCT_SERVICE_SAVE_EXCEPTION, "AdminProductService@save()", e.getMessage());
+
+            return GlobalResponse.failed("Failed to save product data!", AdminConstant.ADMIN_PRODUCT_SERVICE_SAVE_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Successfully save product data!", null, request);
@@ -114,17 +120,17 @@ public class AdminProductService implements ICRUD<Product, Long>, IUploadWithVar
     @Override
     public ResponseEntity<Object> update(Long id, Product product, HttpServletRequest request) {
         if( id == null ) {
-            return GlobalResponse.failed("Product ID is required!", generateErrorCode("04", "001"), null, request);
+            return GlobalResponse.failed("Product ID is required!", AdminConstant.ADMIN_PRODUCT_SERVICE_UPDATE_ID_REQUIRED, null, request);
         }
 
         if( product == null ) {
-            return GlobalResponse.failed("Product data is required!", generateErrorCode("04", "002"), null, request);
+            return GlobalResponse.failed("Product data is required!", AdminConstant.ADMIN_PRODUCT_SERVICE_UPDATE_REQUEST_INVALID, null, request);
         }
 
         try {
             Optional<Product> optionalProduct = productRepo.findById(id);
             if( optionalProduct.isEmpty() ) {
-                return GlobalResponse.failed("Product data not found!", generateErrorCode("04", "003"), null, request);
+                return GlobalResponse.failed("Product data not found!", AdminConstant.ADMIN_PRODUCT_SERVICE_UPDATE_NOT_FOUND, null, request);
             }
 
             Product productDB = optionalProduct.get();
@@ -135,11 +141,12 @@ public class AdminProductService implements ICRUD<Product, Long>, IUploadWithVar
             productDB.setStatus(product.getStatus());
 
             if( !adminProductVariantService.save(id, product.getProductVariants()) ) {
-                return GlobalResponse.failed("Failed to save variants!", generateErrorCode("04", "004"), null, request);
+                return GlobalResponse.failed("Failed to save variants!", AdminConstant.ADMIN_PRODUCT_SERVICE_UPDATE_VARIANT_FAILED, null, request);
             }
         } catch(Exception e) {
-            Logging.handleException("AdminProductService", "update(Long id, Product product, HttpServletRequest request)", 120, generateErrorCode("04", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to update product data!", generateErrorCode("04", "010"), null, request);
+            Logging.handleException("AdminProductService", "update(Long id, Product product, HttpServletRequest request)", 120, AdminConstant.ADMIN_PRODUCT_SERVICE_UPDATE_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_PRODUCT_SERVICE_UPDATE_EXCEPTION, "AdminProductService@update()", e.getMessage());
+            return GlobalResponse.failed("Failed to update product data!", AdminConstant.ADMIN_PRODUCT_SERVICE_UPDATE_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Successfully updated product data!", null, request);
@@ -148,21 +155,22 @@ public class AdminProductService implements ICRUD<Product, Long>, IUploadWithVar
     @Override
     public ResponseEntity<Object> delete(Long id, HttpServletRequest request) {
         if( id == null ) {
-            return GlobalResponse.failed("Product ID is required!", generateErrorCode("05", "001"), null, request);
+            return GlobalResponse.failed("Product ID is required!", AdminConstant.ADMIN_PRODUCT_SERVICE_DELETE_ID_REQUIRED, null, request);
         }
 
         try {
             Optional<Product> optionalProduct = productRepo.findById(id);
             if( optionalProduct.isEmpty() ) {
-                return GlobalResponse.failed("Product data not found!", generateErrorCode("05", "002"), null, request);
+                return GlobalResponse.failed("Product data not found!", AdminConstant.ADMIN_PRODUCT_SERVICE_DELETE_NOT_FOUND, null, request);
             }
 
             if(adminProductVariantService.deleteByProductId(id)) {
                 productRepo.deleteById(id);
             }
         } catch(Exception e) {
-            Logging.handleException("AdminProductService", "delete(Long id, HttpServletRequest request)", 150, generateErrorCode("05", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to delete product data!", generateErrorCode("05", "010"), null, request);
+            Logging.handleException("AdminProductService", "delete(Long id, HttpServletRequest request)", 150, AdminConstant.ADMIN_PRODUCT_SERVICE_DELETE_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_PRODUCT_SERVICE_DELETE_EXCEPTION, "AdminProductService@delete()", e.getMessage());
+            return GlobalResponse.failed("Failed to delete product data!", AdminConstant.ADMIN_PRODUCT_SERVICE_DELETE_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Successfully deleted product data!", null, request);
@@ -171,12 +179,12 @@ public class AdminProductService implements ICRUD<Product, Long>, IUploadWithVar
     @Override
     public ResponseEntity<Object> save(Product product, MultipartFile file, Map<String, MultipartFile> variants, HttpServletRequest request) {
         if( product == null ) {
-            return GlobalResponse.failed("Product data is required!", generateErrorCode("13", "001"), null, request);
+            return GlobalResponse.failed("Product data is required!", AdminConstant.ADMIN_PRODUCT_SERVICE_SAVE_FILE_REQUEST_INVALID, null, request);
         }
 
         String defaultImgUrl = cloudinaryService.uploadImageGetUrl("product", file);
         if( defaultImgUrl == null || defaultImgUrl.isEmpty() ) {
-            return GlobalResponse.failed("Failed to upload product image!", generateErrorCode("13", "002"), null, request);
+            return GlobalResponse.failed("Failed to upload product image!", AdminConstant.ADMIN_PRODUCT_SERVICE_SAVE_FILE_IMAGE_ERROR, null, request);
         }
 
         product.setDefaultImgLink(defaultImgUrl);
@@ -196,7 +204,7 @@ public class AdminProductService implements ICRUD<Product, Long>, IUploadWithVar
         }
 
         if( !variantValidationItems.isEmpty() ) {
-            return GlobalResponse.failed("Failed to upload variant image!", generateErrorCode("13", "003"), variantValidationItems, request);
+            return GlobalResponse.failed("Failed to upload variant image!", AdminConstant.ADMIN_PRODUCT_SERVICE_SAVE_FILE_VARIANT_FAILED, variantValidationItems, request);
         }
 
         return save(product, request);
@@ -205,17 +213,17 @@ public class AdminProductService implements ICRUD<Product, Long>, IUploadWithVar
     @Override
     public ResponseEntity<Object> update(Long id, Product product, MultipartFile file, Map<String, MultipartFile> variants, HttpServletRequest request) {
         if( id == null ) {
-            return GlobalResponse.failed("Product ID is required!", generateErrorCode("14", "001"), null, request);
+            return GlobalResponse.failed("Product ID is required!", AdminConstant.ADMIN_PRODUCT_SERVICE_UPDATE_FILE_ID_REQUIRED, null, request);
         }
 
         if( product == null ) {
-            return GlobalResponse.failed("Product data is required!", generateErrorCode("14", "002"), null, request);
+            return GlobalResponse.failed("Product data is required!", AdminConstant.ADMIN_PRODUCT_SERVICE_UPDATE_FILE_REQUEST_INVALID, null, request);
         }
 
         if( file != null ) {
             String defaultImgUrl = cloudinaryService.uploadImageGetUrl("product", file);
             if( defaultImgUrl == null || defaultImgUrl.isEmpty() ) {
-                return GlobalResponse.failed("Failed to upload product image!", generateErrorCode("14", "003"), null, request);
+                return GlobalResponse.failed("Failed to upload product image!", AdminConstant.ADMIN_PRODUCT_SERVICE_UPDATE_FILE_IMAGE_ERROR, null, request);
             }
 
             product.setDefaultImgLink(defaultImgUrl);
@@ -245,7 +253,7 @@ public class AdminProductService implements ICRUD<Product, Long>, IUploadWithVar
         }
 
         if( !variantValidationItems.isEmpty() ) {
-            return GlobalResponse.failed("Failed to upload variant image!", generateErrorCode("14", "004"), variantValidationItems, request);
+            return GlobalResponse.failed("Failed to upload variant image!", AdminConstant.ADMIN_PRODUCT_SERVICE_UPDATE_FILE_VARIANT_FAILED, variantValidationItems, request);
         }
 
         return update(id, product, request);

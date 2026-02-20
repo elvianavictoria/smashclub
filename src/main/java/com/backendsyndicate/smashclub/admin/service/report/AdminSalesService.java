@@ -7,12 +7,21 @@ import com.backendsyndicate.smashclub.admin.dto.relation.RelAdminTransactionList
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminTransactionDetailDTO;
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminTransactionListDTO;
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminTransactionStatisticDTO;
+import com.backendsyndicate.smashclub.admin.service.log.LogService;
+import com.backendsyndicate.smashclub.booking.dto.response.BookingResponse;
+import com.backendsyndicate.smashclub.booking.dto.response.CoachDetailResponse;
+import com.backendsyndicate.smashclub.booking.dto.response.EquipmentDetailResponse;
+import com.backendsyndicate.smashclub.booking.service.helper.BookingHelper;
+import com.backendsyndicate.smashclub.common.constant.AdminConstant;
 import com.backendsyndicate.smashclub.common.constant.TransactionConstant;
 import com.backendsyndicate.smashclub.common.constant.TransactionTypeConstant;
 import com.backendsyndicate.smashclub.common.util.DatetimeFormatting;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.common.util.Util;
+import com.backendsyndicate.smashclub.ecommerce.dto.response.RespOrderDetailDTO;
+import com.backendsyndicate.smashclub.ecommerce.dto.response.RespOrderItemDTO;
+import com.backendsyndicate.smashclub.ecommerce.service.helper.OrderHelper;
 import com.backendsyndicate.smashclub.payment.model.Transaction;
 import com.backendsyndicate.smashclub.payment.repo.TransactionRepo;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,6 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -40,11 +50,14 @@ import java.util.function.Function;
 public class AdminSalesService implements IStatistic {
     @Autowired
     private TransactionRepo transactionRepo;
-    private ModelMapper modelMapper = new ModelMapper();
+    @Autowired
+    private BookingHelper bookingHelper;
+    @Autowired
+    private OrderHelper orderHelper;
+    @Autowired
+    private LogService logService;
 
-    private String generateErrorCode(String methodNo, String errorNo) {
-        return "ADM-SLS" + "-" + methodNo + "-" + errorNo;
-    }
+    private ModelMapper modelMapper = new ModelMapper();
 
     /**
      * Display:
@@ -66,7 +79,7 @@ public class AdminSalesService implements IStatistic {
 
             BigDecimal totalTransaction = transactionRepo.sumTotalPriceByCreatedAt(startYear, endYear);
             BigDecimal averageTransaction = transactionRepo.averageTotalPriceByCreatedAt(startYear, endYear);
-            List<Map<String, Object>> monthlyTransaction = transactionRepo.findAllGroupByCreatedAt(startYear, endYear);
+            List<Map<String, Object>> monthlyTransaction = transactionRepo.findAllGroupByCreatedAtMonthly(startYear, endYear);
             List<ExtAdminTransactionMonthlyDTO> monthlyTransactionDTOs = new ArrayList<>();
 
             response = new RespAdminTransactionStatisticDTO();
@@ -77,8 +90,9 @@ public class AdminSalesService implements IStatistic {
             }
             response.setMonthlyTransactionValue(monthlyTransactionDTOs);
         } catch(Exception e) {
-            Logging.handleException("AdminSalesService", "statistic(LocalDate yearStart, HttpServletRequest request)", 55, generateErrorCode("01", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to get sales statistics!", generateErrorCode("01", "010"), null, request);
+            Logging.handleException("AdminSalesService", "statistic(LocalDate yearStart, HttpServletRequest request)", 55, AdminConstant.ADMIN_SALES_SERVICE_STATISTIC_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_SALES_SERVICE_STATISTIC_EXCEPTION, "AdminSalesService@statistic()", e.getMessage());
+            return GlobalResponse.failed("Failed to get sales statistics!", AdminConstant.ADMIN_SALES_SERVICE_STATISTIC_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Successfully fetch sales statistics!", response, request);
@@ -112,8 +126,9 @@ public class AdminSalesService implements IStatistic {
             });
             response.setTransactions(listDTO);
         } catch(Exception e) {
-            Logging.handleException("AdminSalesService", "list(LocalDate monthStart, HttpServletRequest request)", 83, generateErrorCode("02", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to get sales statistics!", generateErrorCode("02", "010"), null, request);
+            Logging.handleException("AdminSalesService", "list(LocalDate monthStart, HttpServletRequest request)", 83, AdminConstant.ADMIN_SALES_SERVICE_LIST_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_SALES_SERVICE_LIST_EXCEPTION, "AdminSalesService@list()", e.getMessage());
+            return GlobalResponse.failed("Failed to get sales statistics!", AdminConstant.ADMIN_SALES_SERVICE_LIST_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Successfully fetch sales statistics!", response, request);
@@ -121,7 +136,7 @@ public class AdminSalesService implements IStatistic {
 
     public ResponseEntity<Object> detail(String transactionCode, HttpServletRequest request) {
         if( transactionCode == null || transactionCode.isEmpty() ) {
-            return GlobalResponse.failed("Failed to get sales detail!", generateErrorCode("03", "001"), null, request);
+            return GlobalResponse.failed("Failed to get sales detail!", AdminConstant.ADMIN_SALES_SERVICE_DETAIL_CODE_REQUIRED, null, request);
         }
 
         RespAdminTransactionDetailDTO response = null;
@@ -129,7 +144,7 @@ public class AdminSalesService implements IStatistic {
         try {
             Optional<Transaction> opt = transactionRepo.findByTransactionCode(transactionCode);
             if( opt.isEmpty() ) {
-                return GlobalResponse.failed("Failed to get sales detail!", generateErrorCode("03", "002"), null, request);
+                return GlobalResponse.failed("Failed to get sales detail!", AdminConstant.ADMIN_SALES_SERVICE_DETAIL_NOT_FOUND, null, request);
             }
 
             // Map trx to DTO
@@ -140,11 +155,62 @@ public class AdminSalesService implements IStatistic {
             response.setUpdatedAt(DatetimeFormatting.getDatetimeFormat(transaction.getUpdatedAt()));
             response.setTransactionTypeDesc(TransactionTypeConstant.getTransactionType(transaction.getTransactionType()));
             response.setStatusDesc(TransactionConstant.getStatus(transaction.getStatus()));
+
+            List<ExtAdminTransactionItemDTO> itemList = new ArrayList<>();
+
             // Map item based on trx type
             switch( response.getTransactionType() ) {
                 case TransactionTypeConstant.COURT_BOOKING:
+                    BookingResponse booking = bookingHelper.getBookingDetails(response.getReferenceCode());
+                    if( booking != null ) {
+                        ExtAdminTransactionItemDTO court = new ExtAdminTransactionItemDTO();
+                        court.setItemName(booking.getCourt().getCourtCode() + " - " + booking.getCourt().getCourtName());
+                        court.setItemQty((int) Duration.between(booking.getStartTime(), booking.getEndTime()).toHours());
+                        court.setItemUnit("jam");
+                        court.setItemPrice(booking.getBasePrice());
+
+                        itemList.add(court);
+
+                        if( booking.getCoaches().size() > 0 ) {
+                            for(CoachDetailResponse item: booking.getCoaches()) {
+                                ExtAdminTransactionItemDTO coach = new ExtAdminTransactionItemDTO();
+                                coach.setItemName(item.getCoachCode() + " - " + item.getCoachName());
+                                coach.setItemQty(court.getItemQty());
+                                coach.setItemUnit("jam");
+                                coach.setItemPrice(item.getPricePerHour());
+
+                                itemList.add(coach);
+                            }
+                        }
+
+                        if( booking.getEquipment().size() > 0 ) {
+                            for(EquipmentDetailResponse item: booking.getEquipment()) {
+                                ExtAdminTransactionItemDTO equipment = new ExtAdminTransactionItemDTO();
+                                equipment.setItemName(item.getEquipmentName());
+                                equipment.setItemQty(item.getQuantity());
+                                equipment.setItemUnit("");
+                                equipment.setItemPrice(item.getEquipmentPrice());
+
+                                itemList.add(equipment);
+                            }
+                        }
+                    }
+
                     break;
                 case TransactionTypeConstant.ECOMMERCE_SHOPPING:
+                    RespOrderDetailDTO order = orderHelper.getOrderDetail(Long.parseLong(response.getReferenceCode()), response.getUser().getId());
+                    if( order != null ) {
+                        for(RespOrderItemDTO item: order.getItems()) {
+                            ExtAdminTransactionItemDTO orderItem = new ExtAdminTransactionItemDTO();
+                            orderItem.setItemName(item.getVariantName());
+                            orderItem.setItemQty(item.getQuantity());
+                            orderItem.setItemUnit("");
+                            orderItem.setItemPrice(item.getTotalPrice());
+
+                            itemList.add(orderItem);
+                        }
+                    }
+
                     break;
                 case TransactionTypeConstant.WALLET_TOPUP:
                     ExtAdminTransactionItemDTO walletTopup = new ExtAdminTransactionItemDTO();
@@ -153,13 +219,16 @@ public class AdminSalesService implements IStatistic {
                     walletTopup.setItemPrice(response.getTotalPrice());
                     walletTopup.setItemUnit("kali");
 
-                    response.setItems(List.of(walletTopup));
+                    itemList.add(walletTopup);
                     break;
             }
 
+            response.setItems(itemList);
+
         } catch(Exception e) {
-            Logging.handleException("AdminSalesService", "detail(String transactionCode, HttpServletRequest request)", 109, generateErrorCode("03", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to get sales statistics!", generateErrorCode("03", "010"), null, request);
+            Logging.handleException("AdminSalesService", "detail(String transactionCode, HttpServletRequest request)", 109, AdminConstant.ADMIN_SALES_SERVICE_DETAIL_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_SALES_SERVICE_DETAIL_EXCEPTION, "AdminSalesService@detail()", e.getMessage());
+            return GlobalResponse.failed("Failed to get sales statistics!", AdminConstant.ADMIN_SALES_SERVICE_DETAIL_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Successfully fetch sales statistics!", response, request);

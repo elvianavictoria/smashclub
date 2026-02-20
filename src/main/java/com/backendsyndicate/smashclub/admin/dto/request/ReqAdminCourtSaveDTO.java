@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,9 @@ public class ReqAdminCourtSaveDTO extends CustomRequestValidation {
     @NotNull(message="Close time is required!")
     @NotBlank(message="Close time is required!")
     private LocalTime closeTime;
+
+    @NotNull
+    private BigDecimal pricePerHour;
 
     @NotNull(message="Status is required!")
     private byte status;
@@ -64,6 +68,10 @@ public class ReqAdminCourtSaveDTO extends CustomRequestValidation {
 
         if( closeTime == null ) {
             validationObject.add(constructValidationItem("closeTime", "", "Close time is required!"));
+        }
+
+        if( pricePerHour == null ) {
+            validationObject.add(constructValidationItem("pricePerHour", "", "Price per hour is required!"));
         }
 
         if( !List.of(CommonConstant.STATUS_ACTIVE, CommonConstant.STATUS_INACTIVE).contains((int) status) ) {

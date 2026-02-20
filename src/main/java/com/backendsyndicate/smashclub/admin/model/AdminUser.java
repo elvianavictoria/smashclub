@@ -20,7 +20,7 @@ import java.util.Set;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(exclude = {"adminRole", "user"})
 
-public class AdminUser implements UserDetails {
+public class AdminUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
@@ -53,7 +53,6 @@ public class AdminUser implements UserDetails {
     private AdminRole adminRole;
 
     /** disini letak role dari user nya yang akan di baca di API nanti */
-    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<AdminPermission> lt = this.adminRole.getPermissionSet();
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();

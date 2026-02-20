@@ -70,7 +70,7 @@ public class OrderService implements IOrder {
         for (CartItem item : cart.getCartItems()) {
             Optional<ProductVariant> availVariant = productVariantRepo.findByIdAndSufficientStock(item.getVariant().getId(), item.getQuantity());
             if (availVariant.isEmpty()) {
-                Logging.handleException("OrderService", "buyNow", 144, generateErrorCode("02", "002"), "Product variant not found");
+                Logging.handleException("OrderService", "buyNow", 73, generateErrorCode("02", "002"), "Product variant not found");
             } else {
                 ProductVariant productVariant = availVariant.get();
                 productVariant.setStock(productVariant.getStock() - item.getQuantity());
@@ -135,7 +135,7 @@ public class OrderService implements IOrder {
     public RespCreateOrderDTO buyNow(String userId, ReqBuyNowDTO request) {
         Optional<ProductVariant> availVariant = productVariantRepo.findByIdAndSufficientStock(request.getVariantId(), request.getQuantity());
         if (availVariant.isEmpty()) {
-            Logging.handleException("OrderService", "buyNow", 144, generateErrorCode("02", "002"), "Product variant not found");
+            Logging.handleException("OrderService", "buyNow", 137, generateErrorCode("02", "002"), "Product variant not found");
         }
 
         ProductVariant productVariant = availVariant.get();
@@ -186,14 +186,14 @@ public class OrderService implements IOrder {
     public void updateOrderStatus(Long orderId, byte newStatus) {
         Optional<Order> optOrder = orderRepo.findById(orderId);
         if (optOrder.isEmpty()) {
-            Logging.handleException("OrderService", "updateOrderStatus", 178, generateErrorCode("03", "001"), "Order not found");
+            Logging.handleException("OrderService", "updateOrderStatus", 188, generateErrorCode("03", "001"), "Order not found");
         }
 
         Order order = optOrder.get();
         byte currentStatus = order.getStatus();
 
         if (!OrderStatusConstant.isValidTransition(currentStatus, newStatus)) {
-            Logging.handleException("OrderService", "updateOrderStatus(Long orderId, byte newStatus)", 180, generateErrorCode("03", "001"), "Invalid transition");
+            Logging.handleException("OrderService", "updateOrderStatus(Long orderId, byte newStatus)", 195, generateErrorCode("03", "001"), "Invalid transition");
         }
 
         order.setStatus(newStatus);
@@ -210,7 +210,7 @@ public class OrderService implements IOrder {
         Optional<Order> optOrder = orderRepo.findById(orderId);
 
         if (optOrder.isEmpty()) {
-            Logging.handleException("OrderService", "updateOrderStatus", 198, generateErrorCode("03", "001"), "Order not found");
+            Logging.handleException("OrderService", "updateOrderStatus", 212, generateErrorCode("03", "001"), "Order not found");
         }
 
         Order order = optOrder.get();
