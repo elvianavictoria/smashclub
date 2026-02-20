@@ -10,6 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class RespCartItemDTO {
+    private Long id;
     private RespCartDTO cart;
     private Long variantId;
     private int quantity;

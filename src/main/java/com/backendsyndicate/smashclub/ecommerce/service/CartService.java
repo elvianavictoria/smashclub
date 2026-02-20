@@ -148,7 +148,7 @@ public class CartService implements ICart {
         return "Cart cleared";
     }
 
-    private Cart getActiveCartEntity(String userId) {
+    public Cart getActiveCartEntity(String userId) {
         return cartRepo.findByUserIdAndStatus(userId, CartStatusConstant.CART_ACTIVE)
                 .orElseThrow(() -> new RuntimeException("Active cart not found"));
     }
