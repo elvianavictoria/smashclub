@@ -1,6 +1,7 @@
 package com.backendsyndicate.smashclub.booking.dto.response;
 
 import com.backendsyndicate.smashclub.booking.model.Booking;
+import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransactionDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,6 +28,7 @@ public class BookingResponse {
     private BigDecimal totalPrice;
     private Byte status;
     private LocalDateTime createdAt;
+    private RespCreateTransactionDTO respCreateTransactionDTO;
 
     // Court info
     private CourtInfo court;
@@ -49,6 +51,7 @@ public class BookingResponse {
                 .endTime(booking.getEndTime())
                 .durationHour(booking.getDurationHour())
                 .basePrice(booking.getBasePrice())
+                .respCreateTransactionDTO(respCreateTransactionDTO.getPaymentData())
                 .totalPrice(booking.getTotalPrice())
                 .status(booking.getStatus())
                 .createdAt(booking.getCreatedAt())

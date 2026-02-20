@@ -312,7 +312,6 @@ public class BookingService {
             Court court = courtRepository.findById(request.getCourtId()).orElseThrow();
             long durationHours = Duration.between(request.getStartTime(), request.getEndTime()).toHours();
             BigDecimal basePrice = calculateCourtPrice(court, durationHours);
-
             // 4. Create booking entity
             Booking booking = new Booking();
             booking.setBookingCode(bookingCodeGenerator.generate());
@@ -391,8 +390,20 @@ public class BookingService {
             booking.setTotalPrice(grandTotal);
             bookingRepository.save(booking);
 
+            RespCreateTransactionDTO paymentResponse = paymentService.createTransaction(
+                    booking.getUser().getId(),
+                    booking.getTotalPrice(),
+                    booking.getBookingCode(),
+                    TransactionTypeConstant.COURT_BOOKING
+            );
+
+            if (paymentResponse == null) {
+                throw new RuntimeException("Failed to create payment transaction");
+            }
+
             // 9. Build response
             BookingResponse response = buildBookingResponse(booking, coachDetails, equipmentDetails);
+            response.setRespCreateTransactionDTO(paymentResponse);
 
             log.info("Booking created successfully - bookingCode: {}", booking.getBookingCode());
 
