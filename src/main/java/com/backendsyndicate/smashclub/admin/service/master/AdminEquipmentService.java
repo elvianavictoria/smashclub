@@ -128,7 +128,7 @@ public class AdminEquipmentService implements ICRUD<Equipment, Long>, IUpload<Eq
             equipmentDB.setDescription(equipment.getDescription());
             equipmentDB.setStock(equipment.getStock());
             equipmentDB.setType(equipment.getType());
-//            if( equipment.getEquipmentImgLink() != null ) equipmentDB.setEquipmentImgLink(equipment.getEquipmentImgLink());
+            if( equipment.getEquipmentImgLink() != null ) equipmentDB.setEquipmentImgLink(equipment.getEquipmentImgLink());
             equipmentDB.setStatus(equipment.getStatus());
         } catch(Exception e) {
             Logging.handleException("EquipmentService", "update(Long id, Equipment equipment, HttpServletRequest request)", 92, generateErrorCode("04", "010"), e.getMessage());
@@ -170,7 +170,7 @@ public class AdminEquipmentService implements ICRUD<Equipment, Long>, IUpload<Eq
             return GlobalResponse.failed("Failed to upload equipment image!", generateErrorCode("13", "002"), null, request);
         }
 
-//            equipment.setEquipmentImgLink(equipmentImgLink);
+        equipment.setEquipmentImgLink(equipmentImgLink);
 
         ResponseEntity<Object> response = save(equipment, request);
 
@@ -193,7 +193,7 @@ public class AdminEquipmentService implements ICRUD<Equipment, Long>, IUpload<Eq
                 return GlobalResponse.failed("Failed to upload equipment image!", generateErrorCode("14", "003"), null, request);
             }
 
-//            equipment.setEquipmentImgLink(equipmentImgLink);
+            equipment.setEquipmentImgLink(equipmentImgLink);
         }
 
         ResponseEntity<Object> response = update(id, equipment, request);

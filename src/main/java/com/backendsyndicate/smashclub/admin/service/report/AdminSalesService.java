@@ -66,7 +66,7 @@ public class AdminSalesService implements IStatistic {
 
             BigDecimal totalTransaction = transactionRepo.sumTotalPriceByCreatedAt(startYear, endYear);
             BigDecimal averageTransaction = transactionRepo.averageTotalPriceByCreatedAt(startYear, endYear);
-            List<Map<String, Object>> monthlyTransaction = transactionRepo.findAllGroupByCreatedAt(startYear, endYear);
+            List<Map<String, Object>> monthlyTransaction = transactionRepo.findAllGroupByCreatedAtMonthly(startYear, endYear);
             List<ExtAdminTransactionMonthlyDTO> monthlyTransactionDTOs = new ArrayList<>();
 
             response = new RespAdminTransactionStatisticDTO();

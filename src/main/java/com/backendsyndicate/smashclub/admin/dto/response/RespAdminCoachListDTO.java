@@ -15,6 +15,7 @@ public class RespAdminCoachListDTO {
     private String coachName;
     private BigDecimal pricePerHour;
     private byte status;
+    private String coachImgLink;
     private String createdAt;
     private String updatedAt;
 }

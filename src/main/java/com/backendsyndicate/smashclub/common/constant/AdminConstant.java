@@ -102,4 +102,7 @@ public class AdminConstant {
     public static final String PRODUCT_IMG_KATSURICE_VAR_1 = "https://images.unsplash.com/photo-1591814252471-068b545dff62?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8a2F0c3UlMjByaWNlfGVufDB8fDB8fHwy";
     public static final String PRODUCT_IMG_WILSON_RACQUET = "https://images.unsplash.com/photo-1542144582-1ba00456b5e3?q=80&w=778&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
     public static final String PRODUCT_IMG_WILSON_RACQUET_VAR_1 = "https://images.unsplash.com/photo-1602211847326-dd96f7c45f10?q=80&w=715&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+
+    // Error Codes
+    public static final String ADMIN_DASHBOARD_SERVICE_DASHBOARD_EXCEPTION = "ADMDSBRD-01E010";
 }

@@ -9,6 +9,8 @@ import com.backendsyndicate.smashclub.common.constant.TransactionTypeConstant;
 import com.backendsyndicate.smashclub.payment.core.IWallet;
 import com.backendsyndicate.smashclub.payment.dto.request.ReqUpdateBalanceDTO;
 import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransactionDTO;
+import com.backendsyndicate.smashclub.payment.dto.response.RespGetBalanceInfoDTO;
+import com.backendsyndicate.smashclub.payment.dto.response.RespGetBalanceLogDTO;
 import com.backendsyndicate.smashclub.payment.dto.response.RespUpdateBalanceDTO;
 import com.backendsyndicate.smashclub.payment.model.Wallet;
 import com.backendsyndicate.smashclub.payment.model.WalletLog;
@@ -26,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * Module Code: WLLT
@@ -57,7 +60,7 @@ public class WalletService implements IWallet {
             return GlobalResponse.failed("Auth Token is invalid!", TransactionConstant.WALLET_SERVICE_ERROR_BALANCE_USERID_REQUIRED, null, request);
         }
 
-        Wallet wallet = null;
+        RespGetBalanceInfoDTO response = null;
 
         try {
             Optional<Wallet> optionalWallet = walletRepo.findByUserId(userId);
@@ -65,7 +68,8 @@ public class WalletService implements IWallet {
                 return GlobalResponse.failed("Wallet data not found!", TransactionConstant.WALLET_SERVICE_ERROR_BALANCE_WALLET_NOT_FOUND, null, request);
             }
 
-            wallet = optionalWallet.get();
+            Wallet wallet = optionalWallet.get();
+            response = modelMapper.map(wallet, RespGetBalanceInfoDTO.class);
 
         } catch(Exception e) {
             Logging.handleException("Wallet Service", "getBalance(String userId, HttpServletRequest request)", 74, TransactionConstant.WALLET_SERVICE_ERROR_BALANCE_EXCEPTION, e.getMessage());
@@ -73,7 +77,7 @@ public class WalletService implements IWallet {
             return GlobalResponse.failed("Wallet info not found!", TransactionConstant.WALLET_SERVICE_ERROR_BALANCE_EXCEPTION, null, request);
         }
 
-        return GlobalResponse.success("Successfully get wallet info!", wallet, request);
+        return GlobalResponse.success("Successfully get wallet info!", response, request);
     }
 
     /**
@@ -95,6 +99,13 @@ public class WalletService implements IWallet {
             if( page.isEmpty() ) {
                 return GlobalResponse.failed("Wallet log not found!", TransactionConstant.WALLET_SERVICE_ERROR_LOG_EMPTY, null, request);
             }
+
+            page = page.map(new Function<WalletLog, RespGetBalanceLogDTO>() {
+                @Override
+                public RespGetBalanceLogDTO apply(WalletLog log) {
+                    return mapLogToDTO(log);
+                }
+            });
         } catch(Exception e) {
             Logging.handleException("Wallet Service", "getBalanceLog(String userId, LocalDate startDate, LocalDate endDate, Pageable pageable,  HttpServletRequest request)", 97, TransactionConstant.WALLET_SERVICE_ERROR_LOG_EXCEPTION, e.getMessage());
             logService.writeErrorLog(TransactionConstant.WALLET_SERVICE_ERROR_LOG_EXCEPTION, "WalletService@getBalanceLog()", e.getMessage());
@@ -222,5 +233,10 @@ public class WalletService implements IWallet {
         log.setWallet(wallet);
 
         walletLogRepo.save(log);
+    }
+
+    private RespGetBalanceLogDTO mapLogToDTO(WalletLog log) {
+        RespGetBalanceLogDTO result = modelMapper.map(log, RespGetBalanceLogDTO.class);
+        return result;
     }
 }

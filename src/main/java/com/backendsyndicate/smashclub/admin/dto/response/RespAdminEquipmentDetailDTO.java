@@ -16,6 +16,7 @@ public class RespAdminEquipmentDetailDTO {
     private String brand;
     private String type;
     private BigDecimal price;
+    private String equipmentImgLink;
     private int stock;
     private int status;
     private RelAdminEquipmentEquipmentCategoryDTO equipmentCategory;

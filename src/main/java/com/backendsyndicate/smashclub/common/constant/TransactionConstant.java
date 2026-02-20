@@ -53,7 +53,9 @@ public class TransactionConstant {
     public static final String PAYMENT_SERVICE_ERROR_CANCEL_WALLET_TOPUP = "PYMT-03E002";
     public static final String PAYMENT_SERVICE_ERROR_CANCEL_CANCELLED = "PYMT-03E003";
     public static final String PAYMENT_SERVICE_ERROR_CANCEL_EXCEPTION = "PYMT-03E010";
-//    public static final String PAYMENT_SERVICE_ERROR_EXPIRE_
+    public static final String PAYMENT_SERVICE_ERROR_EXPIRE_TRX_NOT_FOUND = "PYMT-04E001";
+    public static final String PAYMENT_SERVICE_ERROR_EXPIRE_STATUS_NOT_ALLOWED = "PYMT-04E002";
+    public static final String PAYMENT_SERVICE_ERROR_EXPIRE_EXCEPTION = "PYMT-04E010";
 
     public static void initLoad() {
         loadStatus();

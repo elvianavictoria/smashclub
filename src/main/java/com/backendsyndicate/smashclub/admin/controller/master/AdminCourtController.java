@@ -15,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.time.LocalTime;
 
 @RestController
@@ -46,6 +47,7 @@ public class AdminCourtController {
             @RequestParam String courtName,
             @RequestParam LocalTime openTime,
             @RequestParam LocalTime closeTime,
+            @RequestParam BigDecimal pricePerHour,
             @RequestParam byte status,
             HttpServletRequest request
     ) {
@@ -54,6 +56,7 @@ public class AdminCourtController {
         dto.setCourtName(courtName);
         dto.setOpenTime(openTime);
         dto.setCloseTime(closeTime);
+        dto.setPricePerHour(pricePerHour);
         dto.setStatus(status);
         dto.validate();
 
@@ -62,7 +65,7 @@ public class AdminCourtController {
         }
 
         Court court = modelMapper.map(dto, Court.class);
-        return adminCourtService.save(court, request);
+        return adminCourtService.save(court, courtImgLink, request);
     }
 
     @PreAuthorize("hasAuthority('" + PermissionConstant.COURT_EDIT_CODE + "')")
@@ -75,6 +78,7 @@ public class AdminCourtController {
             @RequestParam String courtName,
             @RequestParam LocalTime openTime,
             @RequestParam LocalTime closeTime,
+            @RequestParam BigDecimal pricePerHour,
             @RequestParam byte status,
             HttpServletRequest request
     ) {
@@ -83,6 +87,7 @@ public class AdminCourtController {
         dto.setCourtName(courtName);
         dto.setOpenTime(openTime);
         dto.setCloseTime(closeTime);
+        dto.setPricePerHour(pricePerHour);
         dto.setStatus(status);
         dto.validate();
 
@@ -91,7 +96,7 @@ public class AdminCourtController {
         }
 
         Court court = modelMapper.map(dto, Court.class);
-        return adminCourtService.update(courtId, court, request);
+        return adminCourtService.update(courtId, court, courtImgLink, request);
     }
 
     @PreAuthorize("hasAuthority('" + PermissionConstant.COURT_DELETE_CODE + "')")

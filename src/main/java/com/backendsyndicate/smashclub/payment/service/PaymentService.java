@@ -68,8 +68,6 @@ public class PaymentService implements IPayment {
 
     private ModelMapper modelMapper = new ModelMapper();
 
-    private String generateErrorCode(String a, String b) { return ""; }
-
     /**
      * Code: 01
      * Steps:
@@ -297,13 +295,13 @@ public class PaymentService implements IPayment {
         try {
             Transaction trx = getTransaction(transactionCode);
             if( trx == null ) {
-                Logging.handleException("PaymentService", "expireTransaction(String transactionCode)", 152, generateErrorCode("04", "001"), "Transaction not found!");
+                Logging.handleException("PaymentService", "expireTransaction(String transactionCode)", 152, TransactionConstant.PAYMENT_SERVICE_ERROR_EXPIRE_TRX_NOT_FOUND, "Transaction not found!");
                 return null;
             }
             int previousStatus = trx.getStatus();
 
             if( !TransactionConstant.isStatusAllowed(previousStatus, TransactionConstant.PAYMENT_EXPIRED) ) {
-                Logging.handleException("PaymentService", "expireTransaction(String transactionCode)", 158, generateErrorCode("04", "002"), "Status update is not allowed!");
+                Logging.handleException("PaymentService", "expireTransaction(String transactionCode)", 158, TransactionConstant.PAYMENT_SERVICE_ERROR_EXPIRE_STATUS_NOT_ALLOWED, "Status update is not allowed!");
                 return null;
             }
 
@@ -316,7 +314,8 @@ public class PaymentService implements IPayment {
             response.setTransactionType(trx.getTransactionType());
             response.setUser(modelMapper.map(trx.getUser(), RelTransactionUserDTO.class));
         } catch(Exception e) {
-            Logging.handleException("PaymentService", "expireTransaction(String transactionCode)", 147, generateErrorCode("04", "010"), e.getMessage());
+            Logging.handleException("PaymentService", "expireTransaction(String transactionCode)", 147, TransactionConstant.PAYMENT_SERVICE_ERROR_EXPIRE_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(TransactionConstant.PAYMENT_SERVICE_ERROR_EXPIRE_EXCEPTION, "PaymentService@expireTransaction()", e.getMessage());
         }
 
         return response;

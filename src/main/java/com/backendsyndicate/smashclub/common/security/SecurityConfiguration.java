@@ -189,6 +189,10 @@ public class SecurityConfiguration {
                                 "/api/v1/booking/{bookingCode}/complete"
                         ).authenticated()
 
+                        .requestMatchers(
+                                "/api/v1/wallet/**"
+                        ).authenticated()
+
                         // Sisanya butuh login
                         .anyRequest().authenticated()
                 )

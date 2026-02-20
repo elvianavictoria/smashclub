@@ -125,7 +125,8 @@ public class AdminCourtService implements ICRUD<Court, Long>, IUpload<Court, Lon
             courtDB.setCourtName(court.getCourtName());
             courtDB.setOpenTime(court.getOpenTime());
             courtDB.setCloseTime(court.getCloseTime());
-//            if( court.getCourtImgLink() != null ) courtDB.setCourtImgLink(court.getCourtImgLink());
+            courtDB.setPricePerHour(court.getPricePerHour());
+            if( court.getCourtImgLink() != null ) courtDB.setCourtImgLink(court.getCourtImgLink());
             courtDB.setStatus(court.getStatus());
         } catch(Exception e) {
             Logging.handleException("CourtService", "update(Long id, Court court, HttpServletRequest request)", 94, generateErrorCode("04", "010"), e.getMessage());
@@ -167,7 +168,7 @@ public class AdminCourtService implements ICRUD<Court, Long>, IUpload<Court, Lon
             return GlobalResponse.failed("Failed to upload court image!", generateErrorCode("13", "002"), null, request);
         }
 
-//            court.setCourtImgLink(courtImgLink);
+        court.setCourtImgLink(courtImgLink);
 
         ResponseEntity<Object> response = save(court, request);
 
@@ -190,7 +191,7 @@ public class AdminCourtService implements ICRUD<Court, Long>, IUpload<Court, Lon
                 return GlobalResponse.failed("Failed to upload court image!", generateErrorCode("14", "003"), null, request);
             }
 
-//            court.setCourtImgLink(courtImgLink);
+            court.setCourtImgLink(courtImgLink);
         }
 
         ResponseEntity<Object> response = update(id, court, request);

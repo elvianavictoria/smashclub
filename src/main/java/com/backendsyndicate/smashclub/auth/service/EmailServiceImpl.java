@@ -73,7 +73,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendActivationEmail(String toEmail, String token) {
         try {
-            String activationLink = frontendUrl + "/api/v1/auth/verify?token=" + token + "verify_email";
+            String activationLink = frontendUrl + "/verify?token=" + token + "verify_email";
             String subject = "Verifikasi Email - " + appName;
 //            String emailContent = buildActivationEmail(activationLink);
 //            sendEmail(toEmail, subject, emailContent);

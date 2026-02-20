@@ -122,7 +122,7 @@ public class AdminCoachService implements ICRUD<Coach, Long>, IUpload<Coach, Lon
             coachDB.setCoachCode(coach.getCoachCode());
             coachDB.setCoachName(coach.getCoachName());
             coachDB.setPricePerHour(coach.getPricePerHour());
-//            if( coach.getCoachImgLink() != null ) coachDB.setCoachImgLink(coach.getCoachImgLink());
+            if( coach.getCoachImgLink() != null ) coachDB.setCoachImgLink(coach.getCoachImgLink());
             coachDB.setStatus(coach.getStatus());
         } catch(Exception e) {
             Logging.handleException("CoachService", "update(Long id, Coach coach, HttpServletRequest request)", 94, generateErrorCode("04", "010"), e.getMessage());
@@ -164,7 +164,7 @@ public class AdminCoachService implements ICRUD<Coach, Long>, IUpload<Coach, Lon
             return GlobalResponse.failed("Failed to upload coach image!", generateErrorCode("13", "003"), null, request);
         }
 
-//            coach.setCoachImgLink(coachImgLink);
+        coach.setCoachImgLink(coachImgLink);
 
         ResponseEntity<Object> response = save(coach, request);
 
@@ -187,7 +187,7 @@ public class AdminCoachService implements ICRUD<Coach, Long>, IUpload<Coach, Lon
                 return GlobalResponse.failed("Failed to upload coach image!", generateErrorCode("14", "003"), null, request);
             }
 
-//            coach.setCoachImgLink(coachImgLink);
+            coach.setCoachImgLink(coachImgLink);
         }
 
         ResponseEntity<Object> response = update(id, coach, request);
