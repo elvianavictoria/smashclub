@@ -24,6 +24,8 @@ public interface TransactionRepo extends JpaRepository<Transaction, Long> {
     Page<Transaction> findAllByCreatedAtBetweenAndTransactionCodeContainsIgnoreCase(LocalDateTime startDate, LocalDateTime endDate, String transactionCode, Pageable pageable);
     // Transaction Detail
     Optional<Transaction> findByTransactionCode(String transactionCode);
+    // Get By Reference Code
+    Optional<Transaction> findByReferenceCode(String referenceCode);
 
     // Statistic Related
     @Query(value="SELECT SUM(t.totalPrice) FROM Transaction t WHERE t.createdAt BETWEEN ?1 AND ?2")

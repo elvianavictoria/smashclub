@@ -5,7 +5,9 @@ import com.backendsyndicate.smashclub.admin.model.AdminUser;
 import com.backendsyndicate.smashclub.admin.repo.AdminSessionRepo;
 import com.backendsyndicate.smashclub.admin.security.jwt.AdminJwtModel;
 import com.backendsyndicate.smashclub.admin.security.jwt.AdminJwtUtility;
+import com.backendsyndicate.smashclub.admin.service.log.LogService;
 import com.backendsyndicate.smashclub.common.config.AdminJwtConfig;
+import com.backendsyndicate.smashclub.common.constant.AdminConstant;
 import com.backendsyndicate.smashclub.common.constant.CommonConstant;
 import com.backendsyndicate.smashclub.common.security.Crypto;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
@@ -25,14 +27,12 @@ public class AdminSessionService {
     private AdminSessionRepo adminSessionRepo;
     @Autowired
     private AdminJwtUtility adminJwtUtility;
-
-    private String generateErrorCode(String methodNo, String errorNo) {
-        return "ADM-SESS" + "-" + methodNo + "-" + errorNo;
-    }
+    @Autowired
+    private LogService logService;
 
     protected AdminJwtModel getSessionData(String accessToken) {
         if( accessToken.isEmpty() ) {
-            Logging.handleException("AuthService", "getSessionData(String accessToken)", 35, generateErrorCode("01", "001"), "Session token is empty!");
+            Logging.handleException("AuthService", "getSessionData(String accessToken)", 35, AdminConstant.ADMIN_SESSION_SERVICE_GET_TOKEN_REQUIRED, "Session token is empty!");
         }
 
         AdminJwtModel sessionData = null;
@@ -40,13 +40,14 @@ public class AdminSessionService {
         try {
             boolean isValid = isSessionValid(accessToken);
             if( !isValid ) {
-                Logging.handleException("AuthService", "getSessionData(String accessToken)", 43, generateErrorCode("01", "002"), "Invalid session!");
+                Logging.handleException("AuthService", "getSessionData(String accessToken)", 43, AdminConstant.ADMIN_SESSION_SERVICE_GET_TOKEN_INVALID, "Invalid session!");
                 return sessionData;
             }
 
             sessionData = adminJwtUtility.mapToken(accessToken);
         } catch(Exception e) {
-            Logging.handleException("AuthService", "getSessionData(String accessToken)", 41, generateErrorCode("01", "010"), e.getMessage());
+            Logging.handleException("AuthService", "getSessionData(String accessToken)", 41, AdminConstant.ADMIN_SESSION_SERVICE_GET_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_SESSION_SERVICE_GET_EXCEPTION, "AdminSessionService@getSessionData()", e.getMessage());
         }
 
         return sessionData;
@@ -99,7 +100,8 @@ public class AdminSessionService {
 
             return accessToken;
         } catch(Exception e) {
-            Logging.handleException("AuthService", "saveSession(long userId, String username, String fullName)", 61, generateErrorCode("02", "010"), e.getMessage());
+            Logging.handleException("AuthService", "saveSession(long userId, String username, String fullName)", 61, AdminConstant.ADMIN_SESSION_SERVICE_SAVE_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_SESSION_SERVICE_SAVE_EXCEPTION, "AdminSessionService@saveSession()", e.getMessage());
             return "";
         }
     }
@@ -115,7 +117,7 @@ public class AdminSessionService {
     protected boolean invalidateToken(String token) {
         Optional<AdminSession> currentSession = adminSessionRepo.findByLoginToken(token);
         if( currentSession.isEmpty() ) {
-            Logging.handleException("AuthService", "invalidateToken(String token)", 114, generateErrorCode("03", "010"), "Session token " + token + " not found!");
+            Logging.handleException("AuthService", "invalidateToken(String token)", 114, AdminConstant.ADMIN_SESSION_SERVICE_INVALIDATE_TOKEN_INVALID, "Session token " + token + " not found!");
             return false;
         }
 
@@ -127,7 +129,7 @@ public class AdminSessionService {
 
     public boolean isSessionValid(String accessToken) {
         if( accessToken.isEmpty() ) {
-            Logging.handleException("AuthService", "getSessionData(String accessToken)", 126, generateErrorCode("04", "010"), "Access token is empty!");
+            Logging.handleException("AuthService", "getSessionData(String accessToken)", 126, AdminConstant.ADMIN_SESSION_SERVICE_ISVALID_TOKEN_REQUIRED, "Access token is empty!");
         }
 
         boolean isValid = false;
@@ -137,7 +139,8 @@ public class AdminSessionService {
             Logging.printConsole("Active session count found: " + activeSessionCount);
             isValid = activeSessionCount > 0;
         } catch(Exception e) {
-            Logging.handleException("AuthService", "isSessionValid(String token)", 130, generateErrorCode("04", "010"), e.getMessage());
+            Logging.handleException("AuthService", "isSessionValid(String token)", 130, AdminConstant.ADMIN_SESSION_SERVICE_ISVALID_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_SESSION_SERVICE_ISVALID_EXCEPTION, "AdminSessionService@getSessionData()", e.getMessage());
         }
 
         return isValid;

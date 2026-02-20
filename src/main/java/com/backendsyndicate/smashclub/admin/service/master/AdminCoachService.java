@@ -3,8 +3,10 @@ package com.backendsyndicate.smashclub.admin.service.master;
 import com.backendsyndicate.smashclub.admin.core.ICRUD;
 import com.backendsyndicate.smashclub.admin.core.IUpload;
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminCoachListDTO;
+import com.backendsyndicate.smashclub.admin.service.log.LogService;
 import com.backendsyndicate.smashclub.booking.model.Coach;
 import com.backendsyndicate.smashclub.booking.repo.CoachRepo;
+import com.backendsyndicate.smashclub.common.constant.AdminConstant;
 import com.backendsyndicate.smashclub.common.util.DatetimeFormatting;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
@@ -30,11 +32,10 @@ public class AdminCoachService implements ICRUD<Coach, Long>, IUpload<Coach, Lon
     private CoachRepo coachRepo;
     @Autowired
     private CloudinaryService cloudinaryService;
-    private ModelMapper modelMapper = new ModelMapper();
+    @Autowired
+    private LogService logService;
 
-    private String generateErrorCode(String methodNo, String errorNo) {
-        return "ADM-CCH" + "-" + methodNo + "-" + errorNo;
-    }
+    private ModelMapper modelMapper = new ModelMapper();
 
     @Override
     public ResponseEntity<Object> findAll(String keyword, Integer status, Pageable pageable, HttpServletRequest request) {
@@ -47,7 +48,7 @@ public class AdminCoachService implements ICRUD<Coach, Long>, IUpload<Coach, Lon
                 page = coachRepo.findAll(pageable);
             }
             if( page.isEmpty() ) {
-                return GlobalResponse.failed("Coach list is empty!", generateErrorCode("01", "001"), null, request);
+                return GlobalResponse.failed("Coach list is empty!", AdminConstant.ADMIN_COACH_SERVICE_LIST_EMPTY, null, request);
             }
 
             page = page.map(new Function<Coach, RespAdminCoachListDTO>() {
@@ -57,8 +58,9 @@ public class AdminCoachService implements ICRUD<Coach, Long>, IUpload<Coach, Lon
                 }
             });
         } catch(Exception e) {
-            Logging.handleException("CoachService", "findAll(Pageable pageable, HttpServletRequest request)", 35, generateErrorCode("01", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to get coach list!", generateErrorCode("01", "010"), null, request);
+            Logging.handleException("CoachService", "findAll(Pageable pageable, HttpServletRequest request)", 35, AdminConstant.ADMIN_COACH_SERVICE_LIST_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_COACH_SERVICE_LIST_EXCEPTION, "AdminCoachService@findAll()", e.getMessage());
+            return GlobalResponse.failed("Failed to get coach list!", AdminConstant.ADMIN_COACH_SERVICE_LIST_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Successfully get coach list!", page, request);
@@ -69,18 +71,20 @@ public class AdminCoachService implements ICRUD<Coach, Long>, IUpload<Coach, Lon
         Coach coach = null;
 
         if( id == null ) {
-            return GlobalResponse.failed("Coach ID is required!", generateErrorCode("02", "001"), null, request);
+            return GlobalResponse.failed("Coach ID is required!", AdminConstant.ADMIN_COACH_SERVICE_DETAIL_ID_REQUIRED, null, request);
         }
 
         try {
             Optional<Coach> optionalCoach = coachRepo.findById(id);
             if( optionalCoach.isEmpty() ) {
-                return GlobalResponse.failed("Coach not found!", generateErrorCode("02", "002"), null, request);
+                return GlobalResponse.failed("Coach not found!", AdminConstant.ADMIN_COACH_SERVICE_DETAIL_NOT_FOUND, null, request);
             }
 
             coach = optionalCoach.get();
         } catch(Exception e) {
-            return GlobalResponse.failed("Failed to get coach data!", generateErrorCode("02", "010"), null, request);
+            Logging.handleException("CoachService", "findAll(Pageable pageable, HttpServletRequest request)", 35, AdminConstant.ADMIN_COACH_SERVICE_DETAIL_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_COACH_SERVICE_DETAIL_EXCEPTION, "AdminCoachService@findById()", e.getMessage());
+            return GlobalResponse.failed("Failed to get coach data!", AdminConstant.ADMIN_COACH_SERVICE_DETAIL_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Coach data found!", coach, request);
@@ -89,14 +93,15 @@ public class AdminCoachService implements ICRUD<Coach, Long>, IUpload<Coach, Lon
     @Override
     public ResponseEntity<Object> save(Coach coach, HttpServletRequest request) {
         if( coach == null ) {
-            return GlobalResponse.failed("Coach data is required!", generateErrorCode("03", "001"), null, request);
+            return GlobalResponse.failed("Coach data is required!", AdminConstant.ADMIN_COACH_SERVICE_SAVE_REQUEST_INVALID, null, request);
         }
 
         try {
             coachRepo.save(coach);
         } catch(Exception e) {
-            Logging.handleException("CoachService", "save(Coach coach, HttpServletRequest request)", 75, generateErrorCode("03", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to save coach data!", generateErrorCode("03", "010"), null, request);
+            Logging.handleException("CoachService", "save(Coach coach, HttpServletRequest request)", 75, AdminConstant.ADMIN_COACH_SERVICE_SAVE_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_COACH_SERVICE_SAVE_EXCEPTION, "AdminCoachService@save()", e.getMessage());
+            return GlobalResponse.failed("Failed to save coach data!", AdminConstant.ADMIN_COACH_SERVICE_SAVE_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Successfully save coach data!", null, request);
@@ -105,17 +110,17 @@ public class AdminCoachService implements ICRUD<Coach, Long>, IUpload<Coach, Lon
     @Override
     public ResponseEntity<Object> update(Long id, Coach coach, HttpServletRequest request) {
         if( id == null ) {
-            return GlobalResponse.failed("Coach ID is required!", generateErrorCode("04", "001"), null, request);
+            return GlobalResponse.failed("Coach ID is required!", AdminConstant.ADMIN_COACH_SERVICE_UPDATE_ID_REQUIRED, null, request);
         }
 
         if( coach == null ) {
-            return GlobalResponse.failed("Coach data is required!", generateErrorCode("04", "002"), null, request);
+            return GlobalResponse.failed("Coach data is required!", AdminConstant.ADMIN_COACH_SERVICE_UPDATE_REQUEST_INVALID, null, request);
         }
 
         try {
             Optional<Coach> optionalCoach = coachRepo.findById(id);
             if( optionalCoach.isEmpty() ) {
-                return GlobalResponse.failed("Coach data not found!", generateErrorCode("04", "003"), null, request);
+                return GlobalResponse.failed("Coach data not found!", AdminConstant.ADMIN_COACH_SERVICE_UPDATE_NOT_FOUND, null, request);
             }
 
             Coach coachDB = optionalCoach.get();
@@ -125,8 +130,9 @@ public class AdminCoachService implements ICRUD<Coach, Long>, IUpload<Coach, Lon
             if( coach.getCoachImgLink() != null ) coachDB.setCoachImgLink(coach.getCoachImgLink());
             coachDB.setStatus(coach.getStatus());
         } catch(Exception e) {
-            Logging.handleException("CoachService", "update(Long id, Coach coach, HttpServletRequest request)", 94, generateErrorCode("04", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to update coach data!", generateErrorCode("04", "010"), null, request);
+            Logging.handleException("CoachService", "update(Long id, Coach coach, HttpServletRequest request)", 94, AdminConstant.ADMIN_COACH_SERVICE_UPDATE_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_COACH_SERVICE_UPDATE_EXCEPTION, "AdminCoachService@update()", e.getMessage());
+            return GlobalResponse.failed("Failed to update coach data!", AdminConstant.ADMIN_COACH_SERVICE_UPDATE_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Successfully updated coach data!", null, request);
@@ -135,19 +141,20 @@ public class AdminCoachService implements ICRUD<Coach, Long>, IUpload<Coach, Lon
     @Override
     public ResponseEntity<Object> delete(Long id, HttpServletRequest request) {
         if( id == null ) {
-            return GlobalResponse.failed("Coach ID is required!", generateErrorCode("05", "001"), null, request);
+            return GlobalResponse.failed("Coach ID is required!", AdminConstant.ADMIN_COACH_SERVICE_DELETE_ID_REQUIRED, null, request);
         }
 
         try {
             Optional<Coach> optionalCoach = coachRepo.findById(id);
             if( optionalCoach.isEmpty() ) {
-                return GlobalResponse.failed("Coach data not found!", generateErrorCode("05", "002"), null, request);
+                return GlobalResponse.failed("Coach data not found!", AdminConstant.ADMIN_COACH_SERVICE_DELETE_NOT_FOUND, null, request);
             }
 
             coachRepo.deleteById(id);
         } catch(Exception e) {
-            Logging.handleException("CoachService", "delete(Long id, HttpServletRequest request)", 122, generateErrorCode("05", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to delete coach data!", generateErrorCode("05", "010"), null, request);
+            Logging.handleException("CoachService", "delete(Long id, HttpServletRequest request)", 122, AdminConstant.ADMIN_COACH_SERVICE_DELETE_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_COACH_SERVICE_DELETE_EXCEPTION, "AdminCoachService@delete()", e.getMessage());
+            return GlobalResponse.failed("Failed to delete coach data!", AdminConstant.ADMIN_COACH_SERVICE_DELETE_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Successfully deleted coach data!", null, request);
@@ -156,12 +163,14 @@ public class AdminCoachService implements ICRUD<Coach, Long>, IUpload<Coach, Lon
     @Override
     public ResponseEntity<Object> save(Coach coach, MultipartFile file, HttpServletRequest request) {
         if( coach == null ) {
-            return GlobalResponse.failed("Coach data is required!", generateErrorCode("13", "001"), null, request);
+            return GlobalResponse.failed("Coach data is required!", AdminConstant.ADMIN_COACH_SERVICE_SAVE_FILE_REQUEST_INVALID, null, request);
         }
 
         String coachImgLink = cloudinaryService.uploadImageGetUrl("coach", file);
         if( coachImgLink == null || coachImgLink.isEmpty() ) {
-            return GlobalResponse.failed("Failed to upload coach image!", generateErrorCode("13", "003"), null, request);
+            Logging.handleException("AdminCoachService", "save(Coach coach, MultipartFile file, HttpServletRequest request)", 184, AdminConstant.ADMIN_COACH_SERVICE_SAVE_FILE_IMAGE_ERROR, "Failed to upload image!");
+            logService.writeErrorLog(AdminConstant.ADMIN_COACH_SERVICE_SAVE_FILE_IMAGE_ERROR, "AdminCoachService@save()", "Failed to upload image!");
+            return GlobalResponse.failed("Failed to upload coach image!", AdminConstant.ADMIN_COACH_SERVICE_SAVE_FILE_IMAGE_ERROR, null, request);
         }
 
         coach.setCoachImgLink(coachImgLink);
@@ -174,17 +183,19 @@ public class AdminCoachService implements ICRUD<Coach, Long>, IUpload<Coach, Lon
     @Override
     public ResponseEntity<Object> update(Long id, Coach coach, MultipartFile file, HttpServletRequest request) {
         if( id == null ) {
-            return GlobalResponse.failed("Coach ID is required!", generateErrorCode("14", "001"), null, request);
+            return GlobalResponse.failed("Coach ID is required!", AdminConstant.ADMIN_COACH_SERVICE_UPDATE_FILE_ID_REQUIRED, null, request);
         }
 
         if( coach == null ) {
-            return GlobalResponse.failed("Coach data is required!", generateErrorCode("14", "002"), null, request);
+            return GlobalResponse.failed("Coach data is required!", AdminConstant.ADMIN_COACH_SERVICE_UPDATE_FILE_REQUEST_INVALID, null, request);
         }
 
         if( file != null ) {
             String coachImgLink = cloudinaryService.uploadImageGetUrl("coach", file);
             if( coachImgLink == null || coachImgLink.isEmpty() ) {
-                return GlobalResponse.failed("Failed to upload coach image!", generateErrorCode("14", "003"), null, request);
+                Logging.handleException("AdminCoachService", "update(Long id, Coach coach, MultipartFile file, HttpServletRequest request)", 184, AdminConstant.ADMIN_COACH_SERVICE_UPDATE_FILE_IMAGE_ERROR, "Failed to upload image!");
+                logService.writeErrorLog(AdminConstant.ADMIN_COACH_SERVICE_UPDATE_FILE_IMAGE_ERROR, "AdminCoachService@update()", "Failed to upload image!");
+                return GlobalResponse.failed("Failed to upload coach image!", AdminConstant.ADMIN_COACH_SERVICE_UPDATE_FILE_IMAGE_ERROR, null, request);
             }
 
             coach.setCoachImgLink(coachImgLink);

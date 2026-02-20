@@ -56,6 +56,10 @@ public class TransactionConstant {
     public static final String PAYMENT_SERVICE_ERROR_EXPIRE_TRX_NOT_FOUND = "PYMT-04E001";
     public static final String PAYMENT_SERVICE_ERROR_EXPIRE_STATUS_NOT_ALLOWED = "PYMT-04E002";
     public static final String PAYMENT_SERVICE_ERROR_EXPIRE_EXCEPTION = "PYMT-04E010";
+    public static final String PAYMENT_SERVICE_ERROR_UPDATE_STATUS_REFERENCE_CODE_REQUIRED = "PYMT-05E001";
+    public static final String PAYMENT_SERVICE_ERROR_UPDATE_STATUS_TRX_NOT_FOUND = "PYMT-05E002";
+    public static final String PAYMENT_SERVICE_ERROR_UPDATE_STATUS_NOT_ALLOWED = "PYMT-05E003";
+    public static final String PAYMENT_SERVICE_ERROR_UPDATE_STATUS_EXCEPTION = "PYMT-05E010";
 
     public static void initLoad() {
         loadStatus();

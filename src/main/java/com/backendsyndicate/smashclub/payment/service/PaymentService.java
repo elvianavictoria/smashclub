@@ -321,6 +321,51 @@ public class PaymentService implements IPayment {
         return response;
     }
 
+    /**
+     * Code: 05
+     * 1. Find transaction based on referenceCode
+     * 2. Check status flow
+     * 3. Update status
+     *
+     * @param referenceCode
+     * @param status
+     * @return
+     */
+    public boolean updateTransactionStatus(String referenceCode, int status) {
+        if( referenceCode == null || referenceCode.isEmpty() ) {
+            Logging.handleException("PaymentService", "updateTransactionStatus(String referenceCode, status)", 336, TransactionConstant.PAYMENT_SERVICE_ERROR_UPDATE_STATUS_REFERENCE_CODE_REQUIRED, "Reference code is required!");
+            return false;
+        }
+
+        try {
+            Optional<Transaction> opt = transactionRepo.findByReferenceCode(referenceCode);
+            if( opt.isEmpty() ) {
+                Logging.handleException("PaymentService", "updateTransactionStatus(String referenceCode, status)", 343, TransactionConstant.PAYMENT_SERVICE_ERROR_UPDATE_STATUS_TRX_NOT_FOUND, "Transaction not found!");
+                return false;
+            }
+
+            Transaction transaction = opt.get();
+            if( !TransactionConstant.isStatusAllowed(transaction.getStatus(), status) ) {
+                Logging.handleException("PaymentService", "updateTransactionStatus(String referenceCode, status)", 349, TransactionConstant.PAYMENT_SERVICE_ERROR_UPDATE_STATUS_NOT_ALLOWED, "Failed to update transaction status!");
+                return false;
+            }
+
+            transaction.setStatus((byte) status);
+        } catch(Exception e) {
+            Logging.handleException("PaymentService", "updateTransactionStatus(String referenceCode, status)", 341, TransactionConstant.PAYMENT_SERVICE_ERROR_UPDATE_STATUS_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(TransactionConstant.PAYMENT_SERVICE_ERROR_UPDATE_STATUS_EXCEPTION, "PaymentService@updateTransactionStatus()", e.getMessage());
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     *
+     * @param transactionCode
+     * @return
+     */
     protected Transaction getTransaction(String transactionCode) {
         Optional<Transaction> optionalTrx = transactionRepo.findByTransactionCode(transactionCode);
         if( optionalTrx.isEmpty() ) return null;

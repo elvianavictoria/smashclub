@@ -10,7 +10,9 @@ import com.backendsyndicate.smashclub.admin.repo.AdminSessionRepo;
 import com.backendsyndicate.smashclub.admin.repo.AdminUserRepo;
 import com.backendsyndicate.smashclub.admin.security.jwt.AdminJwtModel;
 import com.backendsyndicate.smashclub.admin.security.jwt.AdminJwtUtility;
+import com.backendsyndicate.smashclub.admin.service.log.LogService;
 import com.backendsyndicate.smashclub.common.config.AdminJwtConfig;
+import com.backendsyndicate.smashclub.common.constant.AdminConstant;
 import com.backendsyndicate.smashclub.common.constant.CommonConstant;
 import com.backendsyndicate.smashclub.common.security.Crypto;
 import com.backendsyndicate.smashclub.common.security.PasswordHasher;
@@ -47,18 +49,16 @@ public class AdminAuthService implements IAuth {
     private AdminSessionService adminSessionService;
     @Autowired
     private CloudinaryService cloudinaryService;
+    @Autowired
+    private LogService logService;
 
     private ModelMapper modelMapper = new ModelMapper();
     private PasswordHasher passwordHasher = new PasswordHasher();
 
-    private String generateErrorCode(String methodNo, String errorNo) {
-        return "ADM-AUTH" + "-" + methodNo + "-" + errorNo;
-    }
-
     @Override
     public ResponseEntity<Object> login(String username, String password, HttpServletRequest request) {
         if( username == null || password == null ) {
-            return GlobalResponse.failed("Credential is empty!", generateErrorCode("01", "001"), null, request);
+            return GlobalResponse.failed("Credential is empty!", AdminConstant.ADMIN_AUTH_SERVICE_LOGIN_REQUEST_INVALID, null, request);
         }
 
         RespAdminLoginDTO response = null;
@@ -66,27 +66,28 @@ public class AdminAuthService implements IAuth {
         try {
             AdminUser user = getUser(username);
             if( user == null ) {
-                return GlobalResponse.failed("Login invalid!", generateErrorCode("01", "002"), null, request);
+                return GlobalResponse.failed("Login invalid!", AdminConstant.ADMIN_AUTH_SERVICE_LOGIN_NOT_FOUND, null, request);
             }
 
             if( user.getPassword() == null || !passwordHasher.verify(password, user.getPassword()) ) {
-                return GlobalResponse.failed("Login invalid!", generateErrorCode("01", "003"), null, request);
+                return GlobalResponse.failed("Login invalid!", AdminConstant.ADMIN_AUTH_SERVICE_LOGIN_PASSWORD_INVALID, null, request);
             }
 
             if( user.getStatus() != CommonConstant.STATUS_ACTIVE) {
-                return GlobalResponse.failed("Account is locked!", generateErrorCode("01", "004"), null, request);
+                return GlobalResponse.failed("Account is locked!", AdminConstant.ADMIN_AUTH_SERVICE_LOGIN_STATUS_INACTIVE, null, request);
             }
 
             String accessToken = adminSessionService.saveSession(user.getId(), user.getUsername(), user.getFullName());
             if( accessToken.isEmpty() ) {
-                return GlobalResponse.failed("Failed to login!", generateErrorCode("01", "005"), null, request);
+                return GlobalResponse.failed("Failed to login!", AdminConstant.ADMIN_AUTH_SERVICE_LOGIN_TOKEN_INVALID, null, request);
             }
 
             response = modelMapper.map(user, RespAdminLoginDTO.class);
             response.setAccessToken(accessToken);
         } catch(Exception e) {
-            Logging.handleException("AuthService", "login(String username, String password, HttpServletRequest request)", 35, generateErrorCode("01", "010"), e.getMessage());
-            return GlobalResponse.failed("Login failed!", generateErrorCode("01", "010"), null, request);
+            Logging.handleException("AuthService", "login(String username, String password, HttpServletRequest request)", 67, AdminConstant.ADMIN_AUTH_SERVICE_LOGIN_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_AUTH_SERVICE_LOGIN_EXCEPTION, "AdminAuthService@login()", e.getMessage());
+            return GlobalResponse.failed("Login failed!", AdminConstant.ADMIN_AUTH_SERVICE_LOGIN_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Successfully login admin page!", response, request);
@@ -102,12 +103,13 @@ public class AdminAuthService implements IAuth {
             response.setLoggedOut(invalidated);
 
             if( !response.isLoggedOut() ) {
-                return GlobalResponse.failed("Logout failed!", generateErrorCode("02", "001"), response, request);
+                return GlobalResponse.failed("Logout failed!", AdminConstant.ADMIN_AUTH_SERVICE_LOGOUT_FAILED, response, request);
             }
 
         } catch(Exception e) {
-            Logging.handleException("AuthService", "logout(String accessToken, HttpServletRequest request)", 89, generateErrorCode("02", "010"), e.getMessage());
-            return GlobalResponse.failed("Logout failed!", generateErrorCode("02", "010"), response, request);
+            Logging.handleException("AuthService", "logout(String accessToken, HttpServletRequest request)", 89, AdminConstant.ADMIN_AUTH_SERVICE_LOGOUT_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_AUTH_SERVICE_LOGOUT_EXCEPTION, "AdminAuthService@logout()", e.getMessage());
+            return GlobalResponse.failed("Logout failed!", AdminConstant.ADMIN_AUTH_SERVICE_LOGOUT_EXCEPTION, response, request);
         }
 
         return GlobalResponse.success("Logout success!", response, request);
@@ -125,7 +127,7 @@ public class AdminAuthService implements IAuth {
     @Override
     public ResponseEntity<Object> isAuthenticated(String accessToken, HttpServletRequest request) {
         if( accessToken.isEmpty() ) {
-            return GlobalResponse.unauthorized("Unauthorized access!", generateErrorCode("03", "001"), request);
+            return GlobalResponse.unauthorized("Unauthorized access!", AdminConstant.ADMIN_AUTH_SERVICE_AUTHENTICATED_TOKEN_REQUIRED, request);
         }
 
         RespAdminLoginDTO response = null;
@@ -133,23 +135,24 @@ public class AdminAuthService implements IAuth {
         try {
             AdminJwtModel data = adminSessionService.getSessionData(accessToken);
             if( data == null ) {
-                return GlobalResponse.unauthorized("Unauthorized access!", generateErrorCode("03", "002"), request);
+                return GlobalResponse.unauthorized("Unauthorized access!", AdminConstant.ADMIN_AUTH_SERVICE_AUTHENTICATED_TOKEN_INVALID, request);
             }
 
             AdminUser user = getUser(data.getUsername());
             if( user == null ) {
-                return GlobalResponse.unauthorized("Unauthorized access!", generateErrorCode("03", "003"), request);
+                return GlobalResponse.unauthorized("Unauthorized access!", AdminConstant.ADMIN_AUTH_SERVICE_AUTHENTICATED_NOT_FOUND, request);
             }
 
             if( user.getStatus() != CommonConstant.STATUS_ACTIVE) {
-                return GlobalResponse.failed("Account is locked!", generateErrorCode("03", "004"), null, request);
+                return GlobalResponse.failed("Account is locked!", AdminConstant.ADMIN_AUTH_SERVICE_AUTHENTICATED_STATUS_INACTIVE, null, request);
             }
 
             response = modelMapper.map(user, RespAdminLoginDTO.class);
             response.setAccessToken(accessToken);
         } catch(Exception e) {
-            Logging.handleException("AuthService", "isAuthenticated(String accessToken, HttpServletRequest request)", 130, generateErrorCode("03", "010"), e.getMessage());
-            return GlobalResponse.unauthorized("Unauthenticated!", generateErrorCode("03", "010"), request);
+            Logging.handleException("AuthService", "isAuthenticated(String accessToken, HttpServletRequest request)", 130, AdminConstant.ADMIN_AUTH_SERVICE_AUTHENTICATED_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_AUTH_SERVICE_AUTHENTICATED_EXCEPTION, "AdminAuthService@isAuthenticated()", e.getMessage());
+            return GlobalResponse.unauthorized("Unauthenticated!", AdminConstant.ADMIN_AUTH_SERVICE_AUTHENTICATED_EXCEPTION, request);
         }
 
         return GlobalResponse.success("This user is authenticated!", response, request);
@@ -180,7 +183,8 @@ public class AdminAuthService implements IAuth {
                 }
             }
         } catch(Exception e) {
-            Logging.handleException("AuthService", "getUser(String username)", 155, generateErrorCode("04", "010"), e.getMessage());
+            Logging.handleException("AuthService", "getUser(String username)", 155, AdminConstant.ADMIN_AUTH_SERVICE_GET_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_AUTH_SERVICE_GET_EXCEPTION, "AdminAuthService@getUser()", e.getMessage());
             return null;
         }
 
@@ -199,7 +203,7 @@ public class AdminAuthService implements IAuth {
      */
     public ResponseEntity<Object> update(String accessToken, AdminUser user, MultipartFile profilePicture, HttpServletRequest request) {
         if( accessToken.isEmpty() ) {
-            return GlobalResponse.unauthorized("Failed to update user profile!", generateErrorCode("05", "001"), request);
+            return GlobalResponse.unauthorized("Failed to update user profile!", AdminConstant.ADMIN_AUTH_SERVICE_UPDATE_TOKEN_REQUIRED, request);
         }
 
         RespAdminUserDetailDTO response = null;
@@ -207,7 +211,7 @@ public class AdminAuthService implements IAuth {
         try {
             AdminJwtModel data = adminSessionService.getSessionData(accessToken);
             if( data == null ) {
-                return GlobalResponse.failed("Failed to update user profile!", generateErrorCode("05", "002"), null, request);
+                return GlobalResponse.failed("Failed to update user profile!", AdminConstant.ADMIN_AUTH_SERVICE_UPDATE_TOKEN_INVALID, null, request);
             }
 
             String profilePictureLink = "";
@@ -217,7 +221,7 @@ public class AdminAuthService implements IAuth {
 
             AdminUser userDB = getUser(data.getUsername());
             if( userDB == null ) {
-                return GlobalResponse.failed("Failed to update user profile!", generateErrorCode("05", "003"), null, request);
+                return GlobalResponse.failed("Failed to update user profile!", AdminConstant.ADMIN_AUTH_SERVICE_UPDATE_NOT_FOUND, null, request);
             }
 
             userDB.setUsername(user.getUsername());
@@ -227,8 +231,9 @@ public class AdminAuthService implements IAuth {
 
             response = modelMapper.map(userDB, RespAdminUserDetailDTO.class);
         } catch(Exception e) {
-            Logging.handleException("AuthService", "update(String authToken, AdminUser user, MultipartFile profilePicture, HttpServletRequest request)", 190, generateErrorCode("05", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to update user profile!", generateErrorCode("05", "010"), null, request);
+            Logging.handleException("AuthService", "update(String authToken, AdminUser user, MultipartFile profilePicture, HttpServletRequest request)", 190, AdminConstant.ADMIN_AUTH_SERVICE_UPDATE_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_AUTH_SERVICE_UPDATE_EXCEPTION, "AdminAuthService@update()", e.getMessage());
+            return GlobalResponse.failed("Failed to update user profile!", AdminConstant.ADMIN_AUTH_SERVICE_UPDATE_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Success", response, request);

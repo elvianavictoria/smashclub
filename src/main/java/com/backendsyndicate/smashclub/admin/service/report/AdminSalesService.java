@@ -7,6 +7,8 @@ import com.backendsyndicate.smashclub.admin.dto.relation.RelAdminTransactionList
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminTransactionDetailDTO;
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminTransactionListDTO;
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminTransactionStatisticDTO;
+import com.backendsyndicate.smashclub.admin.service.log.LogService;
+import com.backendsyndicate.smashclub.common.constant.AdminConstant;
 import com.backendsyndicate.smashclub.common.constant.TransactionConstant;
 import com.backendsyndicate.smashclub.common.constant.TransactionTypeConstant;
 import com.backendsyndicate.smashclub.common.util.DatetimeFormatting;
@@ -40,11 +42,10 @@ import java.util.function.Function;
 public class AdminSalesService implements IStatistic {
     @Autowired
     private TransactionRepo transactionRepo;
-    private ModelMapper modelMapper = new ModelMapper();
+    @Autowired
+    private LogService logService;
 
-    private String generateErrorCode(String methodNo, String errorNo) {
-        return "ADM-SLS" + "-" + methodNo + "-" + errorNo;
-    }
+    private ModelMapper modelMapper = new ModelMapper();
 
     /**
      * Display:
@@ -77,8 +78,9 @@ public class AdminSalesService implements IStatistic {
             }
             response.setMonthlyTransactionValue(monthlyTransactionDTOs);
         } catch(Exception e) {
-            Logging.handleException("AdminSalesService", "statistic(LocalDate yearStart, HttpServletRequest request)", 55, generateErrorCode("01", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to get sales statistics!", generateErrorCode("01", "010"), null, request);
+            Logging.handleException("AdminSalesService", "statistic(LocalDate yearStart, HttpServletRequest request)", 55, AdminConstant.ADMIN_SALES_SERVICE_STATISTIC_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_SALES_SERVICE_STATISTIC_EXCEPTION, "AdminSalesService@statistic()", e.getMessage());
+            return GlobalResponse.failed("Failed to get sales statistics!", AdminConstant.ADMIN_SALES_SERVICE_STATISTIC_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Successfully fetch sales statistics!", response, request);
@@ -112,8 +114,9 @@ public class AdminSalesService implements IStatistic {
             });
             response.setTransactions(listDTO);
         } catch(Exception e) {
-            Logging.handleException("AdminSalesService", "list(LocalDate monthStart, HttpServletRequest request)", 83, generateErrorCode("02", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to get sales statistics!", generateErrorCode("02", "010"), null, request);
+            Logging.handleException("AdminSalesService", "list(LocalDate monthStart, HttpServletRequest request)", 83, AdminConstant.ADMIN_SALES_SERVICE_LIST_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_SALES_SERVICE_LIST_EXCEPTION, "AdminSalesService@list()", e.getMessage());
+            return GlobalResponse.failed("Failed to get sales statistics!", AdminConstant.ADMIN_SALES_SERVICE_LIST_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Successfully fetch sales statistics!", response, request);
@@ -121,7 +124,7 @@ public class AdminSalesService implements IStatistic {
 
     public ResponseEntity<Object> detail(String transactionCode, HttpServletRequest request) {
         if( transactionCode == null || transactionCode.isEmpty() ) {
-            return GlobalResponse.failed("Failed to get sales detail!", generateErrorCode("03", "001"), null, request);
+            return GlobalResponse.failed("Failed to get sales detail!", AdminConstant.ADMIN_SALES_SERVICE_DETAIL_CODE_REQUIRED, null, request);
         }
 
         RespAdminTransactionDetailDTO response = null;
@@ -129,7 +132,7 @@ public class AdminSalesService implements IStatistic {
         try {
             Optional<Transaction> opt = transactionRepo.findByTransactionCode(transactionCode);
             if( opt.isEmpty() ) {
-                return GlobalResponse.failed("Failed to get sales detail!", generateErrorCode("03", "002"), null, request);
+                return GlobalResponse.failed("Failed to get sales detail!", AdminConstant.ADMIN_SALES_SERVICE_DETAIL_NOT_FOUND, null, request);
             }
 
             // Map trx to DTO
@@ -158,8 +161,9 @@ public class AdminSalesService implements IStatistic {
             }
 
         } catch(Exception e) {
-            Logging.handleException("AdminSalesService", "detail(String transactionCode, HttpServletRequest request)", 109, generateErrorCode("03", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to get sales statistics!", generateErrorCode("03", "010"), null, request);
+            Logging.handleException("AdminSalesService", "detail(String transactionCode, HttpServletRequest request)", 109, AdminConstant.ADMIN_SALES_SERVICE_DETAIL_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_SALES_SERVICE_DETAIL_EXCEPTION, "AdminSalesService@detail()", e.getMessage());
+            return GlobalResponse.failed("Failed to get sales statistics!", AdminConstant.ADMIN_SALES_SERVICE_DETAIL_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Successfully fetch sales statistics!", response, request);
