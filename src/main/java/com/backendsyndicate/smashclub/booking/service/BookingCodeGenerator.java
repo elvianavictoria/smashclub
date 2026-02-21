@@ -1,21 +1,34 @@
 package com.backendsyndicate.smashclub.booking.service;
 
+import com.backendsyndicate.smashclub.booking.repository.BookingRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class BookingCodeGenerator {
 
     private static final DateTimeFormatter DATE_FORMATTER =
             DateTimeFormatter.ofPattern("yyMMdd");
-    private static final AtomicInteger counter = new AtomicInteger(1);
+
+    @Autowired
+    private BookingRepository bookingRepository;
 
     public String generate() {
-        String datePart = LocalDateTime.now().format(DATE_FORMATTER);
-        String sequencePart = String.format("%04d", counter.getAndIncrement() % 10000);
+        LocalDate today = LocalDate.now();
+        String datePart = today.format(DATE_FORMATTER);
+
+        // Hitung jumlah booking yang sudah ada di hari ini
+        long todayBookingCount = bookingRepository.countByBookingDate(today);
+
+        // Sequence number = jumlah hari ini + 1
+        long sequence = todayBookingCount + 1;
+
+        String sequencePart = String.format("%04d", sequence);
+
         return "BK-" + datePart + "-" + sequencePart;
     }
 }
