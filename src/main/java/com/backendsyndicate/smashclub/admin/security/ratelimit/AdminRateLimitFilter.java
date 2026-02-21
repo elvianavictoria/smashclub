@@ -44,6 +44,7 @@ public class AdminRateLimitFilter extends OncePerRequestFilter {
             } else {
                 Logging.printConsole("Too many request from IP: " + clientIp);
                 response.setHeader("Content-Type","application/json");
+                response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
                 Map<String, Object> data = new ResponseHandler().constructResponseFormat(
                         "Too many request!",
                         HttpStatus.TOO_MANY_REQUESTS,
@@ -57,6 +58,7 @@ public class AdminRateLimitFilter extends OncePerRequestFilter {
             Logging.handleException("AdminRateLimitFilter","doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) ", 40, "RTLMT-010", e.getMessage() + "; Request: " + RequestCapture.allRequest(request));
 
             response.setHeader("Content-Type","application/json");
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             Map<String, Object> data = new ResponseHandler().constructResponseFormat(
                     "Internal server error!",
                     HttpStatus.INTERNAL_SERVER_ERROR,
