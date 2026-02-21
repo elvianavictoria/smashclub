@@ -14,6 +14,8 @@ import java.util.Optional;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
+    @Query("SELECT COUNT(b) FROM Booking b WHERE b.bookingDate = :date")
+    long countByBookingDate(@Param("date") LocalDate date);
 
     Optional<Booking> findByBookingCode(String bookingCode);
 
