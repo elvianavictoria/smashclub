@@ -60,7 +60,7 @@ public class AdminCoachController {
         }
 
         Coach coach = modelMapper.map(dto, Coach.class);
-        return adminCoachService.save(coach, request);
+        return adminCoachService.save(coach, coachImgLink, request);
     }
 
     @PreAuthorize("hasAuthority('" + PermissionConstant.COACH_EDIT_CODE + "')")
@@ -87,7 +87,7 @@ public class AdminCoachController {
         }
 
         Coach coach = modelMapper.map(dto, Coach.class);
-        return adminCoachService.update(coachId, coach, request);
+        return adminCoachService.update(coachId, coach, coachImgLink, request);
     }
 
     @PreAuthorize("hasAuthority('" + PermissionConstant.COACH_DELETE_CODE + "')")

@@ -24,6 +24,8 @@ public interface TransactionRepo extends JpaRepository<Transaction, Long> {
     Page<Transaction> findAllByCreatedAtBetweenAndTransactionCodeContainsIgnoreCase(LocalDateTime startDate, LocalDateTime endDate, String transactionCode, Pageable pageable);
     // Transaction Detail
     Optional<Transaction> findByTransactionCode(String transactionCode);
+    // Get By Reference Code
+    Optional<Transaction> findByReferenceCode(String referenceCode);
 
     // Statistic Related
     @Query(value="SELECT SUM(t.totalPrice) FROM Transaction t WHERE t.createdAt BETWEEN ?1 AND ?2")
@@ -31,5 +33,8 @@ public interface TransactionRepo extends JpaRepository<Transaction, Long> {
     @Query(value="SELECT AVG(t.totalPrice) FROM Transaction t WHERE t.createdAt BETWEEN ?1 AND ?2")
     BigDecimal averageTotalPriceByCreatedAt(LocalDateTime startDate, LocalDateTime endDate);
     @Query(value="SELECT FORMAT(t.createdAt, 'MMMM yyyy') AS month, COUNT(t) AS totalTransactionCount, SUM(t.totalPrice) AS totalTransactionValue, AVG(t.totalPrice) AS avgTransactionValue FROM Transaction t WHERE t.createdAt BETWEEN ?1 AND ?2 GROUP BY FORMAT(t.createdAt, 'MMMM yyyy')")
-    List<Map<String, Object>> findAllGroupByCreatedAt(LocalDateTime startDate, LocalDateTime endDate);
+    List<Map<String, Object>> findAllGroupByCreatedAtMonthly(LocalDateTime startDate, LocalDateTime endDate);
+
+    @Query(value="SELECT FORMAT(t.createdAt, 'dddd, dd MMMM yyyy') AS month, COUNT(t) AS totalTransactionCount, SUM(t.totalPrice) AS totalTransactionValue, AVG(t.totalPrice) AS avgTransactionValue FROM Transaction t WHERE t.createdAt BETWEEN ?1 AND ?2 GROUP BY FORMAT(t.createdAt, 'dddd, dd MMMM yyyy')")
+    List<Map<String, Object>> findAllGroupByCreatedAtDaily(LocalDateTime startDate, LocalDateTime endDate);
 }

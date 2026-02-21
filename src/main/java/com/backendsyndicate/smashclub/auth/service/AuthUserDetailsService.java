@@ -6,6 +6,7 @@ import com.backendsyndicate.smashclub.common.constant.AuthenticationConstant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,7 +19,6 @@ import java.util.Collections;
 @RequiredArgsConstructor
 @Slf4j
 public class AuthUserDetailsService implements UserDetailsService {
-
     private final UserRepository userRepository;
 
     @Override
@@ -32,18 +32,33 @@ public class AuthUserDetailsService implements UserDetailsService {
                     return new UsernameNotFoundException("User tidak ditemukan: " + userId);
                 });
 
-        // Map status ke Spring Security account status
+        // Map status ke Spring Security's account status
         boolean isAccountLocked = user.getStatus() == AuthenticationConstant.LOCKED;
         boolean isAccountDisabled = user.getStatus() == AuthenticationConstant.PENDING;
+        boolean isAccountExpired = false; // Bisa diatur sesuai kebutuhan
+        boolean isCredentialsExpired = false; // Bisa diatur sesuai kebutuhan
 
         log.debug("User loaded: {}, status: {}", user.getEmail(), user.getStatus());
 
         return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getId())
+                .username(user.getId()) // Gunakan ID sebagai username
                 .password(user.getPasswordHash())
                 .authorities(Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")))
                 .accountLocked(isAccountLocked)
                 .disabled(isAccountDisabled)
+                .accountExpired(isAccountExpired)
+                .credentialsExpired(isCredentialsExpired)
                 .build();
+    }
+
+    /**
+     * Helper method untuk mendapatkan User entity dari SecurityContext
+     * Bisa dipanggil di controller dengan:
+     * User user = ((AuthUserDetailsService)userDetailsService).getCurrentUser();
+     */
+    public User getCurrentUser() {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Current user not found"));
     }
 }

@@ -2,6 +2,8 @@ package com.backendsyndicate.smashclub.admin.service.report;
 
 import com.backendsyndicate.smashclub.admin.dto.relation.RelAdminTransactionListDTO;
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminRefundRequestListDTO;
+import com.backendsyndicate.smashclub.admin.service.log.LogService;
+import com.backendsyndicate.smashclub.common.constant.AdminConstant;
 import com.backendsyndicate.smashclub.common.constant.CommonConstant;
 import com.backendsyndicate.smashclub.common.constant.TransactionConstant;
 import com.backendsyndicate.smashclub.common.service.TemplateService;
@@ -44,11 +46,10 @@ public class AdminRefundRequestService {
     private WalletService walletService;
     @Autowired
     private MailService mailService;
-    private ModelMapper modelMapper = new ModelMapper();
+    @Autowired
+    private LogService logService;
 
-    private String generateErrorCode(String methodNo, String errorNo) {
-        return "ADM-RRQ" + "-" + methodNo + "-" + errorNo;
-    }
+    private ModelMapper modelMapper = new ModelMapper();
 
     public ResponseEntity<Object> list(LocalDate startDate, LocalDate endDate, String keyword, Integer status, Pageable pageable, HttpServletRequest request) {
         Page<RespAdminRefundRequestListDTO> response = null;
@@ -56,7 +57,7 @@ public class AdminRefundRequestService {
         try {
             Page<RefundRequest> page = refundRequestList(LocalDateTime.of(startDate, LocalTime.of(0, 0)), LocalDateTime.of(endDate, LocalTime.of(0, 0)), status, pageable);
             if( page == null || page.isEmpty() ) {
-                return GlobalResponse.failed("Failed to get refund request list!", generateErrorCode("01", "001"), null, request);
+                return GlobalResponse.failed("Failed to get refund request list!", AdminConstant.ADMIN_REFUND_REQUEST_SERVICE_LIST_EMPTY, null, request);
             }
 
             response = page.map(new Function<RefundRequest, RespAdminRefundRequestListDTO>() {
@@ -67,8 +68,9 @@ public class AdminRefundRequestService {
             });
 
         } catch(Exception e) {
-            Logging.handleException("AdminRefundRequestService", "list(LocalDate startDate, LocalDate endDate, Pageable pageable, HttpServletRequest request)", 32, generateErrorCode("01", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to get refund request list!", generateErrorCode("01", "010"), null, request);
+            Logging.handleException("AdminRefundRequestService", "list(LocalDate startDate, LocalDate endDate, Pageable pageable, HttpServletRequest request)", 32, AdminConstant.ADMIN_REFUND_REQUEST_SERVICE_LIST_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_REFUND_REQUEST_SERVICE_LIST_EXCEPTION, "AdminRefundRequestService@list()", e.getMessage());
+            return GlobalResponse.failed("Failed to get refund request list!", AdminConstant.ADMIN_REFUND_REQUEST_SERVICE_LIST_EXCEPTION, null, request);
 
         }
 
@@ -77,7 +79,7 @@ public class AdminRefundRequestService {
 
     public ResponseEntity<Object> process(Long id, int refundStatus, String refundNotes, HttpServletRequest request) {
         if( id == null ) {
-            return GlobalResponse.failed("Failed to process refund request list!", generateErrorCode("02", "001"), null, request);
+            return GlobalResponse.failed("Failed to process refund request list!", AdminConstant.ADMIN_REFUND_REQUEST_SERVICE_PROCESS_ID_REQUIRED, null, request);
         }
 
         String action = "processed";
@@ -85,12 +87,12 @@ public class AdminRefundRequestService {
         try {
             Optional<RefundRequest> opt = refundRequestRepo.findById(id);
             if( opt.isEmpty() ) {
-                return GlobalResponse.failed("Failed to process refund request!", generateErrorCode("02", "002"), null, request);
+                return GlobalResponse.failed("Failed to process refund request!", AdminConstant.ADMIN_REFUND_REQUEST_SERVICE_PROCESS_NOT_FOUND, null, request);
             }
 
             RefundRequest refundRequest = opt.get();
             if( refundRequest.getRefundStatus() != TransactionConstant.REFUND_REQUESTED ) {
-                return GlobalResponse.failed("This refund request has been processed!", generateErrorCode("02", "003"), null, request);
+                return GlobalResponse.failed("This refund request has been processed!", AdminConstant.ADMIN_REFUND_REQUEST_SERVICE_PROCESS_PROCESSED, null, request);
             }
 
             refundRequest.setRefundStatus((byte) refundStatus);
@@ -122,8 +124,9 @@ public class AdminRefundRequestService {
                 mailService.sendMail(TemplateService.TEMPLATE_REFUND_NOTIFY_REJECTED, refundRequest.getTransaction().getUser().getEmail(), "Smashclub - Update Pengajuan Pengembalian Dana", data);
             }
         } catch(Exception e) {
-            Logging.handleException("AdminRefundRequestService", "process(long id, int refundStatus, String notes, HttpServletRequest request)", 59, generateErrorCode("01", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to get refund request list!", generateErrorCode("02", "010"), null, request);
+            Logging.handleException("AdminRefundRequestService", "process(long id, int refundStatus, String notes, HttpServletRequest request)", 59, AdminConstant.ADMIN_REFUND_REQUEST_SERVICE_PROCESS_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_REFUND_REQUEST_SERVICE_PROCESS_EXCEPTION, "AdminRefundRequestService@process()", e.getMessage());
+            return GlobalResponse.failed("Failed to get refund request list!", AdminConstant.ADMIN_REFUND_REQUEST_SERVICE_PROCESS_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success(String.format("Successfully %s refund request!", action), null, request);

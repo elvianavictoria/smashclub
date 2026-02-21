@@ -6,7 +6,9 @@ import com.backendsyndicate.smashclub.admin.dto.response.RespAdminUserDetailDTO;
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminUserListDTO;
 import com.backendsyndicate.smashclub.admin.model.AdminUser;
 import com.backendsyndicate.smashclub.admin.repo.AdminUserRepo;
+import com.backendsyndicate.smashclub.admin.service.log.LogService;
 import com.backendsyndicate.smashclub.booking.model.Court;
+import com.backendsyndicate.smashclub.common.constant.AdminConstant;
 import com.backendsyndicate.smashclub.common.constant.CommonConstant;
 import com.backendsyndicate.smashclub.common.security.PasswordHasher;
 import com.backendsyndicate.smashclub.common.util.DatetimeFormatting;
@@ -35,12 +37,11 @@ public class AdminUserService implements ICRUD<AdminUser, Long>, IUpload<AdminUs
     private AdminUserRepo adminUserRepo;
     @Autowired
     private CloudinaryService cloudinaryService;
+    @Autowired
+    private LogService logService;
+
     private ModelMapper modelMapper = new ModelMapper();
     private PasswordHasher passwordHasher = new PasswordHasher();
-
-    private String generateErrorCode(String methodNo, String errorNo) {
-        return "ADM-USER" + "-" + methodNo + "-" + errorNo;
-    }
 
     @Override
     public ResponseEntity<Object> findAll(String keyword, Integer status, Pageable pageable, HttpServletRequest request) {
@@ -50,7 +51,7 @@ public class AdminUserService implements ICRUD<AdminUser, Long>, IUpload<AdminUs
             page = userList(keyword, status, pageable);
 
             if( page.isEmpty() ) {
-                return GlobalResponse.failed("User list is empty!", generateErrorCode("01", "001"), null, request);
+                return GlobalResponse.failed("User list is empty!", AdminConstant.ADMIN_USER_SERVICE_LIST_EMPTY, null, request);
             }
 
             page = page.map(new Function<AdminUser, RespAdminUserListDTO>() {
@@ -60,8 +61,9 @@ public class AdminUserService implements ICRUD<AdminUser, Long>, IUpload<AdminUs
                 }
             });
         } catch(Exception e) {
-            Logging.handleException("AdminUserService", "findAll(Pageable pageable, HttpServletRequest request)", 33, generateErrorCode("01", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to get admin user list!", generateErrorCode("01", "010"), null, request);
+            Logging.handleException("AdminUserService", "findAll(Pageable pageable, HttpServletRequest request)", 51, AdminConstant.ADMIN_USER_SERVICE_LIST_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_USER_SERVICE_LIST_EXCEPTION, "AdminUserService@list()", e.getMessage());
+            return GlobalResponse.failed("Failed to get admin user list!", AdminConstant.ADMIN_USER_SERVICE_LIST_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Successfully get admin user list!", page, request);
@@ -72,19 +74,21 @@ public class AdminUserService implements ICRUD<AdminUser, Long>, IUpload<AdminUs
         RespAdminUserDetailDTO response = null;
 
         if( id == null ) {
-            return GlobalResponse.failed("User ID is required!", generateErrorCode("02", "001"), null, request);
+            return GlobalResponse.failed("User ID is required!", AdminConstant.ADMIN_USER_SERVICE_DETAIL_ID_REQUIRED, null, request);
         }
 
         try {
             Optional<AdminUser> optionalAdminUser = adminUserRepo.findById(id);
             if( optionalAdminUser.isEmpty() ) {
-                return GlobalResponse.failed("User not found!", generateErrorCode("02", "002"), null, request);
+                return GlobalResponse.failed("User not found!", AdminConstant.ADMIN_USER_SERVICE_DETAIL_NOT_FOUND, null, request);
             }
 
             AdminUser adminUser = optionalAdminUser.get();
             response = modelMapper.map(adminUser, RespAdminUserDetailDTO.class);
         } catch(Exception e) {
-            return GlobalResponse.failed("Failed to get user data!", generateErrorCode("02", "010"), null, request);
+            Logging.handleException("AdminUserService", "findById(Long id, HttpServletRequest request)", 81, AdminConstant.ADMIN_USER_SERVICE_DETAIL_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_USER_SERVICE_DETAIL_EXCEPTION, "AdminUserService@findById()", e.getMessage());
+            return GlobalResponse.failed("Failed to get user data!", AdminConstant.ADMIN_USER_SERVICE_DETAIL_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("User data found!", response, request);
@@ -93,19 +97,20 @@ public class AdminUserService implements ICRUD<AdminUser, Long>, IUpload<AdminUs
     @Override
     public ResponseEntity<Object> save(AdminUser adminUser, HttpServletRequest request) {
         if( adminUser == null ) {
-            return GlobalResponse.failed("User data is required!", generateErrorCode("03", "001"), null, request);
+            return GlobalResponse.failed("User data is required!", AdminConstant.ADMIN_USER_SERVICE_SAVE_REQUEST_INVALID, null, request);
         }
 
         if( adminUser.getPassword() == null || adminUser.getPassword().isEmpty() ) {
-            return GlobalResponse.failed("Failed to save user data!", generateErrorCode("03", "002"), null, request);
+            return GlobalResponse.failed("Failed to save user data!", AdminConstant.ADMIN_USER_SERVICE_SAVE_PASSWORD_INVALID, null, request);
         }
 
         try {
             adminUser.setPassword(passwordHasher.hash(adminUser.getPassword()));
             adminUserRepo.save(adminUser);
         } catch(Exception e) {
-            Logging.handleException("AdminUserService", "save(AdminUser adminUser, HttpServletRequest request)", 73, generateErrorCode("03", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to save user data!", generateErrorCode("03", "010"), null, request);
+            Logging.handleException("AdminUserService", "save(AdminUser adminUser, HttpServletRequest request)", 73, AdminConstant.ADMIN_USER_SERVICE_SAVE_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_USER_SERVICE_SAVE_EXCEPTION, "AdminUserService@save()", e.getMessage());
+            return GlobalResponse.failed("Failed to save user data!", AdminConstant.ADMIN_USER_SERVICE_SAVE_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Successfully save user data!", null, request);
@@ -114,17 +119,17 @@ public class AdminUserService implements ICRUD<AdminUser, Long>, IUpload<AdminUs
     @Override
     public ResponseEntity<Object> update(Long id, AdminUser adminUser, HttpServletRequest request) {
         if( id == null ) {
-            return GlobalResponse.failed("User ID is required!", generateErrorCode("04", "001"), null, request);
+            return GlobalResponse.failed("User ID is required!", AdminConstant.ADMIN_USER_SERVICE_UPDATE_ID_REQUIRED, null, request);
         }
 
         if( adminUser == null ) {
-            return GlobalResponse.failed("User data is required!", generateErrorCode("04", "002"), null, request);
+            return GlobalResponse.failed("User data is required!", AdminConstant.ADMIN_USER_SERVICE_UPDATE_REQUEST_INVALID, null, request);
         }
 
         try {
             Optional<AdminUser> optionalAdminUser = adminUserRepo.findById(id);
             if( optionalAdminUser.isEmpty() ) {
-                return GlobalResponse.failed("User data not found!", generateErrorCode("04", "003"), null, request);
+                return GlobalResponse.failed("User data not found!", AdminConstant.ADMIN_USER_SERVICE_UPDATE_NOT_FOUND, null, request);
             }
 
             Logging.printConsole("Admin Role: " + adminUser.getAdminRole());
@@ -138,8 +143,9 @@ public class AdminUserService implements ICRUD<AdminUser, Long>, IUpload<AdminUs
             }
             adminUserDB.setStatus(adminUser.getStatus());
         } catch(Exception e) {
-            Logging.handleException("AdminUserService", "update(Long id, AdminUser adminUser, HttpServletRequest request)", 94, generateErrorCode("04", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to update user data!", generateErrorCode("04", "010"), null, request);
+            Logging.handleException("AdminUserService", "update(Long id, AdminUser adminUser, HttpServletRequest request)", 94, AdminConstant.ADMIN_USER_SERVICE_UPDATE_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_USER_SERVICE_UPDATE_EXCEPTION, "AdminUserService@update()", e.getMessage());
+            return GlobalResponse.failed("Failed to update user data!", AdminConstant.ADMIN_USER_SERVICE_UPDATE_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Successfully updated user data!", null, request);
@@ -148,19 +154,20 @@ public class AdminUserService implements ICRUD<AdminUser, Long>, IUpload<AdminUs
     @Override
     public ResponseEntity<Object> delete(Long id, HttpServletRequest request) {
         if( id == null ) {
-            return GlobalResponse.failed("User ID is required!", generateErrorCode("05", "001"), null, request);
+            return GlobalResponse.failed("User ID is required!", AdminConstant.ADMIN_USER_SERVICE_DELETE_ID_REQUIRED, null, request);
         }
 
         try {
             Optional<AdminUser> optionalAdminUser = adminUserRepo.findById(id);
             if( optionalAdminUser.isEmpty() ) {
-                return GlobalResponse.failed("User data not found!", generateErrorCode("05", "002"), null, request);
+                return GlobalResponse.failed("User data not found!", AdminConstant.ADMIN_USER_SERVICE_DELETE_NOT_FOUND, null, request);
             }
 
             adminUserRepo.deleteById(id);
         } catch(Exception e) {
-            Logging.handleException("AdminUserService", "delete(Long id, HttpServletRequest request)", 120, generateErrorCode("05", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to delete user data!", generateErrorCode("05", "010"), null, request);
+            Logging.handleException("AdminUserService", "delete(Long id, HttpServletRequest request)", 120, AdminConstant.ADMIN_USER_SERVICE_DELETE_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_USER_SERVICE_DELETE_EXCEPTION, "AdminUserService@delete()", e.getMessage());
+            return GlobalResponse.failed("Failed to delete user data!", AdminConstant.ADMIN_USER_SERVICE_DELETE_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Successfully deleted user data!", null, request);
@@ -169,12 +176,14 @@ public class AdminUserService implements ICRUD<AdminUser, Long>, IUpload<AdminUs
     @Override
     public ResponseEntity<Object> save(AdminUser user, MultipartFile file, HttpServletRequest request) {
         if( user == null ) {
-            return GlobalResponse.failed("User data is required!", generateErrorCode("13", "001"), null, request);
+            return GlobalResponse.failed("User data is required!", AdminConstant.ADMIN_USER_SERVICE_SAVE_FILE_REQUEST_INVALID, null, request);
         }
 
         String profilePicture = uploadImage("admin/user", file);
         if( profilePicture == null || profilePicture.isEmpty() ) {
-            return GlobalResponse.failed("Failed to upload user profile picture!", generateErrorCode("13", "002"), null, request);
+            Logging.handleException("AdminUserService", "save(AdminUser user, MultipartFile file, HttpServletRequest request)", 184, AdminConstant.ADMIN_USER_SERVICE_SAVE_FILE_IMAGE_ERROR, "Failed to upload image!");
+            logService.writeErrorLog(AdminConstant.ADMIN_USER_SERVICE_SAVE_FILE_IMAGE_ERROR, "AdminUserService@save()", "Failed to upload image!");
+            return GlobalResponse.failed("Failed to upload user profile picture!", AdminConstant.ADMIN_USER_SERVICE_SAVE_FILE_IMAGE_ERROR, null, request);
         }
 
         user.setProfilePicture(profilePicture);
@@ -187,17 +196,19 @@ public class AdminUserService implements ICRUD<AdminUser, Long>, IUpload<AdminUs
     @Override
     public ResponseEntity<Object> update(Long id, AdminUser user, MultipartFile file, HttpServletRequest request) {
         if( id == null ) {
-            return GlobalResponse.failed("User ID is required!", generateErrorCode("14", "001"), null, request);
+            return GlobalResponse.failed("User ID is required!", AdminConstant.ADMIN_USER_SERVICE_UPDATE_FILE_ID_REQUIRED, null, request);
         }
 
         if( user == null ) {
-            return GlobalResponse.failed("User data is required!", generateErrorCode("14", "002"), null, request);
+            return GlobalResponse.failed("User data is required!", AdminConstant.ADMIN_USER_SERVICE_UPDATE_FILE_REQUEST_INVALID, null, request);
         }
 
         if( file != null ) {
             String profilePicture = uploadImage("admin/user", file);
             if( profilePicture == null || profilePicture.isEmpty() ) {
-                return GlobalResponse.failed("Failed to upload user profile picture!", generateErrorCode("14", "003"), null, request);
+                Logging.handleException("AdminUserService", "update(Long id, AdminUser user, MultipartFile file, HttpServletRequest request)", 209, AdminConstant.ADMIN_USER_SERVICE_UPDATE_FILE_IMAGE_ERROR, "Failed to upload image!");
+                logService.writeErrorLog(AdminConstant.ADMIN_USER_SERVICE_UPDATE_FILE_IMAGE_ERROR, "AdminUserService@update()", "Failed to upload image!");
+                return GlobalResponse.failed("Failed to upload user profile picture!", AdminConstant.ADMIN_USER_SERVICE_UPDATE_FILE_IMAGE_ERROR, null, request);
             }
 
             user.setProfilePicture(profilePicture);

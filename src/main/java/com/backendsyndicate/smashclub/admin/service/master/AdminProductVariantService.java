@@ -1,5 +1,7 @@
 package com.backendsyndicate.smashclub.admin.service.master;
 
+import com.backendsyndicate.smashclub.admin.service.log.LogService;
+import com.backendsyndicate.smashclub.common.constant.AdminConstant;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.ecommerce.model.Product;
 import com.backendsyndicate.smashclub.ecommerce.model.ProductVariant;
@@ -21,16 +23,14 @@ public class AdminProductVariantService {
     private ProductRepo productRepo;
     @Autowired
     private ProductVariantRepo productVariantRepo;
-
-    private String generateErrorCode(String methodNo, String errorNo) {
-        return "ADM-PRDVAR" + "-" + methodNo + "-" + errorNo;
-    }
+    @Autowired
+    private LogService logService;
 
     public boolean save(long id, List<ProductVariant> variants) {
         try {
             Optional<Product> opt = productRepo.findById(id);
             if( opt.isEmpty() ) {
-                Logging.handleException("AdminProductVariantService", "save(long id, List<ProductVariant> variants)", 34, generateErrorCode("01", "001"), "Product not found!");
+                Logging.handleException("AdminProductVariantService", "save(long id, List<ProductVariant> variants)", 34, AdminConstant.ADMIN_PRODUCT_VARIANT_SERVICE_SAVE_PRODUCT_NOT_FOUND, "Product not found!");
                 return false;
             }
 
@@ -62,26 +62,9 @@ public class AdminProductVariantService {
                     productVariantRepo.deleteById(existingVariant.getId());
                 }
             }
-
-//            for( ProductVariant variant: variants ) {
-//                if( variant.getId() != 0 ) {
-//                    Optional<ProductVariant> opt = productVariantRepo.findById(variant.getId());
-//                    if( opt.isEmpty() ) {
-//                        return false;
-//                    }
-//
-//                    ProductVariant variantDB = opt.get();
-//                    variantDB.setName(variant.getName());
-//                    variantDB.setSku(variant.getSku());
-//                    variantDB.setPrice(variant.getPrice());
-//                    variantDB.setStock(variant.getStock());
-//                    if( variant.getVariantImgLink() != null ) variantDB.setVariantImgLink(variant.getVariantImgLink());
-//                } else {
-//                    productVariantRepo.save(variant);
-//                }
-//            }
         } catch(Exception e) {
-            Logging.handleException("AdminProductVariantService", "save(long id, List<ProductVariant> variants)", 32, generateErrorCode("01", "010"), e.getMessage());
+            Logging.handleException("AdminProductVariantService", "save(long id, List<ProductVariant> variants)", 32, AdminConstant.ADMIN_PRODUCT_VARIANT_SERVICE_SAVE_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_PRODUCT_VARIANT_SERVICE_SAVE_EXCEPTION, "AdminProductVariantService@save()", e.getMessage());
             return false;
         }
 
@@ -92,7 +75,8 @@ public class AdminProductVariantService {
         try {
             productVariantRepo.deleteByProduct_Id(id);
         } catch(Exception e) {
-            Logging.handleException("AdminProductVariantService", "update(Long id, Product product, HttpServletRequest request)", 120, generateErrorCode("02", "010"), "Failed to save variants!");
+            Logging.handleException("AdminProductVariantService", "update(Long id, Product product, HttpServletRequest request)", 120, AdminConstant.ADMIN_PRODUCT_VARIANT_SERVICE_DELETE_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_PRODUCT_VARIANT_SERVICE_DELETE_EXCEPTION, "AdminProductVariantService@save()", e.getMessage());
             return false;
         }
 

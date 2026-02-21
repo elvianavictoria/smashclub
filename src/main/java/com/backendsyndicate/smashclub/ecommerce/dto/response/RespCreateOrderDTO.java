@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Setter
 public class RespCreateOrderDTO {
     private Long orderId;
+    private String userId;
     private BigDecimal totalPrice;
     private byte status;
     private String transactionId;

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 
 @RestController
-@RequestMapping(name="api/v1/wallet")
+@RequestMapping("api/v1/wallet")
 public class WalletController {
     @Autowired
     private WalletService walletService;

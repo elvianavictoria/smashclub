@@ -2,8 +2,10 @@ package com.backendsyndicate.smashclub.admin.service.report;
 
 import com.backendsyndicate.smashclub.admin.core.IRUD;
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminPlayerListDTO;
+import com.backendsyndicate.smashclub.admin.service.log.LogService;
 import com.backendsyndicate.smashclub.auth.model.User;
 import com.backendsyndicate.smashclub.auth.repository.UserRepository;
+import com.backendsyndicate.smashclub.common.constant.AdminConstant;
 import com.backendsyndicate.smashclub.common.util.DatetimeFormatting;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
@@ -24,11 +26,10 @@ import java.util.function.Function;
 public class AdminPlayerService implements IRUD<User, String> {
     @Autowired
     private UserRepository userRepo;
-    private ModelMapper modelMapper = new ModelMapper();
+    @Autowired
+    private LogService logService;
 
-    private String generateErrorCode(String methodNo, String errorNo) {
-        return "ADM-PLYR" + "-" + methodNo + "-" + errorNo;
-    }
+    private ModelMapper modelMapper = new ModelMapper();
     
     @Override
     public ResponseEntity<Object> findAll(String keyword, Pageable pageable, HttpServletRequest request) {
@@ -42,7 +43,7 @@ public class AdminPlayerService implements IRUD<User, String> {
             }
 
             if( page.isEmpty() ) {
-                return GlobalResponse.failed("Player list is empty!", generateErrorCode("01", "001"), null, request);
+                return GlobalResponse.failed("Player list is empty!", AdminConstant.ADMIN_PLAYER_SERVICE_LIST_EMPTY, null, request);
             }
 
             page = page.map(new Function<User, RespAdminPlayerListDTO>() {
@@ -52,8 +53,9 @@ public class AdminPlayerService implements IRUD<User, String> {
                 }
             });
         } catch(Exception e) {
-            Logging.handleException("AdminPlayerService", "findAll(String keyword, Pageable pageable, HttpServletRequest request)", 39, generateErrorCode("01", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to get player list!", generateErrorCode("01", "010"), null, request);
+            Logging.handleException("AdminPlayerService", "findAll(String keyword, Pageable pageable, HttpServletRequest request)", 39, AdminConstant.ADMIN_PLAYER_SERVICE_LIST_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_PLAYER_SERVICE_LIST_EXCEPTION, "AdminPlayerService@findAll()", e.getMessage());
+            return GlobalResponse.failed("Failed to get player list!", AdminConstant.ADMIN_PLAYER_SERVICE_LIST_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Successfully get player list!", page, request);
@@ -64,19 +66,20 @@ public class AdminPlayerService implements IRUD<User, String> {
         User user = null;
 
         if( id == null ) {
-            return GlobalResponse.failed("Player ID is required!", generateErrorCode("02", "001"), null, request);
+            return GlobalResponse.failed("Player ID is required!", AdminConstant.ADMIN_PLAYER_SERVICE_DETAIL_ID_REQUIRED, null, request);
         }
 
         try {
             Optional<User> optionalUser = userRepo.findById(id);
             if( optionalUser.isEmpty() ) {
-                return GlobalResponse.failed("Player not found!", generateErrorCode("02", "002"), null, request);
+                return GlobalResponse.failed("Player not found!", AdminConstant.ADMIN_PLAYER_SERVICE_DETAIL_NOT_FOUND, null, request);
             }
 
             user = optionalUser.get();
         } catch(Exception e) {
-            Logging.handleException("AdminPlayerService", "findById(String id, HttpServletRequest request)", 72, generateErrorCode("02", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to get player data!", generateErrorCode("02", "010"), null, request);
+            Logging.handleException("AdminPlayerService", "findById(String id, HttpServletRequest request)", 72, AdminConstant.ADMIN_PLAYER_SERVICE_DETAIL_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_PLAYER_SERVICE_DETAIL_EXCEPTION, "AdminPlayerService@findById()", e.getMessage());
+            return GlobalResponse.failed("Failed to get player data!", AdminConstant.ADMIN_PLAYER_SERVICE_DETAIL_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Player data found!", user, request);
@@ -90,19 +93,20 @@ public class AdminPlayerService implements IRUD<User, String> {
     @Override
     public ResponseEntity<Object> delete(String id, HttpServletRequest request) {
         if( id == null ) {
-            return GlobalResponse.failed("Player ID is required!", generateErrorCode("04", "001"), null, request);
+            return GlobalResponse.failed("Player ID is required!", AdminConstant.ADMIN_PLAYER_SERVICE_DELETE_ID_REQUIRED, null, request);
         }
 
         try {
             Optional<User> optionalPlayer = userRepo.findById(id);
             if( optionalPlayer.isEmpty() ) {
-                return GlobalResponse.failed("Player data not found!", generateErrorCode("04", "002"), null, request);
+                return GlobalResponse.failed("Player data not found!", AdminConstant.ADMIN_PLAYER_SERVICE_DELETE_NOT_FOUND, null, request);
             }
 
             userRepo.deleteById(id);
         } catch(Exception e) {
-            Logging.handleException("AdminPlayerService", "delete(String id, HttpServletRequest request)", 98, generateErrorCode("04", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to delete player data!", generateErrorCode("04", "010"), null, request);
+            Logging.handleException("AdminPlayerService", "delete(String id, HttpServletRequest request)", 98, AdminConstant.ADMIN_PLAYER_SERVICE_DELETE_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_PLAYER_SERVICE_DELETE_EXCEPTION, "AdminPlayerService@delete()", e.getMessage());
+            return GlobalResponse.failed("Failed to delete player data!", AdminConstant.ADMIN_PLAYER_SERVICE_DELETE_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Successfully deleted player data!", null, request);

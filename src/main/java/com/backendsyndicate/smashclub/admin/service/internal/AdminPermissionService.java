@@ -4,6 +4,8 @@ import com.backendsyndicate.smashclub.admin.dto.relation.RelAdminPermissionMenuD
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminPermissionListDTO;
 import com.backendsyndicate.smashclub.admin.model.AdminPermission;
 import com.backendsyndicate.smashclub.admin.repo.AdminPermissionRepo;
+import com.backendsyndicate.smashclub.admin.service.log.LogService;
+import com.backendsyndicate.smashclub.common.constant.AdminConstant;
 import com.backendsyndicate.smashclub.common.constant.CommonConstant;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
@@ -22,11 +24,10 @@ import java.util.List;
 public class AdminPermissionService {
     @Autowired
     private AdminPermissionRepo adminPermissionRepo;
-    private ModelMapper modelMapper = new ModelMapper();
+    @Autowired
+    private LogService logService;
 
-    private String generateErrorCode(String methodNo, String errorNo) {
-        return "ADM-PRMS" + "-" + methodNo + "-" + errorNo;
-    }
+    private ModelMapper modelMapper = new ModelMapper();
 
     public ResponseEntity<Object> findAll(HttpServletRequest request) {
         List<RespAdminPermissionListDTO> response = new ArrayList<RespAdminPermissionListDTO>();
@@ -34,7 +35,7 @@ public class AdminPermissionService {
         try {
             List<AdminPermission> permissions = adminPermissionRepo.findAllByStatus(CommonConstant.STATUS_ACTIVE);
             if( permissions.isEmpty() ) {
-                return GlobalResponse.failed("Permission list is empty!", generateErrorCode("01", "001"), null, request);
+                return GlobalResponse.failed("Permission list is empty!", AdminConstant.ADMIN_PERMISSION_SERVICE_LIST_EMPTY, null, request);
             }
 
             for( int i = 0; i < permissions.size(); i++ ) {
@@ -46,8 +47,9 @@ public class AdminPermissionService {
                 response.add(dest);
             }
         } catch(Exception e) {
-            Logging.handleException("AdminPermissionService", "findAll(HttpServletRequest request)", 33, generateErrorCode("01", "010"), e.getMessage());
-            return GlobalResponse.failed("Failed to get permission list!", generateErrorCode("01", "010"), null, request);
+            Logging.handleException("AdminPermissionService", "findAll(HttpServletRequest request)", 33, AdminConstant.ADMIN_PERMISSION_SERVICE_LIST_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_PERMISSION_SERVICE_LIST_EXCEPTION, "AdminPermissionService@findAll()", e.getMessage());
+            return GlobalResponse.failed("Failed to get permission list!", AdminConstant.ADMIN_PERMISSION_SERVICE_LIST_EXCEPTION, null, request);
         }
 
         return GlobalResponse.success("Successfully get permission list!", response, request);

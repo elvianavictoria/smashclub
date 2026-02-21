@@ -31,7 +31,13 @@ public class AdminRateLimitFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         try {
             String clientIp = request.getRemoteAddr();
-            Bucket bucket = buckets.computeIfAbsent(clientIp, ip -> adminRateLimitUtility.generateBucket(20, Duration.ofMinutes(1)));
+            String endpoint = request.getServletPath();
+            Logging.printConsole(endpoint);
+            String xForwardedForHeader = request.getHeader("X-Forwarded-For-Header");
+            if( xForwardedForHeader != null && xForwardedForHeader.isEmpty() ) {
+                clientIp = xForwardedForHeader.split(",")[0].trim();
+            }
+            Bucket bucket = buckets.computeIfAbsent(clientIp + endpoint, ip -> adminRateLimitUtility.generateBucket(20, Duration.ofMinutes(1)));
 
             if( bucket.tryConsume(1) ) {
                 filterChain.doFilter(request, response);
