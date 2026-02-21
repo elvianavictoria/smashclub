@@ -3,8 +3,8 @@ package com.backendsyndicate.smashclub.admin.service.report;
 import com.backendsyndicate.smashclub.admin.dto.extra.ExtAdminTransactionDTO;
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminDashboardDTO;
 import com.backendsyndicate.smashclub.admin.service.log.LogService;
-import com.backendsyndicate.smashclub.booking.repo.CoachRepo;
-import com.backendsyndicate.smashclub.booking.repo.CourtRepo;
+import com.backendsyndicate.smashclub.booking.repository.CoachRepository;
+import com.backendsyndicate.smashclub.booking.repository.CourtRepository;
 import com.backendsyndicate.smashclub.common.constant.AdminConstant;
 import com.backendsyndicate.smashclub.common.constant.TransactionConstant;
 import com.backendsyndicate.smashclub.common.util.DatetimeFormatting;
@@ -31,9 +31,9 @@ import java.util.Map;
 @Transactional
 public class AdminDashboardService {
     @Autowired
-    private CourtRepo courtRepo;
+    private CourtRepository courtRepo;
     @Autowired
-    private CoachRepo coachRepo;
+    private CoachRepository coachRepo;
     @Autowired
     private TransactionRepo transactionRepo;
     @Autowired

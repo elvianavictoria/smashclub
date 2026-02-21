@@ -1,19 +1,15 @@
 package com.backendsyndicate.smashclub.admin.dto.request;
 
-import com.backendsyndicate.smashclub.admin.core.IValidation;
 import com.backendsyndicate.smashclub.admin.dto.validation.ValAdminProductProductVariantDTO;
 import com.backendsyndicate.smashclub.common.constant.CommonConstant;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 

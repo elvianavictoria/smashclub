@@ -3,7 +3,7 @@ package com.backendsyndicate.smashclub.admin.seeder.master;
 import com.backendsyndicate.smashclub.admin.core.DataSeeder;
 import com.backendsyndicate.smashclub.booking.model.Equipment;
 import com.backendsyndicate.smashclub.booking.model.EquipmentCategory;
-import com.backendsyndicate.smashclub.booking.repo.EquipmentRepo;
+import com.backendsyndicate.smashclub.booking.repository.EquipmentRepository;
 import com.backendsyndicate.smashclub.common.constant.AdminConstant;
 import com.backendsyndicate.smashclub.common.constant.CommonConstant;
 import com.backendsyndicate.smashclub.common.util.Logging;
@@ -17,10 +17,10 @@ import java.math.BigDecimal;
 @Component
 @Transactional
 public class EquipmentSeeder implements DataSeeder {
-    private EquipmentRepo equipmentRepo;
+    private EquipmentRepository equipmentRepo;
     private EquipmentCategorySeeder equipmentCategorySeeder;
 
-    public EquipmentSeeder(EquipmentRepo equipmentRepo, EquipmentCategorySeeder equipmentCategorySeeder) {
+    public EquipmentSeeder(EquipmentRepository equipmentRepo, EquipmentCategorySeeder equipmentCategorySeeder) {
         this.equipmentRepo = equipmentRepo;
         this.equipmentCategorySeeder = equipmentCategorySeeder;
     }

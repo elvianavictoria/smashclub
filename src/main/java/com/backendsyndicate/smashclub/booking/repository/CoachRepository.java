@@ -2,6 +2,8 @@ package com.backendsyndicate.smashclub.booking.repository;
 
 import com.backendsyndicate.smashclub.booking.model.Coach;
 import com.backendsyndicate.smashclub.common.constant.BookingConstant;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -57,4 +59,7 @@ public interface CoachRepository extends JpaRepository<Coach, Long> {
             @Param("date") LocalDate date,
             @Param("startTime") LocalTime startTime,
             @Param("endTime") LocalTime endTime);
+
+    // Admin CMS
+    Page<Coach> findAllByCoachCodeContainsOrCoachNameContainsIgnoreCase(String coachCode, String coachName, Pageable pageable);
 }

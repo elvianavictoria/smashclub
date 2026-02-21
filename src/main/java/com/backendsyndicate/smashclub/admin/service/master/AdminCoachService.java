@@ -5,12 +5,11 @@ import com.backendsyndicate.smashclub.admin.core.IUpload;
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminCoachListDTO;
 import com.backendsyndicate.smashclub.admin.service.log.LogService;
 import com.backendsyndicate.smashclub.booking.model.Coach;
-import com.backendsyndicate.smashclub.booking.repo.CoachRepo;
+import com.backendsyndicate.smashclub.booking.repository.CoachRepository;
 import com.backendsyndicate.smashclub.common.constant.AdminConstant;
 import com.backendsyndicate.smashclub.common.util.DatetimeFormatting;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
-import com.backendsyndicate.smashclub.external.dto.CloudinaryResponseDTO;
 import com.backendsyndicate.smashclub.external.service.storage.CloudinaryService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
@@ -29,7 +28,7 @@ import java.util.function.Function;
 @Transactional
 public class AdminCoachService implements ICRUD<Coach, Long>, IUpload<Coach, Long> {
     @Autowired
-    private CoachRepo coachRepo;
+    private CoachRepository coachRepo;
     @Autowired
     private CloudinaryService cloudinaryService;
     @Autowired

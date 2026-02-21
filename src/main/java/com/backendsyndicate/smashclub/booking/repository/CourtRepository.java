@@ -2,6 +2,8 @@ package com.backendsyndicate.smashclub.booking.repository;
 
 import com.backendsyndicate.smashclub.booking.model.Court;
 import com.backendsyndicate.smashclub.common.constant.BookingConstant;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -21,4 +23,7 @@ public interface CourtRepository extends JpaRepository<Court, Long> {
 
     // Untuk seeder
     Optional<Court> findByCourtCode(String courtCode);
+
+    // Admin CMS
+    Page<Court> findAllByCourtCodeContainsOrCourtNameContainsIgnoreCase(String courtCode, String courtName, Pageable pageable);
 }

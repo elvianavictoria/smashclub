@@ -2,7 +2,7 @@ package com.backendsyndicate.smashclub.admin.seeder.master;
 
 import com.backendsyndicate.smashclub.admin.core.DataSeeder;
 import com.backendsyndicate.smashclub.booking.model.Coach;
-import com.backendsyndicate.smashclub.booking.repo.CoachRepo;
+import com.backendsyndicate.smashclub.booking.repository.CoachRepository;
 import com.backendsyndicate.smashclub.common.constant.CommonConstant;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import org.springframework.context.annotation.Profile;
@@ -16,9 +16,9 @@ import java.time.LocalTime;
 @Transactional
 @Profile({"dev", "staging"})
 public class CoachSeeder implements DataSeeder {
-    private CoachRepo coachRepo;
+    private CoachRepository coachRepo;
 
-    public CoachSeeder(CoachRepo coachRepo) {
+    public CoachSeeder(CoachRepository coachRepo) {
         this.coachRepo = coachRepo;
     }
 

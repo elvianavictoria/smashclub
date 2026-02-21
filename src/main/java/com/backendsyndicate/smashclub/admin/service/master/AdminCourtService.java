@@ -5,12 +5,11 @@ import com.backendsyndicate.smashclub.admin.core.IUpload;
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminCourtListDTO;
 import com.backendsyndicate.smashclub.admin.service.log.LogService;
 import com.backendsyndicate.smashclub.booking.model.Court;
-import com.backendsyndicate.smashclub.booking.repo.CourtRepo;
+import com.backendsyndicate.smashclub.booking.repository.CourtRepository;
 import com.backendsyndicate.smashclub.common.constant.AdminConstant;
 import com.backendsyndicate.smashclub.common.util.DatetimeFormatting;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
-import com.backendsyndicate.smashclub.external.dto.CloudinaryResponseDTO;
 import com.backendsyndicate.smashclub.external.service.storage.CloudinaryService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -30,7 +28,7 @@ import java.util.function.Function;
 @Transactional
 public class AdminCourtService implements ICRUD<Court, Long>, IUpload<Court, Long> {
     @Autowired
-    private CourtRepo courtRepo;
+    private CourtRepository courtRepo;
     @Autowired
     private CloudinaryService cloudinaryService;
     @Autowired

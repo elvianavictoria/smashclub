@@ -2,6 +2,8 @@ package com.backendsyndicate.smashclub.booking.repository;
 
 import com.backendsyndicate.smashclub.booking.model.Equipment;
 import com.backendsyndicate.smashclub.common.constant.BookingConstant;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -65,4 +67,8 @@ public interface EquipmentRepository extends JpaRepository<Equipment, Long> {
                 LocalTime.MAX,
                 requiredQuantity != null ? requiredQuantity : 1);
     }
+
+    // Admin CMS
+    Page<Equipment> findAllByEquipmentNameContainsIgnoreCase(String equipmentName, Pageable pageable);
+    void deleteByEquipmentCategory_Id(Long id);
 }

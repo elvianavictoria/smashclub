@@ -3,8 +3,8 @@ package com.backendsyndicate.smashclub.admin.service.master;
 import com.backendsyndicate.smashclub.admin.core.ICRUD;
 import com.backendsyndicate.smashclub.admin.service.log.LogService;
 import com.backendsyndicate.smashclub.booking.model.EquipmentCategory;
-import com.backendsyndicate.smashclub.booking.repo.EquipmentCategoryRepo;
-import com.backendsyndicate.smashclub.booking.repo.EquipmentRepo;
+import com.backendsyndicate.smashclub.booking.repository.EquipmentCategoryRepository;
+import com.backendsyndicate.smashclub.booking.repository.EquipmentRepository;
 import com.backendsyndicate.smashclub.common.constant.AdminConstant;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
@@ -23,9 +23,9 @@ import java.util.Optional;
 @Transactional
 public class AdminEquipmentCategoryService implements ICRUD<EquipmentCategory, Long> {
     @Autowired
-    private EquipmentCategoryRepo equipmentCategoryRepo;
+    private EquipmentCategoryRepository equipmentCategoryRepo;
     @Autowired
-    private EquipmentRepo equipmentRepo;
+    private EquipmentRepository equipmentRepo;
     @Autowired
     private LogService logService;
 

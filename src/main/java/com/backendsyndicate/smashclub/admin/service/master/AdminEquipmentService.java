@@ -6,12 +6,11 @@ import com.backendsyndicate.smashclub.admin.dto.response.RespAdminEquipmentDetai
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminEquipmentListDTO;
 import com.backendsyndicate.smashclub.admin.service.log.LogService;
 import com.backendsyndicate.smashclub.booking.model.Equipment;
-import com.backendsyndicate.smashclub.booking.repo.EquipmentRepo;
+import com.backendsyndicate.smashclub.booking.repository.EquipmentRepository;
 import com.backendsyndicate.smashclub.common.constant.AdminConstant;
 import com.backendsyndicate.smashclub.common.util.DatetimeFormatting;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
-import com.backendsyndicate.smashclub.external.dto.CloudinaryResponseDTO;
 import com.backendsyndicate.smashclub.external.service.storage.CloudinaryService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
@@ -30,7 +29,7 @@ import java.util.function.Function;
 @Transactional
 public class AdminEquipmentService implements ICRUD<Equipment, Long>, IUpload<Equipment, Long> {
     @Autowired
-    private EquipmentRepo equipmentRepo;
+    private EquipmentRepository equipmentRepo;
     @Autowired
     private CloudinaryService cloudinaryService;
     @Autowired

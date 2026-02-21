@@ -2,7 +2,7 @@ package com.backendsyndicate.smashclub.admin.seeder.master;
 
 import com.backendsyndicate.smashclub.admin.core.DataSeeder;
 import com.backendsyndicate.smashclub.booking.model.EquipmentCategory;
-import com.backendsyndicate.smashclub.booking.repo.EquipmentCategoryRepo;
+import com.backendsyndicate.smashclub.booking.repository.EquipmentCategoryRepository;
 import com.backendsyndicate.smashclub.common.constant.AdminConstant;
 import com.backendsyndicate.smashclub.common.constant.CommonConstant;
 import com.backendsyndicate.smashclub.common.util.Logging;
@@ -18,11 +18,11 @@ import java.util.Map;
 @Component
 @Transactional
 public class EquipmentCategorySeeder implements DataSeeder {
-    private EquipmentCategoryRepo equipmentCategoryRepo;
+    private EquipmentCategoryRepository equipmentCategoryRepo;
     @Getter
     private final Map<Long, EquipmentCategory> categories = new HashMap<Long, EquipmentCategory>();
 
-    public EquipmentCategorySeeder(EquipmentCategoryRepo equipmentCategoryRepo) {
+    public EquipmentCategorySeeder(EquipmentCategoryRepository equipmentCategoryRepo) {
         this.equipmentCategoryRepo = equipmentCategoryRepo;
     }
 
