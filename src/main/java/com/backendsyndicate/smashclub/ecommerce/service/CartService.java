@@ -2,6 +2,7 @@ package com.backendsyndicate.smashclub.ecommerce.service;
 
 import com.backendsyndicate.smashclub.auth.repository.UserRepository;
 import com.backendsyndicate.smashclub.common.constant.CartStatusConstant;
+import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.ecommerce.core.ICart;
 import com.backendsyndicate.smashclub.ecommerce.dto.request.ReqAddCartItemDTO;
 import com.backendsyndicate.smashclub.ecommerce.dto.request.ReqUpdateCartItemDTO;
@@ -68,8 +69,10 @@ public class CartService implements ICart {
             });
             return modelMapper.map(cart, RespCartDTO.class);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            Logging.handleException("CartService", "getOrCreateActiveCart(String userId)", 72, generateErrorCode("01", "010"), e.getMessage());
+            return null;
         }
+
     }
 
     /**
@@ -79,22 +82,25 @@ public class CartService implements ICart {
      * @return
      */
     @Override
-    public RespCartDTO addToCart(String userId, ReqAddCartItemDTO request){
+    public RespCartDTO addToCart(String userId, ReqAddCartItemDTO request) {
         Cart cart = getActiveCartEntity(userId);
 
-        ProductVariant variant = productVariantRepo.findById(request.getVariantId()).orElseThrow(() -> new RuntimeException("Variant not found!"));
+        try {
+            ProductVariant variant = productVariantRepo.findById(request.getVariantId()).orElseThrow(() -> new RuntimeException("Variant not found!"));
 
-        CartItem cartItem = cartItemRepo.findByCartIdAndVariantId(cart.getId(), variant.getId())
-                .orElse(new CartItem());
+            CartItem cartItem = cartItemRepo.findByCartIdAndVariantId(cart.getId(), variant.getId())
+                    .orElse(new CartItem());
 
-        cartItem.setCart(cart);
-        cartItem.setVariant(variant);
-        cartItem.setQuantity(cartItem.getQuantity() + request.getQuantity());
-        cartItemRepo.save(cartItem);
-
-        return modelMapper.map(cart, RespCartDTO.class);
+            cartItem.setCart(cart);
+            cartItem.setVariant(variant);
+            cartItem.setQuantity(cartItem.getQuantity() + request.getQuantity());
+            cartItemRepo.save(cartItem);
+            return modelMapper.map(cart, RespCartDTO.class);
+        } catch (Exception e) {
+            Logging.handleException("CartService", "addToCart(String userId, ReqAddCartItemDTO request)", 100, generateErrorCode("02", "010"), e.getMessage());
+            return null;
+        }
     }
-
     /**
      * Code: 03
      * @param userId
@@ -104,7 +110,7 @@ public class CartService implements ICart {
     public RespCartDTO updateCartItem(String userId, ReqUpdateCartItemDTO request) {
         Cart cart = getActiveCartEntity(userId);
 
-        CartItem cartItem = cartItemRepo.findByIdAndCartId(request.getCartItemId(), cart.getId()).orElseThrow(() -> new RuntimeException("Item not found!"));
+        try {CartItem cartItem = cartItemRepo.findByIdAndCartId(request.getCartItemId(), cart.getId()).orElseThrow(() -> new RuntimeException("Item not found!"));
 
         if (request.getQuantity() <= 0) {
             cartItemRepo.delete(cartItem);
@@ -112,8 +118,11 @@ public class CartService implements ICart {
             cartItem.setQuantity(request.getQuantity());
         }
         cartRepo.save(cart);
-
-        return modelMapper.map(cart, RespCartDTO.class);
+        return modelMapper.map(cart, RespCartDTO.class);}
+        catch (Exception e) {
+            Logging.handleException("CartService", "updateCartItem(String userId, ReqUpdateCartItemDTO request)", 123, generateErrorCode("03", "010"), e.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -126,6 +135,7 @@ public class CartService implements ICart {
     public String deleteCartItem(String userId, Long cartItemId) {
         Cart cart = getActiveCartEntity(userId);
 
+        try{
         CartItem item = cartItemRepo.findById(cartItemId)
                 .orElseThrow(() -> new RuntimeException("Cart item not found"));
 
@@ -133,7 +143,11 @@ public class CartService implements ICart {
             throw new RuntimeException("Unauthorized");
 
         cartItemRepo.delete(item);
-        return "Item removed";
+        return "Item removed";}
+        catch (Exception e) {
+            Logging.handleException("CartService", "deleteCartItem(String userId, Long cartItemId)", 148, generateErrorCode("04", "010"), e.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -144,8 +158,12 @@ public class CartService implements ICart {
     @Override
     public String clearCart(String userId){
         Cart cart = getActiveCartEntity(userId);
-        cartItemRepo.deleteById(cart.getId());
-        return "Cart cleared";
+        try {cartItemRepo.deleteById(cart.getId());
+        return "Cart cleared";}
+        catch (Exception e) {
+            Logging.handleException("CartService", "clearCart(userId)", 164, generateErrorCode("05", "010"), e.getMessage());
+            return null;
+        }
     }
 
     public Cart getActiveCartEntity(String userId) {
