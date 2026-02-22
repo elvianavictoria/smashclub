@@ -407,4 +407,13 @@ public class PaymentService implements IPayment {
 
         paymentLogRepo.save(paymentLog);
     }
+
+    public String getPaymentUrl(String transactionCode) {
+        Transaction transaction = getTransaction(transactionCode);
+        if( transaction != null ) {
+            return transaction.getPaymentLink();
+        }
+
+        return null;
+    }
 }
