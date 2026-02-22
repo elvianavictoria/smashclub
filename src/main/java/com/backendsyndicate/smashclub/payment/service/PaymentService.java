@@ -375,6 +375,20 @@ public class PaymentService implements IPayment {
         return trx;
     }
 
+    /**
+     *
+     * @param referenceCode
+     * @return
+     */
+    protected Transaction getTransactionByReferenceCode(String referenceCode) {
+        Optional<Transaction> optionalTrx = transactionRepo.findByReferenceCode(referenceCode);
+        if( optionalTrx.isEmpty() ) return null;
+        Transaction trx = optionalTrx.get();
+        Hibernate.initialize(trx.getUser());
+
+        return trx;
+    }
+
     private String generateTransactionCode() {
         LocalDate currentDt = LocalDate.now();
         String strYear = "" + currentDt.getYear();
@@ -408,8 +422,14 @@ public class PaymentService implements IPayment {
         paymentLogRepo.save(paymentLog);
     }
 
-    public String getPaymentUrl(String transactionCode) {
-        Transaction transaction = getTransaction(transactionCode);
+    /**
+     * To be fetched by booking & e-commerce
+     *
+     * @param referenceCode
+     * @return
+     */
+    public String getPaymentUrl(String referenceCode) {
+        Transaction transaction = getTransactionByReferenceCode(referenceCode);
         if( transaction != null ) {
             return transaction.getPaymentLink();
         }
