@@ -105,7 +105,6 @@ public class OrderService implements IOrder {
 
         order.setSubTotal(subtotal);
         order.setTotalPrice(subtotal);
-        orderRepo.save(order);
 
         paymentService.createTransaction(
                 userId,
@@ -113,6 +112,8 @@ public class OrderService implements IOrder {
                 order.getId().toString(),
                 TransactionTypeConstant.ECOMMERCE_SHOPPING
         );
+
+        orderRepo.save(order);
 
         cartService.clearCart(userId);
 
@@ -165,7 +166,6 @@ public class OrderService implements IOrder {
 
         order.setSubTotal(total);
         order.setTotalPrice(total);
-        orderRepo.save(order);
 
         paymentService.createTransaction(
                 userId,
@@ -173,6 +173,8 @@ public class OrderService implements IOrder {
                 order.getId().toString(),
                 TransactionTypeConstant.ECOMMERCE_SHOPPING
         );
+
+        orderRepo.save(order);
 
         RespCreateOrderDTO response = new RespCreateOrderDTO();
         response.setOrderId(order.getId());
