@@ -15,6 +15,7 @@ import com.backendsyndicate.smashclub.ecommerce.repo.CartRepo;
 import com.backendsyndicate.smashclub.ecommerce.repo.ProductVariantRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.hpsf.Variant;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -69,7 +70,7 @@ public class CartService implements ICart {
             });
             return modelMapper.map(cart, RespCartDTO.class);
         } catch (Exception e) {
-            Logging.handleException("CartService", "getOrCreateActiveCart(String userId)", 72, generateErrorCode("01", "010"), e.getMessage());
+            Logging.handleException("CartService", "getOrCreateActiveCart(String userId)", 73, generateErrorCode("01", "010"), e.getMessage());
             return null;
         }
 
@@ -86,18 +87,20 @@ public class CartService implements ICart {
         Cart cart = getActiveCartEntity(userId);
 
         try {
-            ProductVariant variant = productVariantRepo.findById(request.getVariantId()).orElseThrow(() -> new RuntimeException("Variant not found!"));
+            ProductVariant variant = productVariantRepo.findByIdAndSufficientStock(request.getVariantId(), request.getQuantity()).orElseThrow(() -> new RuntimeException("Variant not found!"));
 
             CartItem cartItem = cartItemRepo.findByCartIdAndVariantId(cart.getId(), variant.getId())
                     .orElse(new CartItem());
 
             cartItem.setCart(cart);
+            Logging.printConsole(variant.toString());
             cartItem.setVariant(variant);
             cartItem.setQuantity(cartItem.getQuantity() + request.getQuantity());
             cartItemRepo.save(cartItem);
+            cart.setTotalPrice(cart.getTotalPrice().add(variant.getPrice()).multiply(BigDecimal.valueOf(request.getQuantity())))  ;
             return modelMapper.map(cart, RespCartDTO.class);
         } catch (Exception e) {
-            Logging.handleException("CartService", "addToCart(String userId, ReqAddCartItemDTO request)", 100, generateErrorCode("02", "010"), e.getMessage());
+            Logging.handleException("CartService", "addToCart(String userId, ReqAddCartItemDTO request)", 103, generateErrorCode("02", "010"), e.getMessage());
             return null;
         }
     }
@@ -110,17 +113,26 @@ public class CartService implements ICart {
     public RespCartDTO updateCartItem(String userId, ReqUpdateCartItemDTO request) {
         Cart cart = getActiveCartEntity(userId);
 
-        try {CartItem cartItem = cartItemRepo.findByIdAndCartId(request.getCartItemId(), cart.getId()).orElseThrow(() -> new RuntimeException("Item not found!"));
-
-        if (request.getQuantity() <= 0) {
+        try {
+            CartItem cartItem = cartItemRepo.findByIdAndCartId(request.getCartItemId(), cart.getId()).orElseThrow(() -> new RuntimeException("Item not found!"));
+            if (cartItem.getQuantity() + request.getQuantity() > cartItem.getVariant().getStock()){
+                Logging.handleException("CartService", "updateCartItem", 119, generateErrorCode("02", "001"), "Not enough stock!");
+                return null;
+            }
+        if (request.getQuantity() == 0) {
             cartItemRepo.delete(cartItem);
         } else {
+            if (cartItem.getQuantity() < request.getQuantity()){
+                cart.setTotalPrice(cart.getTotalPrice().add(cartItem.getVariant().getPrice().multiply(BigDecimal.valueOf(request.getQuantity()))));
+            } else if (cartItem.getQuantity() > request.getQuantity()){
+                cart.setTotalPrice(cart.getTotalPrice().subtract(cartItem.getVariant().getPrice().multiply(BigDecimal.valueOf(request.getQuantity()))));
+            }
             cartItem.setQuantity(request.getQuantity());
         }
         cartRepo.save(cart);
         return modelMapper.map(cart, RespCartDTO.class);}
         catch (Exception e) {
-            Logging.handleException("CartService", "updateCartItem(String userId, ReqUpdateCartItemDTO request)", 123, generateErrorCode("03", "010"), e.getMessage());
+            Logging.handleException("CartService", "updateCartItem(String userId, ReqUpdateCartItemDTO request)", 135, generateErrorCode("03", "010"), e.getMessage());
             return null;
         }
     }
@@ -140,12 +152,13 @@ public class CartService implements ICart {
                 .orElseThrow(() -> new RuntimeException("Cart item not found"));
 
         if (!item.getCart().getId().equals(cart.getId()))
-            throw new RuntimeException("Unauthorized");
+        {throw new RuntimeException("Unauthorized");}
 
+        cart.setTotalPrice(cart.getTotalPrice().subtract(item.getVariant().getPrice().multiply(BigDecimal.valueOf(item.getQuantity()))));
         cartItemRepo.delete(item);
         return "Item removed";}
         catch (Exception e) {
-            Logging.handleException("CartService", "deleteCartItem(String userId, Long cartItemId)", 148, generateErrorCode("04", "010"), e.getMessage());
+            Logging.handleException("CartService", "deleteCartItem(String userId, Long cartItemId)", 161, generateErrorCode("04", "010"), e.getMessage());
             return null;
         }
     }
@@ -159,9 +172,10 @@ public class CartService implements ICart {
     public String clearCart(String userId){
         Cart cart = getActiveCartEntity(userId);
         try {cartItemRepo.deleteById(cart.getId());
-        return "Cart cleared";}
+            cart.setTotalPrice(BigDecimal.ZERO);
+            return "Cart cleared";}
         catch (Exception e) {
-            Logging.handleException("CartService", "clearCart(userId)", 164, generateErrorCode("05", "010"), e.getMessage());
+            Logging.handleException("CartService", "clearCart(userId)", 178, generateErrorCode("05", "010"), e.getMessage());
             return null;
         }
     }

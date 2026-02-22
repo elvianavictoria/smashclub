@@ -1,17 +1,14 @@
 package com.backendsyndicate.smashclub.ecommerce.dto.response;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Builder
+//@Builder
 @Data
 @Getter
 @Setter
+@NoArgsConstructor
 public class RespCartItemDTO {
     private Long id;
-    private RespCartDTO cart;
-    private Long variantId;
+    private RespCartVariantDTO variant;
     private int quantity;
 }

@@ -25,6 +25,6 @@ public class CartItem {
     private Cart cart;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "Variant", foreignKey = @ForeignKey(name = "fk_cartItem_to_var"), nullable = false)
+    @JoinColumn(name = "VariantID", foreignKey = @ForeignKey(name = "fk_cartItem_to_var"), nullable = false)
     private ProductVariant variant;
 }
