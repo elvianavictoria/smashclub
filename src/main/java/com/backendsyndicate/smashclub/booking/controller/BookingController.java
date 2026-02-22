@@ -57,12 +57,13 @@ public class BookingController {
     }
 
     // ============ GET BOOKING SUMMARY ============
-    @PostMapping("/summary")
+    @PostMapping("/summary/{bookingCode}")
     public ResponseEntity<Object> getBookingSummary(
+            @PathVariable(required = false) String bookingCode,  // Optional
             @Valid @RequestBody BookingRequest request,
             HttpServletRequest httpRequest) {
 
-        return bookingService.getBookingSummary(request, httpRequest);
+        return bookingService.getBookingSummary(bookingCode, request, httpRequest);
     }
 
     // ============ CREATE BOOKING ============

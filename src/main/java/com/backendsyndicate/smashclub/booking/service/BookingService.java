@@ -595,6 +595,7 @@ public class BookingService {
     // ============ GET BOOKING SUMMARY ============
     @Transactional(readOnly = true)
     public ResponseEntity<Object> getBookingSummary(
+            String bookingCode,
             BookingRequest request,
             HttpServletRequest httpRequest) {
 
@@ -718,6 +719,18 @@ public class BookingService {
             // Build response
             CourtInfo courtInfo = convertToCourtInfo(court);
 
+            String paymentUrl = null;
+            String statusDescription = null;
+            Byte status = null;
+            if (bookingCode != null && !bookingCode.isEmpty()) {
+                paymentUrl = paymentService.getPaymentUrl(bookingCode);
+                Optional<Booking> bookingOpt = bookingRepository.findByBookingCode(bookingCode);
+                if (bookingOpt.isPresent()) {
+                    status = bookingOpt.get().getStatus();
+                    statusDescription = BookingConstant.getBookingStatusDescription(status);
+                }
+            }
+
             BookingSummaryResponse summary = BookingSummaryResponse.builder()
                     .court(courtInfo)
                     .coaches(coachResponses)
@@ -726,6 +739,8 @@ public class BookingService {
                     .coachesTotalPrice(coachesTotalPrice)
                     .equipmentTotalPrice(equipmentTotalPrice)
                     .grandTotal(grandTotal)
+                    .paymentUrl(paymentUrl)
+                    .statusDescription(statusDescription)
                     .estimatedDuration(durationHours + " jam")
                     .build();
 
@@ -1028,6 +1043,7 @@ public class BookingService {
                 .basePrice(booking.getBasePrice())
                 .totalPrice(booking.getTotalPrice())
                 .status(booking.getStatus())
+                .statusDescription(BookingConstant.getBookingStatusDescription(booking.getStatus()))
                 .createdAt(booking.getCreatedAt())
                 .court(courtInfo)
                 .coaches(coachResponses)

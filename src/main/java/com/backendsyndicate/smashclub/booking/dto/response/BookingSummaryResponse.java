@@ -24,4 +24,8 @@ public class BookingSummaryResponse {
 
     private String bookingCode;
     private String estimatedDuration;
+
+    private String paymentUrl;
+
+    private String statusDescription;
 }
