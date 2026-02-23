@@ -29,7 +29,7 @@ public class AuthService {
     // ============ REGISTRATION ============
     @Transactional
     public ResponseEntity<Object> register(RegisterRequest request, HttpServletRequest httpRequest) {
-        return registrationService.register(request, httpRequest, responseHandler);
+        return registrationService.register(request, httpRequest);
     }
 
     // ============ LOGIN ============
@@ -47,7 +47,7 @@ public class AuthService {
     // ============ VERIFY EMAIL ============
     @Transactional
     public ResponseEntity<Object> verifyEmail(String token, HttpServletRequest httpRequest) {
-        return registrationService.verifyEmail(token, httpRequest, responseHandler);
+        return registrationService.verifyEmail(token, httpRequest);
     }
 
     // ============ FORGOT PASSWORD ============
@@ -77,7 +77,7 @@ public class AuthService {
     // ============ RESEND VERIFICATION EMAIL ============
     @Transactional
     public ResponseEntity<Object> resendVerificationEmail(String email, HttpServletRequest httpRequest) {
-        return registrationService.resendVerificationEmail(email, httpRequest, responseHandler);
+        return registrationService.resendVerificationEmail(email, httpRequest);
     }
 
     // ============ RESEND OTP ============

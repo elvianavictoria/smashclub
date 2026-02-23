@@ -17,7 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor
 public class OrderController {
     @Autowired
@@ -39,6 +39,12 @@ public class OrderController {
         String userId = extractUserIdFromToken(authorizationHeader);
         RespCreateOrderDTO order = orderService.buyNow(userId, requestBody);
         return GlobalResponse.success("Buy now order created", order, request);
+    }
+
+    @PostMapping("/{orderId}/payment")
+    public ResponseEntity<Object> createOrderPayment(@PathVariable Long orderId, @RequestHeader("Authorization") String authorizationHeader, HttpServletRequest request) {
+        String userId = extractUserIdFromToken(authorizationHeader);
+        return orderService.paymentOrder(orderId, request);
     }
 
     @GetMapping("/{orderId}")
