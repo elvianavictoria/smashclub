@@ -26,6 +26,7 @@ public class TransactionConstant {
     public static final String TRANSACTION_SERVICE_ERROR_DETAIL_CODE_REQUIRED = "TRX-02E001";
     public static final String TRANSACTION_SERVICE_ERROR_DETAIL_NOT_FOUND = "TRX-02E002";
     public static final String TRANSACTION_SERVICE_ERROR_DETAIL_EXCEPTION = "TRX-02E010";
+    public static final String TRANSACTION_HELPER_ERROR_DETAIL_EXCEPTION = "TRX-12E010";
 
     public static final String WALLET_SERVICE_ERROR_BALANCE_USERID_REQUIRED = "WLLT-01E001";
     public static final String WALLET_SERVICE_ERROR_BALANCE_WALLET_NOT_FOUND = "WLLT-01E002";

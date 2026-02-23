@@ -28,22 +28,32 @@ public class ExtAdminBookingListDTO {
     private String updatedAt;
 
     public void setBookingDate(LocalDate bookingDate) {
-        this.bookingDate = DatetimeFormatting.getDateFormat(bookingDate);
+        if( bookingDate != null ) {
+            this.bookingDate = DatetimeFormatting.getDateFormat(bookingDate);
+        }
     }
 
     public void setStartTime(LocalTime startTime) {
-        this.startTime = DatetimeFormatting.getClockFormat(startTime);
+        if( startTime != null ) {
+            this.startTime = DatetimeFormatting.getClockFormat(startTime);
+        }
     }
 
     public void setEndTime(LocalTime endTime) {
-        this.endTime = DatetimeFormatting.getClockFormat(endTime);
+        if( endTime != null ) {
+            this.endTime = DatetimeFormatting.getClockFormat(endTime);
+        }
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = DatetimeFormatting.getDatetimeFormat(createdAt);
+        if( createdAt != null ) {
+            this.createdAt = DatetimeFormatting.getDatetimeFormat(createdAt);
+        }
     }
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = DatetimeFormatting.getDatetimeFormat(updatedAt);
+        if( updatedAt != null ) {
+            this.updatedAt = DatetimeFormatting.getDatetimeFormat(updatedAt);
+        }
     }
 }

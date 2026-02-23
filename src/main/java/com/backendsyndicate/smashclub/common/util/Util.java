@@ -32,7 +32,7 @@ public class Util {
         try {
             return objectMapper.readValue(json, cls);
         } catch(Exception e) {
-            Logging.handleException("Util", "mapToModel(String json, Class<T> cls)", 29, "UTLMTME010", e.getMessage());
+            Logging.handleException("Util", "mapToModel(String json, Class<T> cls)", 33, "UTLMTME010", e.getMessage());
             return null;
         }
     }
@@ -42,7 +42,17 @@ public class Util {
             String json = objectMapper.writeValueAsString(map);
             return mapToModel(json, cls);
         } catch(Exception e) {
-            Logging.handleException("Util", "mapToModel(Map<String, Object> map, Class<T> cls)", 38, "UTLMTME020", e.getMessage());
+            Logging.handleException("Util", "mapToModel(Map<String, Object> map, Class<T> cls)", 42, "UTLMTME020", e.getMessage());
+            return null;
+        }
+    }
+
+    public static <T> T mapToModel(Object object, Class<T> cls) {
+        try {
+            String json = objectMapper.writeValueAsString(object);
+            return mapToModel(json, cls);
+        } catch(Exception e) {
+            Logging.handleException("Util", "mapToModel(Object object, Class<T> cls)", 52, "UTLMTME030", e.getMessage());
             return null;
         }
     }

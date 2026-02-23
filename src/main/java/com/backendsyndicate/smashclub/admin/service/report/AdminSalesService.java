@@ -167,7 +167,7 @@ public class AdminSalesService implements IStatistic {
                         court.setItemName(booking.getCourt().getCourtCode() + " - " + booking.getCourt().getCourtName());
                         court.setItemQty((int) Duration.between(booking.getStartTime(), booking.getEndTime()).toHours());
                         court.setItemUnit("jam");
-                        court.setItemPrice(booking.getBasePrice());
+                        court.setItemPrice(booking.getBasePrice().divide(BigDecimal.valueOf(court.getItemQty())));
 
                         itemList.add(court);
 

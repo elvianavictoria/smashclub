@@ -191,6 +191,11 @@ public class SecurityConfiguration {
                                 "/api/v1/booking/{bookingCode}/complete"
                         ).authenticated()
 
+                        // Callbacks
+                        .requestMatchers(
+                                "/api/v1/callback/**"
+                        ).permitAll()
+
                         .requestMatchers(
                                 "/api/v1/wallet/**"
                         ).authenticated()
