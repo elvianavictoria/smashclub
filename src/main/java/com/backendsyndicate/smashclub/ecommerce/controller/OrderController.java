@@ -41,6 +41,12 @@ public class OrderController {
         return GlobalResponse.success("Buy now order created", order, request);
     }
 
+    @PostMapping("/{orderId}/payment")
+    public ResponseEntity<Object> createOrderPayment(@PathVariable Long orderId, @RequestHeader("Authorization") String authorizationHeader, HttpServletRequest request) {
+        String userId = extractUserIdFromToken(authorizationHeader);
+        return orderService.paymentOrder(orderId, request);
+    }
+
     @GetMapping("/{orderId}")
     public ResponseEntity<Object> getOrderSummary(@PathVariable Long orderId, @RequestHeader("Authorization") String authorizationHeader,HttpServletRequest request) {
         String userId = extractUserIdFromToken(authorizationHeader);
