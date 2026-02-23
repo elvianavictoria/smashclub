@@ -53,7 +53,7 @@ public class TestPaymentService extends AbstractTestNGSpringContextTests {
         customerId = "123";
         totalPrice = BigDecimal.valueOf(200000);
         referenceCode = "AAA";
-        transactionType = TransactionTypeConstant.COURT_BOOKING;
+        transactionType = TransactionTypeConstant.WALLET_TOPUP;
 
         paymentMethodId = PaymentMethodConstant.VA_BCA;
 

@@ -300,4 +300,10 @@ public class AdminConstant {
     public static final String ADMIN_SALES_SERVICE_DETAIL_CODE_REQUIRED = "ADMSLS-03E001";
     public static final String ADMIN_SALES_SERVICE_DETAIL_NOT_FOUND = "ADMSLS-03E002";
     public static final String ADMIN_SALES_SERVICE_DETAIL_EXCEPTION = "ADMSLS-03E010";
+
+    public static final String ADMIN_BOOKING_SERVICE_STATISTIC_EXCEPTION = "ADMBKG-01E010";
+    public static final String ADMIN_BOOKING_SERVICE_LIST_EXCEPTION = "ADMBKG-02E010";
+    public static final String ADMIN_BOOKING_SERVICE_DETAIL_CODE_REQUIRED = "ADMBKG-03E001";
+    public static final String ADMIN_BOOKING_SERVICE_DETAIL_NOT_FOUND = "ADMBKG-03E002";
+    public static final String ADMIN_BOOKING_SERVICE_DETAIL_EXCEPTION = "ADMBKG-03E010";
 }

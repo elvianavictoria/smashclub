@@ -98,10 +98,12 @@ public class SecurityConfiguration {
                         auth -> auth
                                 // Endpoints that open for public
                                 .requestMatchers(
-                                        "/api/v1/admin/auth/login"
+                                        "/api/v1/admin/auth/login",
                                         // Test
 //                                        "/api/v1/admin/sales/**",
-//                                        "/api/v1/admin/refund-request/**"
+//                                        "/api/v1/admin/refund-request/**",
+                                        "/api/v1/admin/booking/**",
+                                        "/api/v1/admin/order/**"
                                 )
                                 .permitAll()
                                 // Endpoints that need authorization
@@ -188,6 +190,11 @@ public class SecurityConfiguration {
                                 "/api/v1/booking/{bookingCode}/start",
                                 "/api/v1/booking/{bookingCode}/complete"
                         ).authenticated()
+
+                        // Callbacks
+                        .requestMatchers(
+                                "/api/v1/callback/**"
+                        ).permitAll()
 
                         .requestMatchers(
                                 "/api/v1/wallet/**"
