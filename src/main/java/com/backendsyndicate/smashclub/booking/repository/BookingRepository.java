@@ -2,14 +2,19 @@ package com.backendsyndicate.smashclub.booking.repository;
 
 import com.backendsyndicate.smashclub.booking.model.Booking;
 import com.backendsyndicate.smashclub.common.constant.BookingConstant;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -50,4 +55,19 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query("SELECT b FROM Booking b LEFT JOIN FETCH b.user LEFT JOIN FETCH b.court WHERE b.bookingCode = :bookingCode")
     Optional<Booking> findByBookingCodeWithDetails(@Param("bookingCode") String bookingCode);
+
+    // Statistic Related
+    @Query(value="SELECT COUNT(b) FROM Booking b WHERE b.createdAt BETWEEN ?1 AND ?2")
+    int countByCreatedAt(LocalDateTime startDate, LocalDateTime endDate);
+    @Query(value="SELECT AVG(b.durationHour) FROM Booking b WHERE b.createdAt BETWEEN ?1 AND ?2")
+    double averageBookingHourByCreatedAt(LocalDateTime startDate, LocalDateTime endDate);
+//    @Query(value="SELECT ")
+//    double occupancyRate(LocalDateTime startDate, LocalDateTime endDate);
+    @Query(value="SELECT FORMAT(b.createdAt, 'MMMM yyyy') AS month, " +
+            "COUNT(b) AS totalCount, AVG(b.durationHour) AS averageHour, " +
+            "SUM(b.totalPrice) AS totalPrice FROM Booking b " +
+            "WHERE b.createdAt BETWEEN ?1 AND ?2 GROUP BY FORMAT(b.createdAt, 'MMMM yyyy')")
+    List<Map<String, Object>> findAllGroupByCreatedAtMonthly(LocalDateTime startDate, LocalDateTime endDate);
+    Page<Booking> findAllByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
+    Page<Booking> findAllByCreatedAtBetweenAndBookingCodeContainsIgnoreCase(LocalDateTime startDate, LocalDateTime endDate, String bookingCode, Pageable pageable);
 }

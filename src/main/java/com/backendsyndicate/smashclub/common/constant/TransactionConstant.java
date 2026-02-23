@@ -42,8 +42,10 @@ public class TransactionConstant {
     public static final String WALLET_SERVICE_ERROR_CREATE_WALLET_EXISTS = "WLLT-05E002";
     public static final String WALLET_SERVICE_ERROR_CREATE_EXCEPTION = "WLLT-05E010";
 
-    public static final String PAYMENT_SERVICE_ERROR_CREATE_USER_NOT_FOUND = "PYMT-01E001";
-    public static final String PAYMENT_SERVICE_ERROR_CREATE_TRX_NOT_FOUND = "PYMT-01E002";
+    public static final String PAYMENT_SERVICE_ERROR_CREATE_PARAM_REQUIRED = "PYMT-01E001";
+    public static final String PAYMENT_SERVICE_ERROR_CREATE_USER_NOT_FOUND = "PYMT-01E002";
+    public static final String PAYMENT_SERVICE_ERROR_CREATE_TRX_NOT_FOUND = "PYMT-01E003";
+    public static final String PAYMENT_SERVICE_ERROR_CREATE_PG_FAILED = "PYMT-01E004";
     public static final String PAYMENT_SERVICE_ERROR_CREATE_EXCEPTION = "PYMT-01E010";
     public static final String PAYMENT_SERVICE_ERROR_PAYMENT_CODE_REQUIRED = "PYMT-02E001";
     public static final String PAYMENT_SERVICE_ERROR_PAYMENT_TRX_NOT_FOUND = "PYMT-02E002";
