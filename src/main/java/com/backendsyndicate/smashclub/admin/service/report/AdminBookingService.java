@@ -125,6 +125,7 @@ public class AdminBookingService implements IStatistic {
                     return mapListToDTO(booking);
                 }
             });
+            response.setBookings(listDTO);
 
         } catch(Exception e) {
             Logging.handleException("AdminBookingService", "list(LocalDate monthStart, HttpServletRequest request)", 83, AdminConstant.ADMIN_BOOKING_SERVICE_LIST_EXCEPTION, e.getMessage());
