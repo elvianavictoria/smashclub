@@ -4,6 +4,8 @@ import com.backendsyndicate.smashclub.auth.repository.UserRepository;
 import com.backendsyndicate.smashclub.common.constant.CartStatusConstant;
 import com.backendsyndicate.smashclub.common.constant.OrderStatusConstant;
 import com.backendsyndicate.smashclub.common.constant.TransactionTypeConstant;
+import com.backendsyndicate.smashclub.common.handler.GlobalExceptionHandler;
+import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.ecommerce.core.IOrder;
 import com.backendsyndicate.smashclub.ecommerce.dto.request.ReqBuyNowDTO;
@@ -13,18 +15,24 @@ import com.backendsyndicate.smashclub.ecommerce.repo.CartRepo;
 import com.backendsyndicate.smashclub.ecommerce.repo.OrderItemRepo;
 import com.backendsyndicate.smashclub.ecommerce.repo.OrderRepo;
 import com.backendsyndicate.smashclub.ecommerce.repo.ProductVariantRepo;
+import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransactionDTO;
+import com.backendsyndicate.smashclub.payment.model.Transaction;
 import com.backendsyndicate.smashclub.payment.service.PaymentService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -107,13 +115,6 @@ public class OrderService implements IOrder {
         order.setTotalPrice(subtotal);
         orderRepo.save(order);
 
-        paymentService.createTransaction(
-                userId,
-                order.getTotalPrice(),
-                order.getId().toString(),
-                TransactionTypeConstant.ECOMMERCE_SHOPPING
-        );
-
         cartService.clearCart(userId);
 
         RespCreateOrderDTO response = new RespCreateOrderDTO();
@@ -167,13 +168,6 @@ public class OrderService implements IOrder {
         order.setTotalPrice(total);
         orderRepo.save(order);
 
-        paymentService.createTransaction(
-                userId,
-                total,
-                order.getId().toString(),
-                TransactionTypeConstant.ECOMMERCE_SHOPPING
-        );
-
         RespCreateOrderDTO response = new RespCreateOrderDTO();
         response.setOrderId(order.getId());
         response.setStatus(order.getStatus());
@@ -185,8 +179,36 @@ public class OrderService implements IOrder {
         }
     }
 
+
+    @Override
+    public ResponseEntity<Object> paymentOrder(Long orderId, HttpServletRequest request){
+        try{
+            Order order = orderRepo.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found") );
+            if (order.getStatus() != OrderStatusConstant.ORDER_PAYMENT_PENDING) {
+                return GlobalResponse.failed("Invalid order status", generateErrorCode("03", "001"), null, request);
+            }
+            RespCreateTransactionDTO transaction = paymentService.createTransaction(
+                    order.getUser().getId(),
+                    order.getTotalPrice(),
+                    order.getId().toString(),
+                    TransactionTypeConstant.ECOMMERCE_SHOPPING
+            );
+            if (transaction == null){
+                return GlobalResponse.failed("Failed to create payment transaction", generateErrorCode("03", "002"), null, request);
+            }
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("orderId", order.getId());
+            response.put("paymentData", transaction.getPaymentData());
+
+            return GlobalResponse.success("Succesfully created payment transaction", response, request);
+        } catch (Exception ex){
+            return GlobalResponse.failed("Failed to create payment", generateErrorCode("03", "010"), ex, request);
+        }
+    }
+
     /**
-     * Code: 03
+     * Code: 04
      *
      * @param orderId
      * @param newStatus
@@ -196,25 +218,25 @@ public class OrderService implements IOrder {
         Optional<Order> optOrder = orderRepo.findById(orderId);
         try{
         if (optOrder.isEmpty()) {
-            Logging.handleException("OrderService", "updateOrderStatus(Long orderId, byte newStatus)", 199, generateErrorCode("03", "001"), "Order not found");
+            Logging.handleException("OrderService", "updateOrderStatus(Long orderId, byte newStatus)", 199, generateErrorCode("04", "001"), "Order not found");
         }
 
         Order order = optOrder.get();
         byte currentStatus = order.getStatus();
 
         if (!OrderStatusConstant.isValidTransition(currentStatus, newStatus)) {
-            Logging.handleException("OrderService", "updateOrderStatus(Long orderId, byte newStatus)", 206, generateErrorCode("03", "002"), "Invalid transition");
+            Logging.handleException("OrderService", "updateOrderStatus(Long orderId, byte newStatus)", 206, generateErrorCode("04", "002"), "Invalid transition");
         }
 
         order.setStatus(newStatus);
         orderRepo.save(order);}
         catch (Exception ex){
-            Logging.handleException("OrderService", "updateOrderStatus(Long orderId, byte newStatus)", 212, generateErrorCode("03", "010"), ex.getMessage());
+            Logging.handleException("OrderService", "updateOrderStatus(Long orderId, byte newStatus)", 212, generateErrorCode("04", "010"), ex.getMessage());
         }
     }
 
     /**
-     * Code: 04
+     * Code: 05
      *
      * @param orderId
      */
@@ -242,7 +264,7 @@ public class OrderService implements IOrder {
     }
 
     /**
-     * Code: 05
+     * Code: 06
      *
      * @param orderId
      * @param userId
@@ -280,7 +302,7 @@ public class OrderService implements IOrder {
     }
 
     /**
-     * Code: 06
+     * Code: 07
      *
      * @param userId
      * @param page
