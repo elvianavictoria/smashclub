@@ -408,7 +408,7 @@ public class PaymentService implements IPayment {
      * @param referenceCode
      * @return
      */
-    protected Transaction getTransactionByReferenceCode(String referenceCode) {
+    public Transaction getTransactionByReferenceCode(String referenceCode) {
         Optional<Transaction> optionalTrx = transactionRepo.findByReferenceCode(referenceCode);
         if( optionalTrx.isEmpty() ) return null;
         Transaction trx = optionalTrx.get();

@@ -7,6 +7,7 @@ import com.backendsyndicate.smashclub.payment.dto.request.ReqPaymentTransactionD
 import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransactionDTO;
 import com.backendsyndicate.smashclub.payment.dto.response.RespPaymentTransactionDTO;
 import com.backendsyndicate.smashclub.payment.dto.response.RespCancelTransactionDTO;
+import com.backendsyndicate.smashclub.payment.model.Transaction;
 import com.backendsyndicate.smashclub.payment.service.TransactionService;
 import com.backendsyndicate.smashclub.payment.service.helper.PaymentHelper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -64,5 +65,16 @@ public class TransactionController {
     public ResponseEntity<Object> transactionCancel(@PathVariable String transactionCode, @RequestBody String refundReason, HttpServletRequest request) {
         RespCancelTransactionDTO refund = paymentService.cancelTransaction(transactionCode, refundReason);
         return GlobalResponse.success("Successfully cancel transaction!", refund, request);
+    }
+
+    @PostMapping("cancel-by-reference/{referenceCode}")
+    public ResponseEntity<Object> transactionCancelByReference(@PathVariable String referenceCode, @RequestBody String refundReason, HttpServletRequest request) {
+        Transaction transaction = paymentService.getTransactionByReferenceCode(referenceCode);
+        if( transaction == null ) {
+            return GlobalResponse.failed("Failed to cancel transaction!", "PYMTCBR01E001", null, request);
+        }
+
+        RespCancelTransactionDTO cancel = paymentService.cancelTransaction(transaction.getTransactionCode(), refundReason);
+        return GlobalResponse.success("Successfully cancel transaction!", cancel, request);
     }
 }
