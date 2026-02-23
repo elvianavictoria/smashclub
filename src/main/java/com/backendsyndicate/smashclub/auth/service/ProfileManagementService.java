@@ -58,7 +58,7 @@ public class ProfileManagementService {
         // Check if there's pending email change
         Optional<EmailChangeToken> pendingEmailChange = emailChangeTokenRepository
                 .findByUserIdAndUsedAtIsNull(userId);
-        String newEmail = pendingEmailChange.get().getNewEmail();
+        String newEmail = pendingEmailChange.map(EmailChangeToken::getNewEmail).orElse(null);
         ProfileResponse profileResponse = ProfileResponse.fromUser(user, newEmail);
 
         if (pendingEmailChange.isPresent()) {
