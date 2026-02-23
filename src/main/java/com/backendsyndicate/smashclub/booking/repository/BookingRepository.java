@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -23,6 +22,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Long countTodayBooking();
 
     Optional<Booking> findByBookingCode(String bookingCode);
+
+    Page<Booking> findByUserId(String userId, Pageable pageable);
 
     List<Booking> findByUserId(String userId);
 

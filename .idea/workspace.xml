@@ -6,12 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="cd9e846d-d2b3-4db3-8c78-09651c2e3476" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/admin/dto/extra/ExtAdminBookingListDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/admin/dto/extra/ExtAdminBookingListDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/admin/service/report/AdminSalesService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/admin/service/report/AdminSalesService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/common/constant/TransactionConstant.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/common/constant/TransactionConstant.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/common/security/SecurityConfiguration.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/common/security/SecurityConfiguration.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/common/util/Util.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/common/util/Util.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/payment/dto/response/RespGetBalanceLogDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/payment/dto/response/RespGetBalanceLogDTO.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/payment/service/TransactionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/payment/service/TransactionService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

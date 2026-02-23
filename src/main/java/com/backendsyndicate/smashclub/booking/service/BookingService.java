@@ -15,6 +15,9 @@
     import jakarta.servlet.http.HttpServletRequest;
     import lombok.RequiredArgsConstructor;
     import lombok.extern.slf4j.Slf4j;
+    import org.springframework.data.domain.Page;
+    import org.springframework.data.domain.PageImpl;
+    import org.springframework.data.domain.Pageable;
     import org.springframework.http.HttpStatus;
     import org.springframework.http.ResponseEntity;
     import org.springframework.stereotype.Service;
@@ -500,27 +503,49 @@
         @Transactional(readOnly = true)
         public ResponseEntity<Object> getUserBookings(
                 String userId,
+                Pageable pageable,
                 HttpServletRequest httpRequest) {
 
-            log.info("Getting user bookings - userId: {}", userId);
+            log.info("Getting user bookings - userId: {}, page: {}, size: {}",
+                    userId, pageable.getPageNumber(), pageable.getPageSize());
 
             try {
-                List<Booking> bookings = bookingRepository.findByUserId(userId);
+                // Gunakan method repository dengan Pageable - ini mengembalikan org.springframework.data.domain.Page
+                Page<Booking> bookingPage = bookingRepository.findByUserId(userId, pageable);
 
-                List<BookingResponse> responses = new ArrayList<>();
-                for (Booking booking : bookings) {
-                    List<CoachDetail> coachDetails = coachDetailRepository
-                            .findByBookingIdWithDetails(booking.getId());
-                    List<EquipmentDetail> equipmentDetails = equipmentDetailRepository
-                            .findByBookingIdWithDetails(booking.getId());
-                    responses.add(buildBookingResponse(booking, coachDetails, equipmentDetails));
+                if (bookingPage.isEmpty()) {
+                    return responseHandler.handleResponse(
+                            "Tidak ada data booking",
+                            HttpStatus.OK,
+                            null,
+                            bookingPage, // Langsung return Page kosong
+                            httpRequest
+                    );
                 }
+
+                // Convert each booking to response DTO
+                List<BookingResponse> bookingResponses = bookingPage.getContent().stream()
+                        .map(booking -> {
+                            List<CoachDetail> coachDetails = coachDetailRepository
+                                    .findByBookingIdWithDetails(booking.getId());
+                            List<EquipmentDetail> equipmentDetails = equipmentDetailRepository
+                                    .findByBookingIdWithDetails(booking.getId());
+                            return buildBookingResponse(booking, coachDetails, equipmentDetails);
+                        })
+                        .collect(Collectors.toList());
+
+                // Create Page object with responses menggunakan PageImpl
+                Page<BookingResponse> responsePage = new PageImpl<>(
+                        bookingResponses,
+                        pageable,
+                        bookingPage.getTotalElements()
+                );
 
                 return responseHandler.handleResponse(
                         "Data booking user berhasil diambil",
                         HttpStatus.OK,
                         null,
-                        responses,
+                        responsePage,
                         httpRequest
                 );
 
