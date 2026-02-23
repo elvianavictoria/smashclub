@@ -9,6 +9,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -93,6 +96,10 @@ public class BookingController {
     @GetMapping("/my-bookings")
     public ResponseEntity<Object> getMyBookings(
             @RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDirection,
             HttpServletRequest httpRequest) {
 
         String userId = extractUserIdFromToken(authorizationHeader);
@@ -100,7 +107,13 @@ public class BookingController {
             return ResponseEntity.status(401).body("Unauthorized");
         }
 
-        return bookingService.getUserBookings(userId, httpRequest);
+        // Create Pageable object
+        Sort sort = sortDirection.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return bookingService.getUserBookings(userId, pageable, httpRequest);
     }
 
     // ============ UPDATE BOOKING STATUS ============
