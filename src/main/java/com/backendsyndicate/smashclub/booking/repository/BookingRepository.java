@@ -2,6 +2,9 @@ package com.backendsyndicate.smashclub.booking.repository;
 
 import com.backendsyndicate.smashclub.booking.model.Booking;
 import com.backendsyndicate.smashclub.common.constant.BookingConstant;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,6 +21,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Long countTodayBooking();
 
     Optional<Booking> findByBookingCode(String bookingCode);
+
+    Page<Booking> findByUserId(String userId, Pageable pageable);
 
     List<Booking> findByUserId(String userId);
 

@@ -5,6 +5,7 @@ import com.backendsyndicate.smashclub.auth.model.EmailVerificationTokens;
 import com.backendsyndicate.smashclub.auth.model.User;
 import com.backendsyndicate.smashclub.auth.repository.EmailVerificationTokenRepository;
 import com.backendsyndicate.smashclub.auth.repository.UserRepository;
+import com.backendsyndicate.smashclub.common.util.ValidationError;
 import com.backendsyndicate.smashclub.common.handler.ResponseHandler;
 import com.backendsyndicate.smashclub.common.security.PasswordHasher;
 import com.backendsyndicate.smashclub.common.constant.AuthenticationConstant;
@@ -17,6 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -31,62 +35,75 @@ public class RegistrationService {
     private final PasswordHasher passwordHasher;
     private final EmailServiceImpl emailServiceImpl;
     private final ValidationService validationService;
+    private final ResponseHandler responseHandler;
 
     @Transactional
-    public ResponseEntity<Object> register(RegisterRequest request, HttpServletRequest httpRequest,
-                                           ResponseHandler responseHandler) {
+    public ResponseEntity<Object> register(RegisterRequest request, HttpServletRequest httpRequest) {
         log.info("Registration attempt - email: {}", request.getEmail());
 
-        // 1. Validasi format data
-        if (!validationService.isValidRegistrationData(request)) {
-            log.warn("Invalid registration data - email: {}", request.getEmail());
+        // Validasi data registrasi (format, panjang, kompleksitas)
+        List<ValidationError> validationErrors = validationService.validateRegistrationData(request);
+
+        if (!validationErrors.isEmpty()) {
+            log.warn("Invalid registration data - email: {}, errors: {}",
+                    request.getEmail(), validationErrors.size());
+
+            Map<String, Object> errorData = new HashMap<>();
+            errorData.put("errors", validationErrors);
+
             return responseHandler.handleResponse(
                     "Data registrasi tidak valid",
                     HttpStatus.BAD_REQUEST,
                     "AUTH_001",
-                    null,
+                    errorData,
                     httpRequest
             );
         }
 
-        // 2. Cek email unique
-        if (userRepository.existsByEmail(request.getEmail())) {
+        // Cek keunikan email di database
+        if (userRepository.existsByEmail(request.getEmail().toLowerCase().trim())) {
             log.warn("Email already exists - email: {}", request.getEmail());
+
+            Map<String, Object> errorData = new HashMap<>();
+            errorData.put("field", "email");
+            errorData.put("reason", "already_exists");
+
             return responseHandler.handleResponse(
                     "Email sudah terdaftar",
                     HttpStatus.BAD_REQUEST,
                     "AUTH_002",
-                    null,
+                    errorData,
                     httpRequest
             );
         }
 
-        // 3. Create user dengan status PENDING
+        // Buat user baru dengan status PENDING (menunggu verifikasi email)
         User user = createUser(request);
         user = userRepository.saveAndFlush(user);
         log.info("User created - userId: {}, email: {}", user.getId(), user.getEmail());
 
-        // 4. Generate dan simpan verification token
+        // Generate token verifikasi email (berlaku 24 jam)
         EmailVerificationTokens verificationToken = createVerificationToken(user);
         emailVerificationTokenRepository.saveAndFlush(verificationToken);
 
-        // 5. Kirim email verifikasi
+        // Kirim email verifikasi ke user
         sendVerificationEmail(user, verificationToken.getToken());
 
-        Map<String, Object> data = Map.of("userId", user.getId());
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("userId", user.getId());
+        responseData.put("email", user.getEmail());
 
         return responseHandler.handleResponse(
                 "Registrasi berhasil, cek email untuk verifikasi",
                 HttpStatus.CREATED,
                 null,
-                data,
+                responseData,
                 httpRequest
         );
     }
 
     @Transactional
-    public ResponseEntity<Object> verifyEmail(String token, HttpServletRequest httpRequest,
-                                              ResponseHandler responseHandler) {
+    public ResponseEntity<Object> verifyEmail(String token, HttpServletRequest httpRequest) {
         log.info("Email verification attempt - token: {}", token);
 
         Optional<EmailVerificationTokens> tokenOpt = emailVerificationTokenRepository
@@ -94,34 +111,44 @@ public class RegistrationService {
 
         if (tokenOpt.isEmpty()) {
             log.warn("Invalid verification token - token: {}", token);
+
+            Map<String, Object> errorData = new HashMap<>();
+            errorData.put("token", token);
+            errorData.put("reason", "invalid_or_used");
+
             return responseHandler.handleResponse(
                     "Token verifikasi tidak valid",
                     HttpStatus.BAD_REQUEST,
                     "AUTH_009",
-                    null,
+                    errorData,
                     httpRequest
             );
         }
 
         EmailVerificationTokens verificationToken = tokenOpt.get();
 
-        // Cek expired
+        // Cek masa berlaku token (24 jam sejak dibuat)
         if (verificationToken.getExpiresAt().isBefore(LocalDateTime.now())) {
             log.warn("Expired verification token - token: {}", token);
+
+            Map<String, Object> errorData = new HashMap<>();
+            errorData.put("token", token);
+            errorData.put("expiredAt", verificationToken.getExpiresAt().toString());
+
             return responseHandler.handleResponse(
                     "Token verifikasi telah kadaluarsa",
                     HttpStatus.BAD_REQUEST,
                     "AUTH_010",
-                    null,
+                    errorData,
                     httpRequest
             );
         }
 
-        // Update token as used
+        // Tandai token sudah digunakan
         verificationToken.setUsedAt(LocalDateTime.now());
         emailVerificationTokenRepository.save(verificationToken);
 
-        // Update user status to ACTIVE
+        // Aktifkan user
         User user = verificationToken.getUser();
         user.setStatus(AuthenticationConstant.ACTIVE);
         user.setUpdatedDate(LocalDateTime.now());
@@ -129,18 +156,22 @@ public class RegistrationService {
 
         log.info("Email verified successfully - userId: {}, email: {}", user.getId(), user.getEmail());
 
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("userId", user.getId());
+        responseData.put("email", user.getEmail());
+        responseData.put("verifiedAt", LocalDateTime.now().toString());
+
         return responseHandler.handleResponse(
                 "Email berhasil diverifikasi",
                 HttpStatus.OK,
                 null,
-                null,
+                responseData,
                 httpRequest
         );
     }
 
     @Transactional
-    public ResponseEntity<Object> resendVerificationEmail(String email, HttpServletRequest httpRequest,
-                                                          ResponseHandler responseHandler) {
+    public ResponseEntity<Object> resendVerificationEmail(String email, HttpServletRequest httpRequest) {
         String ipAddress = httpRequest.getRemoteAddr();
         log.info("Resend verification email request - email: {}, IP: {}", email, ipAddress);
 
@@ -148,76 +179,100 @@ public class RegistrationService {
 
         if (userOpt.isEmpty()) {
             log.warn("Email not found for resend - email: {}", email);
+
+            Map<String, Object> errorData = new HashMap<>();
+            errorData.put("email", email);
+
             return responseHandler.handleResponse(
                     "Email tidak ditemukan",
                     HttpStatus.NOT_FOUND,
                     "AUTH_013",
-                    null,
+                    errorData,
                     httpRequest
             );
         }
 
         User user = userOpt.get();
 
+        // Hanya user dengan status PENDING yang boleh minta verifikasi ulang
         if (user.getStatus() != AuthenticationConstant.PENDING) {
             log.warn("Resend blocked - account not pending - email: {}, status: {}", email, user.getStatus());
+
+            Map<String, Object> errorData = new HashMap<>();
+            errorData.put("email", email);
+            errorData.put("status", user.getStatus());
+
             return responseHandler.handleResponse(
                     "Akun sudah aktif atau tidak memerlukan verifikasi",
                     HttpStatus.BAD_REQUEST,
                     "AUTH_014",
-                    null,
+                    errorData,
                     httpRequest
             );
         }
 
-        // Cek kapan terakhir dikirim (prevent spam)
+        // Cegah spam: minimal 1 menit antar pengiriman
         Optional<EmailVerificationTokens> lastToken = emailVerificationTokenRepository
                 .findTopByUserOrderByCreatedAtDesc(user);
 
         if (lastToken.isPresent()) {
             LocalDateTime lastSent = lastToken.get().getCreatedAt();
-            java.time.Duration timeSinceLast = java.time.Duration.between(lastSent, LocalDateTime.now());
+            Duration timeSinceLast = Duration.between(lastSent, LocalDateTime.now());
 
-            if (timeSinceLast.toMinutes() < 1) { // Minimal 1 menit antar request
+            if (timeSinceLast.toMinutes() < 1) {
                 log.warn("Resend too soon - email: {}, lastSent: {}", email, lastSent);
+
+                Map<String, Object> errorData = new HashMap<>();
+                errorData.put("email", email);
+                errorData.put("lastSent", lastSent.toString());
+                errorData.put("waitSeconds", 60 - timeSinceLast.toSeconds());
+
                 return responseHandler.handleResponse(
                         "Silakan tunggu 1 menit sebelum meminta email verifikasi lagi",
                         HttpStatus.BAD_REQUEST,
                         "AUTH_020",
-                        null,
+                        errorData,
                         httpRequest
                 );
             }
         }
 
-        // Invalidate existing tokens
+        // Nonaktifkan token-token lama
         emailVerificationTokenRepository.invalidateUserTokens(user.getId(), LocalDateTime.now());
 
-        // Generate new token
+        // Generate token baru
         String token = UUID.randomUUID().toString();
         EmailVerificationTokens verificationToken = createVerificationToken(user, token);
         emailVerificationTokenRepository.save(verificationToken);
 
-        // Kirim email
+        // Kirim ulang email verifikasi
         try {
             emailServiceImpl.sendActivationEmail(user.getEmail(), token);
             log.info("Verification email resent - email: {}", user.getEmail());
         } catch (Exception e) {
             log.error("Failed to resend verification email - email: {}, error: {}", user.getEmail(), e.getMessage());
+
+            Map<String, Object> errorData = new HashMap<>();
+            errorData.put("email", user.getEmail());
+
             return responseHandler.handleResponse(
                     "Gagal mengirim email verifikasi. Silakan coba lagi nanti.",
-                    HttpStatus.BAD_REQUEST,
+                    HttpStatus.INTERNAL_SERVER_ERROR,
                     "AUTH_021",
-                    null,
+                    errorData,
                     httpRequest
             );
         }
+
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("email", user.getEmail());
+        responseData.put("nextResendAvailableIn", 60);
 
         return responseHandler.handleResponse(
                 "Email verifikasi telah dikirim ulang",
                 HttpStatus.OK,
                 null,
-                null,
+                responseData,
                 httpRequest
         );
     }
@@ -237,7 +292,6 @@ public class RegistrationService {
         return createVerificationToken(user, UUID.randomUUID().toString());
     }
 
-    // RegistrationService.java
     private EmailVerificationTokens createVerificationToken(User user, String token) {
         return EmailVerificationTokens.builder()
                 .user(user)
@@ -245,7 +299,7 @@ public class RegistrationService {
                 .expiresAt(LocalDateTime.now()
                         .plusHours(AuthenticationConstant.VERIFICATION_TOKEN_EXPIRY_HOURS))
                 .createdAt(LocalDateTime.now())
-                .build();  // ← usedAt otomatis null (default)
+                .build();
     }
 
     private void sendVerificationEmail(User user, String token) {
