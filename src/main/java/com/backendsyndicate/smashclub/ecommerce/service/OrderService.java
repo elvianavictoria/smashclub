@@ -29,7 +29,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +40,7 @@ import java.util.Optional;
 @Service
 @Transactional
 public class OrderService implements IOrder {
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyMMdd");
     @Autowired
     private OrderRepo orderRepo;
 
@@ -151,7 +154,7 @@ public class OrderService implements IOrder {
         order.setUser(userRepo.findById(userId).get());
         order.setStatus(OrderStatusConstant.ORDER_PAYMENT_PENDING);
         order.setOrderDate(LocalDateTime.now());
-        orderRepo.save(order);
+        order.setOrderCode(generateOrderCode());
 
         BigDecimal price = productVariant.getPrice();
         BigDecimal total = price.multiply(BigDecimal.valueOf(request.getQuantity()));
@@ -162,14 +165,34 @@ public class OrderService implements IOrder {
         orderItem.setPriceAtPurchase(price);
         orderItem.setQuantity(request.getQuantity());
         order.setTotalPrice(total);
-        orderItemRepo.save(orderItem);
 
         order.setSubTotal(total);
         order.setTotalPrice(total);
-        orderRepo.save(order);
+        Logging.printConsole(order.getUser().getId());
+        Logging.printConsole(order.getTotalPrice().toString());
+        Logging.printConsole(order.getOrderCode());
+        RespCreateTransactionDTO transactionDTO = paymentService.createTransaction(
+                order.getUser().getId(),
+                order.getTotalPrice(),
+                order.getOrderCode(),
+                TransactionTypeConstant.ECOMMERCE_SHOPPING
+            );
+        if (transactionDTO == null){
+            Logging.handleException("OrderService", "buyNow(String userId, ReqBuyNowDTO request)", 177, generateErrorCode("02", "002"), "Transaction failed");
+            return null;
+        }
+        Transaction transaction = paymentService.getTransaction(transactionDTO.getTransactionCode());
+        Logging.printConsole(transaction.toString());
+        order.setTransactionId(transaction);
+
+        order = orderRepo.save(order);
+        orderItemRepo.save(orderItem);
 
         RespCreateOrderDTO response = new RespCreateOrderDTO();
         response.setOrderId(order.getId());
+        response.setOrderCode(order.getOrderCode());
+        response.setOrderDate(order.getOrderDate());
+        response.setTransactionId(order.getTransactionId().getId());
         response.setStatus(order.getStatus());
         response.setTotalPrice(order.getTotalPrice());
         return response;}
@@ -329,6 +352,21 @@ public class OrderService implements IOrder {
             Logging.handleException("OrderService", "getUserOrderHistory(String userId, int page, int size)", 307, generateErrorCode("06", "010"), e.getMessage());
             return null;
         }
+    }
+
+    private String generateOrderCode(){
+        LocalDate today = LocalDate.now();
+        String datePart = today.format(DATE_FORMATTER);
+
+        // Hitung jumlah booking yang sudah ada di hari ini
+        Long countToday = orderRepo.countTodayOrder();
+
+        // Kalau null (misal belum ada booking), set ke 0
+        long sequence = (countToday != null ? countToday : 0) + 1;
+
+        String sequencePart = String.format("%04d", sequence);
+
+        return "EC-" + datePart + "-" + sequencePart;
     }
 }
 
