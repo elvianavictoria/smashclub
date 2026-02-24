@@ -142,7 +142,8 @@ public class AuthController {
     // ============ HELPER METHOD ============
     private String extractTokenFromHeader(String authorizationHeader) {
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            return authorizationHeader.substring(7);
+            String token = authorizationHeader.substring(7).trim();
+            return token.isEmpty() ? "" : token;
         }
         return authorizationHeader;
     }
