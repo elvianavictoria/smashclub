@@ -15,9 +15,6 @@ public class XenditConfig {
     private static String publicKey;
     private static char useInvoice;
 
-    private static String successRedirectUrl;
-    private static String failedRedirectUrl;
-
     public static String getSecretKey() {
         return secretKey;
     }
@@ -43,24 +40,6 @@ public class XenditConfig {
     @Value("${xendit.api.use-invoice}")
     private void setUseInvoice(char useInvoice) {
         XenditConfig.useInvoice = useInvoice;
-    }
-
-    public static String getSuccessRedirectUrl() {
-        return successRedirectUrl;
-    }
-
-    @Value("${xendit.url.redirect-success}")
-    private void setSuccessRedirectUrl(String successRedirectUrl) {
-        XenditConfig.successRedirectUrl = successRedirectUrl;
-    }
-
-    public static String getFailedRedirectUrl() {
-        return failedRedirectUrl;
-    }
-
-    @Value("${xendit.url.redirect-failed}")
-    private void setFailedRedirectUrl(String failedRedirectUrl) {
-        XenditConfig.failedRedirectUrl = failedRedirectUrl;
     }
 
     @Bean

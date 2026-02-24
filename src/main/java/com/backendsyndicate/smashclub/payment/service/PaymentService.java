@@ -3,6 +3,7 @@ package com.backendsyndicate.smashclub.payment.service;
 import com.backendsyndicate.smashclub.admin.service.log.LogService;
 import com.backendsyndicate.smashclub.auth.model.User;
 import com.backendsyndicate.smashclub.auth.repository.UserRepository;
+import com.backendsyndicate.smashclub.common.config.MainConfig;
 import com.backendsyndicate.smashclub.common.service.TemplateService;
 import com.backendsyndicate.smashclub.common.util.DatetimeFormatting;
 import com.backendsyndicate.smashclub.common.util.Logging;
@@ -142,7 +143,21 @@ public class PaymentService implements IPayment {
             } else {
                 XenditResponseDTO pgResponse = new XenditResponseDTO();
                 if(XenditConfig.getUseInvoice() == 'y') {
-                    pgResponse = xenditService.createPayment(trxCode, totalPrice, transaction.getUser().getEmail(), transaction.getTransactionLabel());
+                    String redirectUrl = MainConfig.getAppFrontendUrl();
+
+                    switch(transactionType) {
+                        case TransactionTypeConstant.COURT_BOOKING:
+                            redirectUrl += "/booking-history";
+                            break;
+                        case TransactionTypeConstant.ECOMMERCE_SHOPPING:
+                            redirectUrl += "/shop/orders";
+                            break;
+                        case TransactionTypeConstant.WALLET_TOPUP:
+                            redirectUrl += "/top-up/history";
+                            break;
+                    }
+
+                    pgResponse = xenditService.createPayment(trxCode, totalPrice, transaction.getUser().getEmail(), transaction.getTransactionLabel(), redirectUrl);
                     if( pgResponse.getInvoiceUrl() != null ) {
                         transaction.setPaymentLink(pgResponse.getInvoiceUrl());
                         // Write to payment log

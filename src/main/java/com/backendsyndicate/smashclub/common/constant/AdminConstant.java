@@ -329,4 +329,7 @@ public class AdminConstant {
     public static final String ADMIN_ORDER_SERVICE_PROCESS_NOT_CANCELLABLE = "ADMORD-04E003";
     public static final String ADMIN_ORDER_SERVICE_PROCESS_INACTIVE = "ADMORD-04E004";
     public static final String ADMIN_ORDER_SERVICE_PROCESS_EXCEPTION = "ADMORD-04E010";
+
+    public static final String ADMIN_LOG_SERVICE_LIST_EMPTY = "ERRLG-01E001";
+    public static final String ADMIN_LOG_SERVICE_LIST_EXCEPTION = "ERRLG-01E010";
 }

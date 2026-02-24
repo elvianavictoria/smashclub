@@ -36,10 +36,10 @@ public class XenditService {
         return "XEN-" + methodNo + "E" + errorNo;
     }
 
-    public XenditResponseDTO createPayment(String externalId, BigDecimal amount, String payerEmail, String description) {
+    public XenditResponseDTO createPayment(String externalId, BigDecimal amount, String payerEmail, String description, String redirectUrl) {
         XenditResponseDTO response = new XenditResponseDTO();
 
-        String paymentUrl = this.createInvoice(externalId, amount, payerEmail, description);
+        String paymentUrl = this.createInvoice(externalId, amount, payerEmail, description, redirectUrl);
         response.setExternalId(externalId);
         response.setInvoiceUrl(paymentUrl);
 
@@ -108,7 +108,7 @@ public class XenditService {
         return response;
     }
 
-    public String createInvoice(String externalId, BigDecimal amount, String payerEmail, String description) {
+    public String createInvoice(String externalId, BigDecimal amount, String payerEmail, String description, String redirectUrl) {
         String invoiceUrl = null;
 
         try {
@@ -117,8 +117,8 @@ public class XenditService {
             params.put("amount", amount);
             params.put("payer_email", payerEmail);
             params.put("description", description);
-            params.put("success_redirect_url", XenditConfig.getSuccessRedirectUrl());
-            params.put("failed_redirect_url", XenditConfig.getFailedRedirectUrl());
+            params.put("success_redirect_url", redirectUrl);
+            params.put("failed_redirect_url", redirectUrl);
 
             Invoice invoice = xenditClient.invoice.create(params);
             invoiceUrl = invoice.getInvoiceUrl();
@@ -152,7 +152,7 @@ public class XenditService {
 
         try {
             Map<String, String> channelProperties = new HashMap<>();
-            channelProperties.put("success_redirect_url", XenditConfig.getSuccessRedirectUrl());
+            channelProperties.put("success_redirect_url", "");
 
             Map<String, Object> params = new HashMap<>();
             params.put("reference_id", referenceId);

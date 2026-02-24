@@ -34,6 +34,7 @@ public class TransactionConstant {
     public static final String WALLET_SERVICE_ERROR_LOG_EMPTY = "WLLT-02E001";
     public static final String WALLET_SERVICE_ERROR_LOG_EXCEPTION = "WLLT-02E010";
     public static final String WALLET_SERVICE_ERROR_TOPUP_USERID_REQUIRED = "WLLT-03E001";
+    public static final String WALLET_SERVICE_ERROR_TOPUP_TRANSACTION_FAILED = "WLLT-03E002";
     public static final String WALLET_SERVICE_ERROR_TOPUP_EXCEPTION = "WLLT-03E010";
     public static final String WALLET_SERVICE_ERROR_UPDATE_USERID_REQUIRED = "WLLT-04E001";
     public static final String WALLET_SERVICE_ERROR_UPDATE_REQUEST_INVALID = "WLLT-04E002";
