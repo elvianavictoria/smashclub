@@ -14,8 +14,8 @@ public interface OrderItemRepo extends JpaRepository<OrderItem,Long> {
     List<OrderItem> findByOrderId(Long orderId);
 
     // Statistic Related
-    @Query(value="SELECT SUM(oi.quantity) FROM OrderItem oi JOIN Order o WHERE o.orderDate BETWEEN ?1 AND ?2")
+    @Query(value="SELECT COALESCE(SUM(oi.quantity), 0) FROM OrderItem oi JOIN oi.order o WHERE o.orderDate BETWEEN ?1 AND ?2")
     int sumQuantityByOrderDateBetween(LocalDateTime startDate, LocalDateTime endDate);
-    @Query(value="SELECT oi.variant.product.category, COUNT(oi.variant.product.category) AS soldQuantity FROM OrderItem oi WHERE oi.order.orderDate BETWEEN ?1 AND ?2 GROUP BY oi.variant.product.category")
+    @Query(value="SELECT oi.variant.product.category, COUNT(oi.variant.product.category) AS soldQuantity FROM OrderItem oi JOIN oi.order o WHERE o.orderDate BETWEEN ?1 AND ?2 GROUP BY oi.variant.product.category")
     List<Map<String, Object>> findAllGroupByProduct_Category(LocalDateTime startDate, LocalDateTime endDate);
 }
