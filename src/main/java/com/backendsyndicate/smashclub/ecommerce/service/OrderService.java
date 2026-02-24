@@ -88,9 +88,9 @@ public class OrderService implements IOrder {
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);
             orderItem.setVariant(cartItem.getVariant());
+            orderItem.setOrderItemImgLink(cartItem.getVariant().getVariantImgLink());
             orderItem.setPriceAtPurchase(cartItem.getVariant().getPrice());
-            orderItem.setQuantity(cartItem.getQuantity());
-            order.setTotalPrice(totalPrice);
+            orderItem.setTotalPrice(totalPrice);
 
             orderItems.add(orderItem);
             subtotal = subtotal.add(totalPrice);
@@ -169,9 +169,10 @@ public class OrderService implements IOrder {
         OrderItem orderItem = new OrderItem();
         orderItem.setOrder(order);
         orderItem.setVariant(productVariant);
+        orderItem.setOrderItemImgLink(productVariant.getVariantImgLink());
         orderItem.setPriceAtPurchase(price);
+        orderItem.setTotalPrice(total);
         orderItem.setQuantity(request.getQuantity());
-        order.setTotalPrice(total);
 
         order.setSubTotal(total);
         order.setTotalPrice(total);
