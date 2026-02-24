@@ -6,13 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="cd9e846d-d2b3-4db3-8c78-09651c2e3476" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/admin/controller/AdminAuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/admin/controller/AdminAuthController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/admin/service/AdminSessionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/admin/service/AdminSessionService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/payment/dto/response/RespTransactionDetailDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/payment/dto/response/RespTransactionDetailDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/payment/model/Transaction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/payment/model/Transaction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/payment/service/TransactionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/payment/service/TransactionService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/backendsyndicate/smashclub/admin/TestAdminAuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/backendsyndicate/smashclub/admin/TestAdminAuthController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/backendsyndicate/smashclub/payment/TestTransactionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/backendsyndicate/smashclub/payment/TestTransactionController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/payment/controller/WalletController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/payment/controller/WalletController.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

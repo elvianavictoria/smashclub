@@ -11,6 +11,7 @@ import lombok.Setter;
 public class RelTransactionRefundRequestDTO {
     private Long refundId = 0L;
     private byte refundStatus = 0;
+    private String refundStatusDesc = "";
     private String refundReason = "";
     private String refundNotes = "";
 }

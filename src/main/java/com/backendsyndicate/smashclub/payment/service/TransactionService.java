@@ -101,6 +101,7 @@ public class TransactionService implements IHistory {
             response.setStatusDesc(TransactionConstant.getStatus(trx.getStatus()));
             response.setTransactionTypeDesc(TransactionTypeConstant.getTransactionType(trx.getTransactionType()));
             if( trx.getRefundRequest().isEmpty() ) response.setRefundRequest(modelMapper.map(trx.getRefundRequest().getFirst(), RelTransactionRefundRequestDTO.class));
+            response.getRefundRequest().setRefundStatusDesc(TransactionConstant.getRefundStatus(trx.getRefundRequest().getFirst().getRefundStatus()));
 
         } catch(Exception e) {
             Logging.handleException("TransactionService", "findByCode(String code, HttpServletRequest request)", 79, TransactionConstant.TRANSACTION_SERVICE_ERROR_DETAIL_EXCEPTION, e.getMessage());
