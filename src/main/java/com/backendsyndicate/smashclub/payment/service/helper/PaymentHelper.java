@@ -1,7 +1,6 @@
 package com.backendsyndicate.smashclub.payment.service.helper;
 
 import com.backendsyndicate.smashclub.booking.dto.request.BookingStatusUpdateRequest;
-import com.backendsyndicate.smashclub.booking.service.BookingService;
 import com.backendsyndicate.smashclub.booking.service.helper.BookingHelper;
 import com.backendsyndicate.smashclub.common.constant.BookingConstant;
 import com.backendsyndicate.smashclub.common.constant.OrderStatusConstant;
@@ -14,7 +13,6 @@ import com.backendsyndicate.smashclub.payment.dto.response.RespCancelTransaction
 import com.backendsyndicate.smashclub.payment.model.Transaction;
 import com.backendsyndicate.smashclub.payment.service.PaymentService;
 import com.backendsyndicate.smashclub.payment.service.WalletService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +41,7 @@ public class PaymentHelper extends PaymentService {
                     break;
                 case TransactionTypeConstant.ECOMMERCE_SHOPPING:
                     // Update order status
-                    orderService.updateOrderStatus(Long.parseLong(trx.getReferenceCode()), OrderStatusConstant.ORDER_PAID);
+                    orderService.updateOrderStatus(Long.parseLong(trx.getReferenceCode()), OrderStatusConstant.ORDER_READY_FOR_PICKUP);
                     break;
                 case TransactionTypeConstant.WALLET_TOPUP:
                     // Update balance
