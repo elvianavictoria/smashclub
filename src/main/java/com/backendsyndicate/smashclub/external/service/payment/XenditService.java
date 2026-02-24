@@ -117,8 +117,8 @@ public class XenditService {
             params.put("amount", amount);
             params.put("payer_email", payerEmail);
             params.put("description", description);
-            params.put("success_redirect_url", "");
-            params.put("failed_redirect_url", "");
+            params.put("success_redirect_url", XenditConfig.getSuccessRedirectUrl());
+            params.put("failed_redirect_url", XenditConfig.getFailedRedirectUrl());
 
             Invoice invoice = xenditClient.invoice.create(params);
             invoiceUrl = invoice.getInvoiceUrl();

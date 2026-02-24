@@ -35,6 +35,8 @@ public interface TransactionRepo extends JpaRepository<Transaction, Long> {
     @Query(value="SELECT FORMAT(t.createdAt, 'MMMM yyyy') AS month, COUNT(t) AS totalTransactionCount, SUM(t.totalPrice) AS totalTransactionValue, AVG(t.totalPrice) AS avgTransactionValue FROM Transaction t WHERE t.createdAt BETWEEN ?1 AND ?2 GROUP BY FORMAT(t.createdAt, 'MMMM yyyy')")
     List<Map<String, Object>> findAllGroupByCreatedAtMonthly(LocalDateTime startDate, LocalDateTime endDate);
 
+    // For booking part
+
     @Query(value="SELECT FORMAT(t.createdAt, 'dddd, dd MMMM yyyy') AS month, COUNT(t) AS totalTransactionCount, SUM(t.totalPrice) AS totalTransactionValue, AVG(t.totalPrice) AS avgTransactionValue FROM Transaction t WHERE t.createdAt BETWEEN ?1 AND ?2 GROUP BY FORMAT(t.createdAt, 'dddd, dd MMMM yyyy')")
     List<Map<String, Object>> findAllGroupByCreatedAtDaily(LocalDateTime startDate, LocalDateTime endDate);
 }

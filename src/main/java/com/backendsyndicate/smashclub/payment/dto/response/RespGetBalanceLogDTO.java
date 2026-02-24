@@ -21,6 +21,8 @@ public class RespGetBalanceLogDTO {
     private String createdAt;
 
     public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = DatetimeFormatting.getDatetimeFormat(createdAt);
+        if( createdAt != null ) {
+            this.createdAt = DatetimeFormatting.getDatetimeFormat(createdAt);
+        }
     }
 }

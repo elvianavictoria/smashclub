@@ -28,7 +28,6 @@ import com.backendsyndicate.smashclub.payment.repo.PaymentLogRepo;
 import com.backendsyndicate.smashclub.payment.repo.RefundRequestRepo;
 import com.backendsyndicate.smashclub.payment.repo.TransactionLogRepo;
 import com.backendsyndicate.smashclub.payment.repo.TransactionRepo;
-import jakarta.servlet.http.HttpServletRequest;
 import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +38,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -88,6 +89,28 @@ public class PaymentService implements IPayment {
     public RespCreateTransactionDTO createTransaction(String customerId, BigDecimal totalPrice, String referenceCode, int transactionType) {
         RespCreateTransactionDTO response = null;
 
+        List<String> missingArgs = new ArrayList<>();
+        boolean missingCustomerId = customerId == null || customerId.isEmpty();
+        boolean missingTotalPrice = totalPrice == null;
+        boolean missingReferenceCode = referenceCode == null || referenceCode.isEmpty();
+
+        if( missingCustomerId ) {
+            missingArgs.add("customerId");
+        }
+
+        if( missingTotalPrice ) {
+            missingArgs.add("totalPrice");
+        }
+
+        if( missingReferenceCode ) {
+            missingArgs.add("referenceCode");
+        }
+
+        if( !missingArgs.isEmpty() ) {
+            Logging.handleException("PaymentService", "createTransaction", 111, TransactionConstant.PAYMENT_SERVICE_ERROR_CREATE_PARAM_REQUIRED, "One of the argument is missing! Missing Param: {" + String.join(", ", missingArgs) + "}");
+            return null;
+        }
+
         try {
             String trxCode = generateTransactionCode();
             String trxLabel = "Transaksi " + trxCode + ": " + TransactionTypeConstant.getTransactionType(transactionType);
@@ -95,7 +118,7 @@ public class PaymentService implements IPayment {
             Transaction trx = new Transaction();
             Optional<User> optUser = userRepo.findById(customerId);
             if( optUser.isEmpty() ) {
-                Logging.handleException("PaymentService", "createTransaction", 97, TransactionConstant.PAYMENT_SERVICE_ERROR_CREATE_USER_NOT_FOUND, "Failed to get created transaction!");
+                Logging.handleException("PaymentService", "createTransaction", 121, TransactionConstant.PAYMENT_SERVICE_ERROR_CREATE_USER_NOT_FOUND, "Failed to get created transaction!");
                 return null;
             }
 
@@ -115,7 +138,7 @@ public class PaymentService implements IPayment {
             // Create payment link
             Transaction transaction = getTransaction(trx.getTransactionCode());
             if( transaction == null ) {
-                Logging.handleException("PaymentService", "createTransaction", 97, TransactionConstant.PAYMENT_SERVICE_ERROR_CREATE_TRX_NOT_FOUND, "Failed to get created transaction!");
+                Logging.handleException("PaymentService", "createTransaction", 141, TransactionConstant.PAYMENT_SERVICE_ERROR_CREATE_TRX_NOT_FOUND, "Failed to get created transaction!");
             } else {
                 XenditResponseDTO pgResponse = new XenditResponseDTO();
                 if(XenditConfig.getUseInvoice() == 'y') {
@@ -132,6 +155,11 @@ public class PaymentService implements IPayment {
                     * QRIS: Safe
                     * */
                     pgResponse = xenditService.createPayment(trxCode, totalPrice, transaction.getUser().getEmail(), transaction.getTransactionLabel(), PaymentMethodConstant.QRIS_DANA);
+                }
+
+                if( pgResponse == null ) {
+                    Logging.handleException("PaymentService", "createTransaction", 161, TransactionConstant.PAYMENT_SERVICE_ERROR_CREATE_PG_FAILED, "Failed to create payment link!");
+                    return null;
                 }
 
                 Logging.printConsole("Sending email!");
@@ -380,7 +408,7 @@ public class PaymentService implements IPayment {
      * @param referenceCode
      * @return
      */
-    protected Transaction getTransactionByReferenceCode(String referenceCode) {
+    public Transaction getTransactionByReferenceCode(String referenceCode) {
         Optional<Transaction> optionalTrx = transactionRepo.findByReferenceCode(referenceCode);
         if( optionalTrx.isEmpty() ) return null;
         Transaction trx = optionalTrx.get();

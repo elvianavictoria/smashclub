@@ -115,6 +115,11 @@ public class AdminSalesService implements IStatistic {
                 transactions = transactionRepo.findAllByCreatedAtBetween(startMonth, endMonth, pageable);
             }
 
+            if( transactions.isEmpty() ) {
+                Logging.handleException("AdminSalesService", "list(int yearStart, int monthStart, String keyword, Pageable pageable, HttpServletRequest request)", 119, AdminConstant.ADMIN_SALES_SERVICE_LIST_EMPTY, "Sales list is empty");
+                return GlobalResponse.failed("Failed to get sales list!", AdminConstant.ADMIN_SALES_SERVICE_LIST_EMPTY, null, request);
+            }
+
             response = new RespAdminTransactionListDTO();
             response.setTotalTransactionValue(totalTransaction);
             response.setAverageTransactionValue(averageTransaction);
@@ -167,7 +172,7 @@ public class AdminSalesService implements IStatistic {
                         court.setItemName(booking.getCourt().getCourtCode() + " - " + booking.getCourt().getCourtName());
                         court.setItemQty((int) Duration.between(booking.getStartTime(), booking.getEndTime()).toHours());
                         court.setItemUnit("jam");
-                        court.setItemPrice(booking.getBasePrice());
+                        court.setItemPrice(booking.getBasePrice().divide(BigDecimal.valueOf(court.getItemQty())));
 
                         itemList.add(court);
 
