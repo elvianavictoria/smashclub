@@ -88,6 +88,8 @@ public class OrderService implements IOrder {
             orderItem.setOrder(order);
             orderItem.setVariant(cartItem.getVariant());
             orderItem.setQuantity(cartItem.getQuantity());
+            orderItem.setProductName(cartItem.getVariant().getProduct().getProductName());
+            orderItem.setOrderItemImgLink(cartItem.getVariant().getVariantImgLink());
             orderItem.setPriceAtPurchase(cartItem.getVariant().getPrice());
             orderItem.setTotalPrice(totalPrice);
 
@@ -167,6 +169,8 @@ public class OrderService implements IOrder {
         OrderItem orderItem = new OrderItem();
         orderItem.setOrder(order);
         orderItem.setVariant(productVariant);
+        orderItem.setProductName(productVariant.getProduct().getProductName());
+        orderItem.setOrderItemImgLink(productVariant.getVariantImgLink());
         orderItem.setPriceAtPurchase(price);
         orderItem.setTotalPrice(total);
         orderItem.setQuantity(request.getQuantity());
@@ -288,6 +292,8 @@ public class OrderService implements IOrder {
                    return RespOrderItemDTO.builder()
                         .variantId(item.getVariant().getId())
                         .variantName(item.getVariant().getVariantName())
+                           .productName(item.getVariant().getProduct().getProductName())
+                           .orderItemImgLink(item.getOrderItemImgLink())
                         .quantity(item.getQuantity())
                         .price(item.getPriceAtPurchase())
                         .totalPrice(item.getTotalPrice())
