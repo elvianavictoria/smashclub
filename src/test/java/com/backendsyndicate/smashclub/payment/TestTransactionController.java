@@ -17,7 +17,7 @@ import java.time.LocalDate;
 import static io.restassured.RestAssured.given;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class TestTransactionService extends AbstractTestNGSpringContextTests {
+public class TestTransactionController extends AbstractTestNGSpringContextTests {
     private JSONObject req;
     private String transactionCode;
     private boolean isContinue;

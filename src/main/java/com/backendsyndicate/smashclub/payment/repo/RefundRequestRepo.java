@@ -13,4 +13,5 @@ public interface RefundRequestRepo extends JpaRepository<RefundRequest, Long> {
     Page<RefundRequest> findAllByCreatedAtBetweenAndRefundStatus(LocalDateTime startDate, LocalDateTime endDate, byte refundStatus, Pageable pageable);
     // Refund Request Filter by Date
     Page<RefundRequest> findAllByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
+    int countByTransaction_TransactionCode(String transactionCode);
 }

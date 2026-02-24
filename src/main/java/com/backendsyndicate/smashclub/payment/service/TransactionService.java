@@ -6,11 +6,13 @@ import com.backendsyndicate.smashclub.common.constant.TransactionTypeConstant;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.payment.core.IHistory;
+import com.backendsyndicate.smashclub.payment.dto.relation.RelTransactionRefundRequestDTO;
 import com.backendsyndicate.smashclub.payment.dto.response.RespTransactionDetailDTO;
 import com.backendsyndicate.smashclub.payment.dto.response.RespTransactionListDTO;
 import com.backendsyndicate.smashclub.payment.model.Transaction;
 import com.backendsyndicate.smashclub.payment.repo.TransactionRepo;
 import jakarta.servlet.http.HttpServletRequest;
+import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -94,9 +96,12 @@ public class TransactionService implements IHistory {
             }
 
             Transaction trx = optionalTrx.get();
+            Hibernate.initialize(trx.getRefundRequest());
             response = modelMapper.map(trx, RespTransactionDetailDTO.class);
             response.setStatusDesc(TransactionConstant.getStatus(trx.getStatus()));
             response.setTransactionTypeDesc(TransactionTypeConstant.getTransactionType(trx.getTransactionType()));
+            if( trx.getRefundRequest().isEmpty() ) response.setRefundRequest(modelMapper.map(trx.getRefundRequest().getFirst(), RelTransactionRefundRequestDTO.class));
+
         } catch(Exception e) {
             Logging.handleException("TransactionService", "findByCode(String code, HttpServletRequest request)", 79, TransactionConstant.TRANSACTION_SERVICE_ERROR_DETAIL_EXCEPTION, e.getMessage());
             logService.writeErrorLog(TransactionConstant.TRANSACTION_SERVICE_ERROR_DETAIL_EXCEPTION, "TransactionService@findByCode()", e.getMessage());

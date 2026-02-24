@@ -2,6 +2,7 @@ package com.backendsyndicate.smashclub.payment.dto.response;
 
 import com.backendsyndicate.smashclub.common.util.DatetimeFormatting;
 import com.backendsyndicate.smashclub.payment.dto.extra.ExtTransactionItemDTO;
+import com.backendsyndicate.smashclub.payment.dto.relation.RelTransactionRefundRequestDTO;
 import com.backendsyndicate.smashclub.payment.dto.relation.RelTransactionUserDTO;
 import lombok.Data;
 import lombok.Getter;
@@ -32,6 +33,8 @@ public class RespTransactionDetailDTO {
     private String referenceCode;
 
     private List<ExtTransactionItemDTO> items;
+
+    private RelTransactionRefundRequestDTO refundRequest;
 
     public void setCreatedAt(LocalDateTime createdAt) {
         if( createdAt != null ) {
