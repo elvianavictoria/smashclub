@@ -16,6 +16,7 @@ import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransaction
 import com.backendsyndicate.smashclub.payment.model.Transaction;
 import com.backendsyndicate.smashclub.payment.service.PaymentService;
 import jakarta.transaction.Transactional;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -81,14 +82,12 @@ public class OrderService implements IOrder {
                 return null;
             }
 
-            BigDecimal totalPrice =
-                    cartItem.getVariant().getPrice()
-                            .multiply(BigDecimal.valueOf(cartItem.getQuantity()));
+            BigDecimal totalPrice = cartItem.getVariant().getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity()));
 
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);
             orderItem.setVariant(cartItem.getVariant());
-            orderItem.setOrderItemImgLink(cartItem.getVariant().getVariantImgLink());
+            orderItem.setQuantity(cartItem.getQuantity());
             orderItem.setPriceAtPurchase(cartItem.getVariant().getPrice());
             orderItem.setTotalPrice(totalPrice);
 
@@ -114,7 +113,6 @@ public class OrderService implements IOrder {
             Logging.printConsole(transaction.toString());
             order.setTransactionId(transaction);
 
-        order.setOrderItem(orderItems);
         orderRepo.save(order);
 
         for (CartItem item : cart.getCartItems()) {
@@ -169,16 +167,15 @@ public class OrderService implements IOrder {
         OrderItem orderItem = new OrderItem();
         orderItem.setOrder(order);
         orderItem.setVariant(productVariant);
-        orderItem.setOrderItemImgLink(productVariant.getVariantImgLink());
         orderItem.setPriceAtPurchase(price);
         orderItem.setTotalPrice(total);
         orderItem.setQuantity(request.getQuantity());
 
         order.setSubTotal(total);
         order.setTotalPrice(total);
-        Logging.printConsole(order.getUser().getId());
-        Logging.printConsole(order.getTotalPrice().toString());
-        Logging.printConsole(order.getOrderCode());
+        Logging.printConsole(String.valueOf(orderItem.getQuantity()));
+        Logging.printConsole(orderItem.getTotalPrice().toString());
+        Logging.printConsole(orderItem.getPriceAtPurchase().toString());
         RespCreateTransactionDTO transactionDTO = paymentService.createTransaction(
                 order.getUser().getId(),
                 order.getTotalPrice(),
@@ -286,14 +283,16 @@ public class OrderService implements IOrder {
         try{
         List<RespOrderItemDTO> items = order.getOrderItem()
                 .stream()
-                .map(item -> RespOrderItemDTO.builder()
+                .map(item -> {
+                            Hibernate.initialize(item.getVariant());
+                   return RespOrderItemDTO.builder()
                         .variantId(item.getVariant().getId())
                         .variantName(item.getVariant().getVariantName())
                         .quantity(item.getQuantity())
                         .price(item.getPriceAtPurchase())
                         .totalPrice(item.getTotalPrice())
-                        .orderItemImgLink(item.getVariant().getVariantImgLink())
-                        .build()
+                        .build();
+                }
                 )
                 .toList();
 
