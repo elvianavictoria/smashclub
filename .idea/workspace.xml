@@ -4,8 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cd9e846d-d2b3-4db3-8c78-09651c2e3476" name="Changes" comment="ECommerce Update">
+    <list default="true" id="cd9e846d-d2b3-4db3-8c78-09651c2e3476" name="Changes" comment="ECommerce update">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/ecommerce/dto/response/RespOrderItemDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/ecommerce/dto/response/RespOrderItemDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/ecommerce/model/OrderItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/ecommerce/model/OrderItem.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/ecommerce/service/OrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/ecommerce/service/OrderService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -171,6 +173,8 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.SmashclubApplication" />
+        <item itemvalue="TestNG.TestAdminAuthService.login" />
         <item itemvalue="Application.SmashclubApplication" />
         <item itemvalue="TestNG.TestAdminAuthService.login" />
         <item itemvalue="Application.SmashclubApplication" />

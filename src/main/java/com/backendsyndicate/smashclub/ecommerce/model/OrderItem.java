@@ -19,11 +19,17 @@ public class OrderItem {
     @EqualsAndHashCode.Include
     private Long id;
 
+    @Column(name = "ProductName")
+    private String productName;
+
     @Column(name = "Quantity", nullable = false)
     private int quantity = 0;
 
     @Column(name = "Price", precision = 17, scale = 2,nullable = false)
     private BigDecimal priceAtPurchase = BigDecimal.ZERO;
+
+    @Column(name = "OrderItemImgLink")
+    private String orderItemImgLink;
 
     @Column(name = "TotalPrice", precision = 17, scale = 2,nullable = false)
     private BigDecimal totalPrice = BigDecimal.ZERO;

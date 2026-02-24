@@ -10,9 +10,11 @@ import java.math.BigDecimal;
 @Setter
 @Builder
 public class RespOrderItemDTO {
+    private String productName;
     private Long variantId;
     private String variantName;
     private BigDecimal price;
     private Integer quantity;
     private BigDecimal totalPrice;
+    private String orderItemImgLink;
 }
