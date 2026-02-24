@@ -28,6 +28,9 @@ public class OrderItem {
     @Column(name = "TotalPrice", precision = 17, scale = 2,nullable = false)
     private BigDecimal totalPrice = BigDecimal.ZERO;
 
+    @Column(name = "OrderItemImgLink")
+    private String orderItemImgLink;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "OrderID", foreignKey = @ForeignKey(name = "fk_orderItem_to_order"), nullable = false)
     private Order order;

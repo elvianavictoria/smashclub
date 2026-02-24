@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @Builder
 public class RespOrderSummaryDTO {
     private Long orderId;
+    private String orderCode;
     private BigDecimal totalPrice;
     private byte status;
     private LocalDateTime orderDate;

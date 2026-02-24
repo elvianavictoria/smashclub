@@ -31,6 +31,9 @@ public class Order {
     @Column(name = "Status", nullable = false)
     private byte status = 0;
 
+    @Column(name = "OrderCode")
+    private String orderCode = "";
+
     @Column(name = "OrderDate", nullable = false)
     private LocalDateTime orderDate;
 

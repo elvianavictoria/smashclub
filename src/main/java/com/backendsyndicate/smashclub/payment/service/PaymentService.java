@@ -394,7 +394,7 @@ public class PaymentService implements IPayment {
      * @param transactionCode
      * @return
      */
-    protected Transaction getTransaction(String transactionCode) {
+    public Transaction getTransaction(String transactionCode) {
         Optional<Transaction> optionalTrx = transactionRepo.findByTransactionCode(transactionCode);
         if( optionalTrx.isEmpty() ) return null;
         Transaction trx = optionalTrx.get();
