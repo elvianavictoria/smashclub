@@ -61,4 +61,7 @@ public interface CoachDetailRepository extends JpaRepository<CoachDetail, Long> 
                 LocalTime.of(23, 59) // 23:59
         );
     }
+
+    // Statistic Related
+    List<CoachDetail> findAllByBooking_Id(Long bookingId);
 }

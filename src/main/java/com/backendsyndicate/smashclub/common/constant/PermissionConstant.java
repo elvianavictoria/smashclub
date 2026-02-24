@@ -37,9 +37,11 @@ public class PermissionConstant {
 
     public static final String BOOKING_SALES_READ_CODE = "BOOKING_SALES_READ";
     public static final String BOOKING_SALES_DETAIL_CODE = "BOOKING_SALES_DETAIL";
+    public static final String BOOKING_SALES_PROCESS_CODE = "BOOKING_SALES_PROCESS";
 
     public static final String PRODUCT_SALES_READ_CODE = "PRODUCT_SALES_READ";
     public static final String PRODUCT_SALES_DETAIL_CODE = "PRODUCT_SALES_DETAIL";
+    public static final String PRODUCT_SALES_PROCESS_CODE = "PRODUCT_SALES_PROCESS";
 
     public static final String REFUND_REQUEST_READ_CODE = "REFUND_REQUEST_READ";
     public static final String REFUND_REQUEST_EDIT_CODE = "REFUND_REQUEST_EDIT";

@@ -71,9 +71,11 @@ public class AdminPermissionSeeder implements DataSeeder {
 
         generatePermissionItem(AdminConstant.PERMISSION_BOOKING_SALES_READ, PermissionConstant.BOOKING_SALES_READ_CODE, "View Booking Sales List", CommonConstant.STATUS_ACTIVE, adminMenuSeeder.getMenus().get(AdminConstant.MENU_BOOKING_SALES));
         generatePermissionItem(AdminConstant.PERMISSION_BOOKING_SALES_DETAIL, PermissionConstant.BOOKING_SALES_DETAIL_CODE, "View Booking Sales Detail", CommonConstant.STATUS_ACTIVE, adminMenuSeeder.getMenus().get(AdminConstant.MENU_BOOKING_SALES));
+        generatePermissionItem(AdminConstant.PERMISSION_BOOKING_SALES_PROCESS, PermissionConstant.BOOKING_SALES_PROCESS_CODE, "Process Booking Sales", CommonConstant.STATUS_ACTIVE, adminMenuSeeder.getMenus().get(AdminConstant.MENU_BOOKING_SALES));
 
         generatePermissionItem(AdminConstant.PERMISSION_PRODUCT_SALES_READ, PermissionConstant.PRODUCT_SALES_READ_CODE, "View Product Sales List", CommonConstant.STATUS_ACTIVE, adminMenuSeeder.getMenus().get(AdminConstant.MENU_PRODUCT_SALES));
         generatePermissionItem(AdminConstant.PERMISSION_PRODUCT_SALES_DETAIL, PermissionConstant.PRODUCT_SALES_DETAIL_CODE, "View Product Sales Detail", CommonConstant.STATUS_ACTIVE, adminMenuSeeder.getMenus().get(AdminConstant.MENU_PRODUCT_SALES));
+        generatePermissionItem(AdminConstant.PERMISSION_PRODUCT_SALES_PROCESS, PermissionConstant.PRODUCT_SALES_PROCESS_CODE, "Process Product Sales", CommonConstant.STATUS_ACTIVE, adminMenuSeeder.getMenus().get(AdminConstant.MENU_PRODUCT_SALES));
 
         generatePermissionItem(AdminConstant.PERMISSION_REFUND_REQUEST_READ, PermissionConstant.REFUND_REQUEST_READ_CODE, "View Refund Request List", CommonConstant.STATUS_ACTIVE, adminMenuSeeder.getMenus().get(AdminConstant.MENU_REFUND_REQUEST));
         generatePermissionItem(AdminConstant.PERMISSION_REFUND_REQUEST_EDIT, PermissionConstant.REFUND_REQUEST_EDIT_CODE, "Edit Refund Request", CommonConstant.STATUS_ACTIVE, adminMenuSeeder.getMenus().get(AdminConstant.MENU_REFUND_REQUEST));

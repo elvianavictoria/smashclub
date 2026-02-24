@@ -76,6 +76,10 @@ public class AdminConstant {
     public static final int PERMISSION_USERS_EDIT = 39;
     public static final int PERMISSION_USERS_DELETE = 40;
 
+    // Additional Permissions
+    public static final int PERMISSION_PRODUCT_SALES_PROCESS = 41;
+    public static final int PERMISSION_BOOKING_SALES_PROCESS = 42;
+
     // Roles
     public static final int ROLE_DEVELOPER = 1;
     public static final int ROLE_ADMIN = 2;
@@ -296,14 +300,33 @@ public class AdminConstant {
     public static final String ADMIN_REFUND_REQUEST_SERVICE_PROCESS_EXCEPTION = "ADMRRQ-02E010";
 
     public static final String ADMIN_SALES_SERVICE_STATISTIC_EXCEPTION = "ADMSLS-01E010";
+    public static final String ADMIN_SALES_SERVICE_LIST_EMPTY = "ADMSLS-02E001";
     public static final String ADMIN_SALES_SERVICE_LIST_EXCEPTION = "ADMSLS-02E010";
     public static final String ADMIN_SALES_SERVICE_DETAIL_CODE_REQUIRED = "ADMSLS-03E001";
     public static final String ADMIN_SALES_SERVICE_DETAIL_NOT_FOUND = "ADMSLS-03E002";
     public static final String ADMIN_SALES_SERVICE_DETAIL_EXCEPTION = "ADMSLS-03E010";
 
     public static final String ADMIN_BOOKING_SERVICE_STATISTIC_EXCEPTION = "ADMBKG-01E010";
+    public static final String ADMIN_BOOKING_SERVICE_LIST_EMPTY = "ADMBKG-02E001";
     public static final String ADMIN_BOOKING_SERVICE_LIST_EXCEPTION = "ADMBKG-02E010";
     public static final String ADMIN_BOOKING_SERVICE_DETAIL_CODE_REQUIRED = "ADMBKG-03E001";
     public static final String ADMIN_BOOKING_SERVICE_DETAIL_NOT_FOUND = "ADMBKG-03E002";
     public static final String ADMIN_BOOKING_SERVICE_DETAIL_EXCEPTION = "ADMBKG-03E010";
+    public static final String ADMIN_BOOKING_SERVICE_PROCESS_CODE_REQUIRED = "ADMBKG-04E001";
+    public static final String ADMIN_BOOKING_SERVICE_PROCESS_NOT_FOUND = "ADMBKG-04E002";
+    public static final String ADMIN_BOOKING_SERVICE_PROCESS_NOT_CANCELLABLE = "ADMBKG-04E003";
+    public static final String ADMIN_BOOKING_SERVICE_PROCESS_INACTIVE = "ADMBKG-04E004";
+    public static final String ADMIN_BOOKING_SERVICE_PROCESS_EXCEPTION = "ADMBKG-04E010";
+
+    public static final String ADMIN_ORDER_SERVICE_STATISTIC_EXCEPTION = "ADMORD-01E010";
+    public static final String ADMIN_ORDER_SERVICE_LIST_EMPTY = "ADMORD-02E001";
+    public static final String ADMIN_ORDER_SERVICE_LIST_EXCEPTION = "ADMORD-02E010";
+    public static final String ADMIN_ORDER_SERVICE_DETAIL_CODE_REQUIRED = "ADMORD-03E001";
+    public static final String ADMIN_ORDER_SERVICE_DETAIL_NOT_FOUND = "ADMORD-03E002";
+    public static final String ADMIN_ORDER_SERVICE_DETAIL_EXCEPTION = "ADMORD-03E010";
+    public static final String ADMIN_ORDER_SERVICE_PROCESS_CODE_REQUIRED = "ADMORD-04E001";
+    public static final String ADMIN_ORDER_SERVICE_PROCESS_NOT_FOUND = "ADMORD-04E002";
+    public static final String ADMIN_ORDER_SERVICE_PROCESS_NOT_CANCELLABLE = "ADMORD-04E003";
+    public static final String ADMIN_ORDER_SERVICE_PROCESS_INACTIVE = "ADMORD-04E004";
+    public static final String ADMIN_ORDER_SERVICE_PROCESS_EXCEPTION = "ADMORD-04E010";
 }

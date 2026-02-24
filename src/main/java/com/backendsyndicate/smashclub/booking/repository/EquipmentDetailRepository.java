@@ -1,5 +1,6 @@
 package com.backendsyndicate.smashclub.booking.repository;
 
+import com.backendsyndicate.smashclub.booking.model.CoachDetail;
 import com.backendsyndicate.smashclub.booking.model.EquipmentDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -42,4 +43,7 @@ public interface EquipmentDetailRepository extends JpaRepository<EquipmentDetail
             @Param("date") LocalDate date,
             @Param("startTime") LocalTime startTime,
             @Param("endTime") LocalTime endTime);
+
+    // Statistic Related
+    List<EquipmentDetail> findAllByBooking_Id(Long bookingId);
 }
