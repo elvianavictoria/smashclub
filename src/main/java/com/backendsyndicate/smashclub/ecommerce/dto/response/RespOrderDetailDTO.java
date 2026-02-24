@@ -11,6 +11,7 @@ import java.util.List;
 @Builder
 public class RespOrderDetailDTO {
     private Long orderId;
+    private String orderCode;
     private byte status;
     private BigDecimal subtotal;
     private BigDecimal totalPrice;

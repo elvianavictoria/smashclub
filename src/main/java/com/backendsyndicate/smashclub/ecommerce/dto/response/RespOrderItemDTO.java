@@ -15,4 +15,5 @@ public class RespOrderItemDTO {
     private BigDecimal price;
     private Integer quantity;
     private BigDecimal totalPrice;
+    private String orderItemImgLink;
 }
