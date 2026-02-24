@@ -1,7 +1,9 @@
 package com.backendsyndicate.smashclub.admin.dto.response;
 
 import com.backendsyndicate.smashclub.admin.dto.extra.ExtAdminBookingListDTO;
+import com.backendsyndicate.smashclub.admin.dto.relation.RelAdminBookingCoachDetailDTO;
 import com.backendsyndicate.smashclub.admin.dto.relation.RelAdminBookingCourtDTO;
+import com.backendsyndicate.smashclub.admin.dto.relation.RelAdminBookingEquipmentDetailDTO;
 import com.backendsyndicate.smashclub.admin.dto.relation.RelAdminBookingPlayerDTO;
 import com.backendsyndicate.smashclub.common.constant.BookingConstant;
 import com.backendsyndicate.smashclub.common.util.DatetimeFormatting;
@@ -14,6 +16,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Getter
@@ -32,6 +36,8 @@ public class RespAdminBookingDetailDTO {
     private String updatedAt;
     private RelAdminBookingPlayerDTO user;
     private RelAdminBookingCourtDTO court;
+    private List<RelAdminBookingCoachDetailDTO> coaches = new ArrayList<>();
+    private List<RelAdminBookingEquipmentDetailDTO> equipments = new ArrayList<>();
 
     public void setBookingDate(LocalDate bookingDate) {
         this.bookingDate = DatetimeFormatting.getDateFormat(bookingDate);

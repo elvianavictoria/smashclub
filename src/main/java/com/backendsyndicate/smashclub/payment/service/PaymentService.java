@@ -282,6 +282,7 @@ public class PaymentService implements IPayment {
             logTransactionUpdate(trx, previousStatus);
 
             boolean isRefund = previousStatus > TransactionConstant.PAYMENT_UNPAID;
+            isRefund = isRefund && refundRequestRepo.countByTransaction_TransactionCode(trx.getTransactionCode()) == 0;
 
             if( isRefund ) {
                 RefundRequest refundRequest = new RefundRequest();

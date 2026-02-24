@@ -67,5 +67,8 @@ public class Transaction {
 
     @OneToMany(mappedBy = "transactionId", fetch = FetchType.LAZY)
     private List<Order> orders;
+
+    @OneToMany(mappedBy = "transaction", fetch = FetchType.LAZY)
+    private List<RefundRequest> refundRequest;
 }
 

@@ -5,6 +5,9 @@ import com.backendsyndicate.smashclub.admin.dto.extra.ExtAdminBookingListDTO;
 import com.backendsyndicate.smashclub.admin.dto.extra.ExtAdminBookingMonthlyDTO;
 import com.backendsyndicate.smashclub.admin.dto.extra.ExtAdminTransactionItemDTO;
 import com.backendsyndicate.smashclub.admin.dto.extra.ExtAdminTransactionMonthlyDTO;
+import com.backendsyndicate.smashclub.admin.dto.relation.RelAdminBookingCoachDetailDTO;
+import com.backendsyndicate.smashclub.admin.dto.relation.RelAdminBookingEquipmentDTO;
+import com.backendsyndicate.smashclub.admin.dto.relation.RelAdminBookingEquipmentDetailDTO;
 import com.backendsyndicate.smashclub.admin.dto.relation.RelAdminTransactionListDTO;
 import com.backendsyndicate.smashclub.admin.dto.response.*;
 import com.backendsyndicate.smashclub.admin.service.log.LogService;
@@ -12,7 +15,12 @@ import com.backendsyndicate.smashclub.booking.dto.response.BookingResponse;
 import com.backendsyndicate.smashclub.booking.dto.response.CoachDetailResponse;
 import com.backendsyndicate.smashclub.booking.dto.response.EquipmentDetailResponse;
 import com.backendsyndicate.smashclub.booking.model.Booking;
+import com.backendsyndicate.smashclub.booking.model.Coach;
+import com.backendsyndicate.smashclub.booking.model.CoachDetail;
+import com.backendsyndicate.smashclub.booking.model.EquipmentDetail;
 import com.backendsyndicate.smashclub.booking.repository.BookingRepository;
+import com.backendsyndicate.smashclub.booking.repository.CoachDetailRepository;
+import com.backendsyndicate.smashclub.booking.repository.EquipmentDetailRepository;
 import com.backendsyndicate.smashclub.booking.service.helper.BookingHelper;
 import com.backendsyndicate.smashclub.common.constant.AdminConstant;
 import com.backendsyndicate.smashclub.common.constant.BookingConstant;
@@ -53,6 +61,10 @@ import java.util.function.Function;
 public class AdminBookingService implements IStatistic {
     @Autowired
     private BookingRepository bookingRepo;
+    @Autowired
+    private CoachDetailRepository coachDetailRepository;
+    @Autowired
+    private EquipmentDetailRepository equipmentDetailRepository;
     @Autowired
     private LogService logService;
 
@@ -116,6 +128,11 @@ public class AdminBookingService implements IStatistic {
                 bookings = bookingRepo.findAllByCreatedAtBetween(startMonth, endMonth, pageable);
             }
 
+            if( bookings.isEmpty() ) {
+                Logging.handleException("AdminBookingService", "list(int yearStart, int monthStart, String keyword, Pageable pageable, HttpServletRequest request)", 120, AdminConstant.ADMIN_BOOKING_SERVICE_LIST_EMPTY, "Booking list is empty");
+                return GlobalResponse.failed("Failed to get booking list!", AdminConstant.ADMIN_BOOKING_SERVICE_LIST_EMPTY, null, request);
+            }
+
             response = new RespAdminBookingListDTO();
             response.setTotalBookingCount(totalBookingCount);
             response.setAverageBookingHours(averageHourCount);
@@ -125,14 +142,15 @@ public class AdminBookingService implements IStatistic {
                     return mapListToDTO(booking);
                 }
             });
+            response.setBookings(listDTO);
 
         } catch(Exception e) {
-            Logging.handleException("AdminBookingService", "list(LocalDate monthStart, HttpServletRequest request)", 83, AdminConstant.ADMIN_BOOKING_SERVICE_LIST_EXCEPTION, e.getMessage());
+            Logging.handleException("AdminBookingService", "list(int yearStart, int monthStart, String keyword, Pageable pageable, HttpServletRequest request)", 136, AdminConstant.ADMIN_BOOKING_SERVICE_LIST_EXCEPTION, e.getMessage());
             logService.writeErrorLog(AdminConstant.ADMIN_BOOKING_SERVICE_LIST_EXCEPTION, "AdminBookingService@list()", e.getMessage());
-            return GlobalResponse.failed("Failed to get booking statistics!", AdminConstant.ADMIN_BOOKING_SERVICE_LIST_EXCEPTION, null, request);
+            return GlobalResponse.failed("Failed to get booking list!", AdminConstant.ADMIN_BOOKING_SERVICE_LIST_EXCEPTION, null, request);
         }
 
-        return GlobalResponse.success("Successfully fetch booking statistics!", response, request);
+        return GlobalResponse.success("Successfully fetch booking list!", response, request);
     }
 
     public ResponseEntity<Object> detail(String bookingCode, HttpServletRequest request) {
@@ -148,25 +166,87 @@ public class AdminBookingService implements IStatistic {
                 return GlobalResponse.failed("Failed to get booking detail!", AdminConstant.ADMIN_BOOKING_SERVICE_DETAIL_NOT_FOUND, null, request);
             }
 
-            // Map trx to DTO
+            // Map booking to DTO
             Booking booking = opt.get();
             Hibernate.initialize(booking.getUser());
             Hibernate.initialize(booking.getCourt());
+            List<CoachDetail> coachesDB = coachDetailRepository.findAllByBooking_Id(booking.getId());
+            List<RelAdminBookingCoachDetailDTO> coaches = coachesDB.stream().map(new Function<CoachDetail, RelAdminBookingCoachDetailDTO>() {
+                @Override
+                public RelAdminBookingCoachDetailDTO apply(CoachDetail coachDetail) {
+                    return mapCoachDetailToDTO(coachDetail);
+                }
+            }).toList();
+            List<EquipmentDetail> equipmentsDB = equipmentDetailRepository.findAllByBooking_Id(booking.getId());
+            List<RelAdminBookingEquipmentDetailDTO> equipments = equipmentsDB.stream().map(new Function<EquipmentDetail, RelAdminBookingEquipmentDetailDTO>() {
+                @Override
+                public RelAdminBookingEquipmentDetailDTO apply(EquipmentDetail equipmentDetail) {
+                    return mapEquipmentDetailToDTO(equipmentDetail);
+                }
+            }).toList();
+
             response = modelMapper.map(booking, RespAdminBookingDetailDTO.class);
             response.setStatusDesc(BookingConstant.getBookingStatusDescription(booking.getStatus()));
+            response.setCoaches(coaches);
+            response.setEquipments(equipments);
 
         } catch(Exception e) {
             Logging.handleException("AdminBookingService", "detail(String bookingCode, HttpServletRequest request)", 109, AdminConstant.ADMIN_BOOKING_SERVICE_DETAIL_EXCEPTION, e.getMessage());
             logService.writeErrorLog(AdminConstant.ADMIN_BOOKING_SERVICE_DETAIL_EXCEPTION, "AdminBookingService@detail()", e.getMessage());
-            return GlobalResponse.failed("Failed to get booking statistics!", AdminConstant.ADMIN_BOOKING_SERVICE_DETAIL_EXCEPTION, null, request);
+            return GlobalResponse.failed("Failed to get booking detail!", AdminConstant.ADMIN_BOOKING_SERVICE_DETAIL_EXCEPTION, null, request);
         }
 
-        return GlobalResponse.success("Successfully fetch booking statistics!", response, request);
+        return GlobalResponse.success("Successfully fetch booking detail!", response, request);
+    }
+
+    public ResponseEntity<Object> process(String bookingCode, int status, HttpServletRequest request) {
+        if( bookingCode == null || bookingCode.isEmpty() ) {
+            return GlobalResponse.failed("Failed to get booking detail!", AdminConstant.ADMIN_BOOKING_SERVICE_PROCESS_CODE_REQUIRED, null, request);
+        }
+
+        try {
+            Optional<Booking> opt = bookingRepo.findByBookingCode(bookingCode);
+            if( opt.isEmpty() ) {
+                return GlobalResponse.failed("Failed to process booking!", AdminConstant.ADMIN_BOOKING_SERVICE_PROCESS_NOT_FOUND, null, request);
+            }
+
+            Booking booking = opt.get();
+            if( status == BookingConstant.BOOKING_CANCELLED && !BookingConstant.isBookingCancellable(booking.getStatus()) ) {
+                return GlobalResponse.failed("Failed to process booking!", AdminConstant.ADMIN_BOOKING_SERVICE_PROCESS_NOT_CANCELLABLE, null, request);
+            }
+
+            if( !BookingConstant.isBookingActive(booking.getStatus()) ) {
+                return GlobalResponse.failed("Failed to process booking!", AdminConstant.ADMIN_BOOKING_SERVICE_PROCESS_INACTIVE, null, request);
+            }
+
+            booking.setStatus((byte) status);
+        } catch(Exception e) {
+            Logging.handleException("AdminBookingService", "process(String bookingCode, int status, HttpServletRequest request)", 206, AdminConstant.ADMIN_BOOKING_SERVICE_PROCESS_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_BOOKING_SERVICE_PROCESS_EXCEPTION, "AdminBookingService@process()", e.getMessage());
+            return GlobalResponse.failed("Failed to process booking!", AdminConstant.ADMIN_BOOKING_SERVICE_PROCESS_EXCEPTION, null, request);
+        }
+
+        return GlobalResponse.success("Successfully process booking!", null, request);
     }
 
     private ExtAdminBookingListDTO mapListToDTO(Booking booking) {
         ExtAdminBookingListDTO result = modelMapper.map(booking, ExtAdminBookingListDTO.class);
         result.setStatusDesc(BookingConstant.getBookingStatusDescription(booking.getStatus()));
+        return result;
+    }
+
+    private RelAdminBookingCoachDetailDTO mapCoachDetailToDTO(CoachDetail coachDetail) {
+        Hibernate.initialize(coachDetail.getCoach());
+        RelAdminBookingCoachDetailDTO result = modelMapper.map(coachDetail, RelAdminBookingCoachDetailDTO.class);
+        return result;
+    }
+
+    private RelAdminBookingEquipmentDetailDTO mapEquipmentDetailToDTO(EquipmentDetail equipmentDetail) {
+        Hibernate.initialize(equipmentDetail.getEquipment());
+        RelAdminBookingEquipmentDetailDTO result = new RelAdminBookingEquipmentDetailDTO();
+        result.setEquipment(modelMapper.map(equipmentDetail.getEquipment(), RelAdminBookingEquipmentDTO.class));
+        result.setEquipmentPrice(equipmentDetail.getEquipmentPrice());
+        result.setQuantity(equipmentDetail.getQuantity());
         return result;
     }
 }

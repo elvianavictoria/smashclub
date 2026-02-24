@@ -39,7 +39,8 @@ public class AdminAuthController {
 
     @PostMapping("logout")
     public ResponseEntity<Object> logout(HttpServletRequest request) {
-        String authToken = "";
+        String authToken = request.getHeader("Authorization");
+        authToken = authToken.replaceAll("Bearer ", "");
         return adminAuthService.logout(authToken, request);
     }
 

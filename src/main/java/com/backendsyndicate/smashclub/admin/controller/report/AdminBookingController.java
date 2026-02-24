@@ -27,7 +27,7 @@ public class AdminBookingController {
             @RequestParam int month,
             @RequestParam int page,
             @RequestParam int size,
-            @RequestParam String keyword,
+            @RequestParam(required = false) String keyword,
             HttpServletRequest request
     ) {
         Pageable pageable = PageRequest.of(page, size);
@@ -35,8 +35,14 @@ public class AdminBookingController {
     }
 
 //    @PreAuthorize("hasAuthority('" + PermissionConstant.BOOKING_DETAIL_CODE + "')")
-    @GetMapping("detail/{transactionCode}")
-    public ResponseEntity<Object> bookingDetail(@PathVariable String transactionCode, HttpServletRequest request) {
-        return adminBookingService.detail(transactionCode, request);
+    @GetMapping("detail/{bookingCode}")
+    public ResponseEntity<Object> bookingDetail(@PathVariable String bookingCode, HttpServletRequest request) {
+        return adminBookingService.detail(bookingCode, request);
+    }
+
+    //    @PreAuthorize("hasAuthority('" + PermissionConstant.BOOKING_PROCESS_CODE + "')")
+    @PostMapping("process/{bookingCode}")
+    public ResponseEntity<Object> bookingProcess(@PathVariable String bookingCode, @RequestBody int status, HttpServletRequest request) {
+        return adminBookingService.process(bookingCode, status, request);
     }
 }
