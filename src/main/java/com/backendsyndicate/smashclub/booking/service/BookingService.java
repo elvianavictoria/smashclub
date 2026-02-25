@@ -952,8 +952,8 @@
             List<CourtAvailabilityResponse.TimeSlot> timeSlots = new ArrayList<>();
 
             // Generate time slots from open to close time
-            LocalTime currentTime = court.getOpenTime();
-            while (currentTime.isBefore(court.getCloseTime())) {
+            LocalTime currentTime = court.getOpenTime(); // 08:00
+            while (currentTime.isBefore(court.getCloseTime())) { // 23:00
                 LocalTime slotStart = currentTime;
                 LocalTime slotEnd = currentTime.plusHours(1);
 

@@ -174,8 +174,16 @@ public class WalletService implements IWallet {
         try {
             Optional<Wallet> optionalWallet = walletRepo.findByUserId(userId);
             if( optionalWallet.isEmpty() ) {
-                Logging.handleException("WalletService", "updateBalance", 160, TransactionConstant.WALLET_SERVICE_ERROR_UPDATE_WALLET_NOT_FOUND, "Wallet not found!");
-                return false;
+                boolean createNew = createWallet(userId);
+
+                if (createNew) {
+                    optionalWallet = walletRepo.findByUserId(userId);
+                }
+
+                if( optionalWallet.isEmpty() ){
+                    Logging.handleException("WalletService", "updateBalance", 160, TransactionConstant.WALLET_SERVICE_ERROR_UPDATE_WALLET_NOT_FOUND, "Wallet not found!");
+                    return false;
+                }
             }
 
             wallet = optionalWallet.get();
