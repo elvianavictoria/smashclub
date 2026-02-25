@@ -62,6 +62,8 @@ public class PaymentService implements IPayment {
     private UserRepository userRepo;
 
     @Autowired
+    private TransactionService transactionService;
+    @Autowired
     private LogService logService;
     @Autowired
     private XenditService xenditService;
@@ -137,7 +139,7 @@ public class PaymentService implements IPayment {
             logTransactionUpdate(trx, -1);
 
             // Create payment link
-            Transaction transaction = getTransaction(trx.getTransactionCode());
+            Transaction transaction = transactionService.getTransaction(trx.getTransactionCode());
             if( transaction == null ) {
                 Logging.handleException("PaymentService", "createTransaction", 141, TransactionConstant.PAYMENT_SERVICE_ERROR_CREATE_TRX_NOT_FOUND, "Failed to get created transaction!");
             } else {
@@ -220,7 +222,7 @@ public class PaymentService implements IPayment {
         RespPaymentTransactionDTO response = null;
 
         try {
-            trx = getTransaction(transactionCode);
+            trx = transactionService.getTransaction(transactionCode);
             if( trx == null ) {
                 Logging.handleException("PaymentService", "paymentTransaction(String transactionCode)", 177, TransactionConstant.PAYMENT_SERVICE_ERROR_PAYMENT_TRX_NOT_FOUND, "Transaction not found!");
                 return null;
@@ -276,7 +278,7 @@ public class PaymentService implements IPayment {
         RespCancelTransactionDTO response = null;
 
         try {
-            Transaction trx = getTransaction(transactionCode);
+            Transaction trx = transactionService.getTransaction(transactionCode);
             if( trx == null ) {
                 Logging.handleException("PaymentService", "cancelTransaction(String transactionCode, String refundReason)", 238, TransactionConstant.PAYMENT_SERVICE_ERROR_CANCEL_TRX_NOT_FOUND, "Transaction not found!");
                 return null;
@@ -337,7 +339,7 @@ public class PaymentService implements IPayment {
         RespExpireTransactionDTO response = null;
 
         try {
-            Transaction trx = getTransaction(transactionCode);
+            Transaction trx = transactionService.getTransaction(transactionCode);
             if( trx == null ) {
                 Logging.handleException("PaymentService", "expireTransaction(String transactionCode)", 152, TransactionConstant.PAYMENT_SERVICE_ERROR_EXPIRE_TRX_NOT_FOUND, "Transaction not found!");
                 return null;
@@ -416,34 +418,6 @@ public class PaymentService implements IPayment {
         return true;
     }
 
-    /**
-     *
-     * @param transactionCode
-     * @return
-     */
-    public Transaction getTransaction(String transactionCode) {
-        Optional<Transaction> optionalTrx = transactionRepo.findByTransactionCode(transactionCode);
-        if( optionalTrx.isEmpty() ) return null;
-        Transaction trx = optionalTrx.get();
-        Hibernate.initialize(trx.getUser());
-
-        return trx;
-    }
-
-    /**
-     *
-     * @param referenceCode
-     * @return
-     */
-    public Transaction getTransactionByReferenceCode(String referenceCode) {
-        Optional<Transaction> optionalTrx = transactionRepo.findByReferenceCode(referenceCode);
-        if( optionalTrx.isEmpty() ) return null;
-        Transaction trx = optionalTrx.get();
-        Hibernate.initialize(trx.getUser());
-
-        return trx;
-    }
-
     private String generateTransactionCode() {
         LocalDate currentDt = LocalDate.now();
         String strYear = "" + currentDt.getYear();
@@ -484,7 +458,7 @@ public class PaymentService implements IPayment {
      * @return
      */
     public String getPaymentUrl(String referenceCode) {
-        Transaction transaction = getTransactionByReferenceCode(referenceCode);
+        Transaction transaction = transactionService.getTransactionByReferenceCode(referenceCode);
         if( transaction != null ) {
             return transaction.getPaymentLink();
         }

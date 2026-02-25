@@ -15,6 +15,7 @@ import com.backendsyndicate.smashclub.ecommerce.repo.ProductVariantRepo;
 import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransactionDTO;
 import com.backendsyndicate.smashclub.payment.model.Transaction;
 import com.backendsyndicate.smashclub.payment.service.PaymentService;
+import com.backendsyndicate.smashclub.payment.service.TransactionService;
 import jakarta.transaction.Transactional;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,9 @@ public class OrderService implements IOrder {
 
     @Autowired
     private PaymentService paymentService;
+
+    @Autowired
+    private TransactionService transactionService;
 
     @Autowired
     private UserRepository userRepo;
@@ -111,7 +115,7 @@ public class OrderService implements IOrder {
                 Logging.handleException("OrderService", "buyNow(String userId, ReqBuyNowDTO request)", 127, generateErrorCode("02", "002"), "Transaction failed");
                 return null;
             }
-            Transaction transaction = paymentService.getTransaction(transactionDTO.getTransactionCode());
+            Transaction transaction = transactionService.getTransaction(transactionDTO.getTransactionCode());
             Logging.printConsole(transaction.toString());
             order.setTransactionId(transaction);
 
@@ -190,7 +194,7 @@ public class OrderService implements IOrder {
             Logging.handleException("OrderService", "buyNow(String userId, ReqBuyNowDTO request)", 200, generateErrorCode("02", "002"), "Transaction failed");
             return null;
         }
-        Transaction transaction = paymentService.getTransaction(transactionDTO.getTransactionCode());
+        Transaction transaction = transactionService.getTransaction(transactionDTO.getTransactionCode());
         Logging.printConsole(transaction.toString());
         order.setTransactionId(transaction);
 

@@ -13,6 +13,7 @@ import com.backendsyndicate.smashclub.payment.dto.response.RespPaymentTransactio
 import com.backendsyndicate.smashclub.payment.dto.response.RespCancelTransactionDTO;
 import com.backendsyndicate.smashclub.payment.model.Transaction;
 import com.backendsyndicate.smashclub.payment.service.PaymentService;
+import com.backendsyndicate.smashclub.payment.service.TransactionService;
 import com.backendsyndicate.smashclub.payment.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,13 +26,15 @@ public class PaymentHelper extends PaymentService {
     private BookingHelper bookingService;
     @Autowired
     private OrderService orderService;
+    @Autowired
+    private TransactionService transactionService;
 
     @Override
     public RespPaymentTransactionDTO paymentTransaction(String transactionCode) {
         RespPaymentTransactionDTO response = null;
 
         try {
-            Transaction trx = getTransaction(transactionCode);
+            Transaction trx = transactionService.getTransaction(transactionCode);
 
             switch( trx.getTransactionType() ) {
                 case TransactionTypeConstant.COURT_BOOKING:
