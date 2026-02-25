@@ -11,8 +11,8 @@ import org.springframework.http.ResponseEntity;
 public interface IOrder {
     public RespCreateOrderDTO createOrder(String userId);
     public RespCreateOrderDTO buyNow(String userId, ReqBuyNowDTO request);
-    void updateOrderStatus(Long orderId, byte newStatus);
-    void cancelOrder(Long orderId);
+    void updateOrderStatus(String orderCode, byte newStatus);
+    void cancelOrder(String orderCode);
     public Page<RespOrderSummaryDTO> getUserOrderHistory(String userId, int page, int size);
     public RespOrderDetailDTO getOrderDetail(Long orderId, String userId);
 }

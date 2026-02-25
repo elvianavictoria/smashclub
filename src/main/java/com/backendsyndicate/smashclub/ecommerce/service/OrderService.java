@@ -83,7 +83,7 @@ public class OrderService implements IOrder {
         for (CartItem cartItem : cart.getCartItems()) {
             Optional<ProductVariant> availVariant = productVariantRepo.findByIdAndSufficientStock(cartItem.getVariant().getId(), cartItem.getQuantity());
             if (availVariant.isEmpty()) {
-                Logging.handleException("OrderService", "buyNow", 80, generateErrorCode("01", "001"), "Product variant not found");
+                Logging.handleException("OrderService", "buyNow", 86, generateErrorCode("01", "001"), "Product variant not found");
                 return null;
             }
 
@@ -114,7 +114,7 @@ public class OrderService implements IOrder {
                     TransactionTypeConstant.ECOMMERCE_SHOPPING
             );
             if (transactionDTO == null){
-                Logging.handleException("OrderService", "buyNow(String userId, ReqBuyNowDTO request)", 127, generateErrorCode("02", "002"), "Transaction failed");
+                Logging.handleException("OrderService", "buyNow(String userId, ReqBuyNowDTO request)", 117, generateErrorCode("02", "002"), "Transaction failed");
                 return null;
             }
             Transaction transaction = transactionService.getTransaction(transactionDTO.getTransactionCode());
@@ -142,7 +142,7 @@ public class OrderService implements IOrder {
         return response;
         }
         catch (Exception ex){
-            Logging.handleException("OrderService", "createOrder", 149, generateErrorCode("01", "010"), ex.getMessage());
+            Logging.handleException("OrderService", "createOrder", 145, generateErrorCode("01", "010"), ex.getMessage());
             return null;
         }
     }
@@ -158,7 +158,7 @@ public class OrderService implements IOrder {
     public RespCreateOrderDTO buyNow(String userId, ReqBuyNowDTO request) {
         Optional<ProductVariant> availVariant = productVariantRepo.findByIdAndSufficientStock(request.getVariantId(), request.getQuantity());
         try {if (availVariant.isEmpty()) {
-            Logging.handleException("OrderService", "buyNow(String userId, ReqBuyNowDTO request)", 165, generateErrorCode("02", "001"), "Product variant not found");
+            Logging.handleException("OrderService", "buyNow(String userId, ReqBuyNowDTO request)", 161, generateErrorCode("02", "001"), "Product variant not found");
             return null;
         }
 
@@ -193,7 +193,7 @@ public class OrderService implements IOrder {
                 TransactionTypeConstant.ECOMMERCE_SHOPPING
             );
         if (transactionDTO == null){
-            Logging.handleException("OrderService", "buyNow(String userId, ReqBuyNowDTO request)", 200, generateErrorCode("02", "002"), "Transaction failed");
+            Logging.handleException("OrderService", "buyNow(String userId, ReqBuyNowDTO request)", 196, generateErrorCode("02", "002"), "Transaction failed");
             return null;
         }
 
@@ -226,43 +226,43 @@ public class OrderService implements IOrder {
     /**
      * Code: 03
      *
-     * @param orderId
+     * @param orderCode
      * @param newStatus
      */
     @Override
-    public void updateOrderStatus(Long orderId, byte newStatus) {
-        Optional<Order> optOrder = orderRepo.findById(orderId);
+    public void updateOrderStatus(String orderCode, byte newStatus) {
+        Optional<Order> optOrder = orderRepo.findByOrderCode(orderCode);
         try{
         if (optOrder.isEmpty()) {
-            Logging.handleException("OrderService", "updateOrderStatus(Long orderId, byte newStatus)", 226, generateErrorCode("03", "001"), "Order not found");
+            Logging.handleException("OrderService", "updateOrderStatus(Long orderId, byte newStatus)", 237, generateErrorCode("03", "001"), "Order not found");
         }
 
         Order order = optOrder.get();
         byte currentStatus = order.getStatus();
 
         if (!OrderStatusConstant.isValidTransition(currentStatus, newStatus)) {
-            Logging.handleException("OrderService", "updateOrderStatus(Long orderId, byte newStatus)", 233, generateErrorCode("03", "002"), "Invalid transition");
+            Logging.handleException("OrderService", "updateOrderStatus(Long orderId, byte newStatus)", 244, generateErrorCode("03", "002"), "Invalid transition");
         }
 
         order.setStatus(newStatus);
         order.setUpdatedAt(LocalDateTime.now());
         orderRepo.save(order);}
         catch (Exception ex){
-            Logging.handleException("OrderService", "updateOrderStatus(Long orderId, byte newStatus)", 239, generateErrorCode("04", "010"), ex.getMessage());
+            Logging.handleException("OrderService", "updateOrderStatus(Long orderId, byte newStatus)", 251, generateErrorCode("04", "010"), ex.getMessage());
         }
     }
 
     /**
      * Code: 04
      *
-     * @param orderId
+     * @param orderCode
      */
     @Override
-    public void cancelOrder(Long orderId) {
-        Optional<Order> optOrder = orderRepo.findById(orderId);
+    public void cancelOrder(String orderCode) {
+        Optional<Order> optOrder = orderRepo.findByOrderCode(orderCode);
         try{
         if (optOrder.isEmpty()) {
-            Logging.handleException("OrderService", "cancelOrder(Long orderId)", 253, generateErrorCode("04", "001"), "Order not found");
+            Logging.handleException("OrderService", "cancelOrder(Long orderId)", 265, generateErrorCode("04", "001"), "Order not found");
         }
 
         Order order = optOrder.get();
@@ -278,7 +278,7 @@ public class OrderService implements IOrder {
 
         orderRepo.save(order);}
         catch (Exception ex){
-            Logging.handleException("OrderService", "cancelOrder(Long orderId)", 267, generateErrorCode("04", "010"), ex.getMessage());
+            Logging.handleException("OrderService", "cancelOrder(Long orderId)", 281, generateErrorCode("04", "010"), ex.getMessage());
         }
     }
 
@@ -334,7 +334,7 @@ public class OrderService implements IOrder {
             return orderDetail;
         }
         catch (Exception ex){
-            Logging.handleException("OrderService", "getOrderDetail(Long orderId, String userId)", 304, generateErrorCode("05", "010"), ex.getMessage());
+            Logging.handleException("OrderService", "getOrderDetail(Long orderId, String userId)", 337, generateErrorCode("05", "010"), ex.getMessage());
             return null;
         }
     }
@@ -366,7 +366,7 @@ public class OrderService implements IOrder {
                         .orderItemImgLink(order.getOrderItem().getFirst().getOrderItemImgLink())
                         .build()
         );} catch (Exception e) {
-            Logging.handleException("OrderService", "getUserOrderHistory(String userId, int page, int size)", 335, generateErrorCode("06", "010"), e.getMessage());
+            Logging.handleException("OrderService", "getUserOrderHistory(String userId, int page, int size)", 369, generateErrorCode("06", "010"), e.getMessage());
             return null;
         }
     }
