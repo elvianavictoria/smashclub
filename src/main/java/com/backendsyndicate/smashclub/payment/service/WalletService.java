@@ -251,7 +251,7 @@ public class WalletService implements IWallet {
         return response;
     }
 
-    private void logWalletUpdate(Wallet wallet, BigDecimal previousBalance, String referenceCode) {
+    private void logWalletUpdate(Wallet wallet, BigDecimal previousBalance, String transactionCode) {
         BigDecimal balanceDiff = wallet.getUserBalance().subtract(previousBalance);
 
         WalletLog log = new WalletLog();
@@ -259,7 +259,7 @@ public class WalletService implements IWallet {
         log.setCurrentBalance(wallet.getUserBalance());
         log.setUsageValue(balanceDiff.abs());
         log.setUsageType(balanceDiff.compareTo(BigDecimal.valueOf(0)) > 0);
-        log.setRefID(referenceCode);
+        log.setRefID(transactionCode);
         log.setWallet(wallet);
 
         walletLogRepo.save(log);
@@ -267,6 +267,15 @@ public class WalletService implements IWallet {
 
     private RespGetBalanceLogDTO mapLogToDTO(WalletLog log) {
         RespGetBalanceLogDTO result = modelMapper.map(log, RespGetBalanceLogDTO.class);
+        String label = "";
+
+        if( log.isUsageType() ) {
+            label = "Penambahan Saldo #" + log.getRefID();
+        } else {
+            label = "Transaksi #" + log.getRefID();
+        }
+
+        result.setLabel(label);
         return result;
     }
 

@@ -107,6 +107,7 @@ public class AdminRefundRequestService {
                 ReqUpdateBalanceDTO updateBalanceDTO = new ReqUpdateBalanceDTO();
                 updateBalanceDTO.setValue(refundRequest.getTransaction().getTotalPrice());
                 updateBalanceDTO.setAddition(true);
+                updateBalanceDTO.setRefId(refundRequest.getTransaction().getTransactionCode());
                 walletService.updateBalance(refundRequest.getTransaction().getUser().getId(), updateBalanceDTO);
 
                 Map<String, Object> data = new HashMap<>();
