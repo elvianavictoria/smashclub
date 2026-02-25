@@ -159,6 +159,11 @@ public class PaymentService implements IPayment {
                             break;
                     }
 
+                    Logging.printConsole(trxCode);
+                    Logging.printConsole(totalPrice.toString());
+                    Logging.printConsole(transaction.getUser().getEmail());
+                    Logging.printConsole(transaction.getTransactionLabel());
+                    Logging.printConsole(redirectUrl);
                     pgResponse = xenditService.createPayment(trxCode, totalPrice, transaction.getUser().getEmail(), transaction.getTransactionLabel(), redirectUrl);
                     if( pgResponse.getInvoiceUrl() != null ) {
                         transaction.setPaymentLink(pgResponse.getInvoiceUrl());
