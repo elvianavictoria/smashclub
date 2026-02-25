@@ -91,18 +91,19 @@ public class TransactionService implements IHistory {
         }
 
         try {
-            Optional<Transaction> optionalTrx = transactionRepo.findByTransactionCode(code);
-            if( optionalTrx.isEmpty() ) {
+            Transaction trx = getTransaction(code);
+            if( trx == null ) {
                 return GlobalResponse.failed("Transaction not found!", TransactionConstant.TRANSACTION_SERVICE_ERROR_DETAIL_NOT_FOUND, null, request);
             }
 
-            Transaction trx = optionalTrx.get();
             Hibernate.initialize(trx.getRefundRequest());
             response = modelMapper.map(trx, RespTransactionDetailDTO.class);
             response.setStatusDesc(TransactionConstant.getStatus(trx.getStatus()));
             response.setTransactionTypeDesc(TransactionTypeConstant.getTransactionType(trx.getTransactionType()));
-            if( trx.getRefundRequest().isEmpty() ) response.setRefundRequest(modelMapper.map(trx.getRefundRequest().getFirst(), RelTransactionRefundRequestDTO.class));
-            response.getRefundRequest().setRefundStatusDesc(TransactionConstant.getRefundStatus(trx.getRefundRequest().getFirst().getRefundStatus()));
+            if( !trx.getRefundRequest().isEmpty() ) {
+                response.setRefundRequest(modelMapper.map(trx.getRefundRequest().getFirst(), RelTransactionRefundRequestDTO.class));
+                response.getRefundRequest().setRefundStatusDesc(TransactionConstant.getRefundStatus(trx.getRefundRequest().getFirst().getRefundStatus()));
+            }
 
         } catch(Exception e) {
             Logging.handleException("TransactionService", "findByCode(String code, HttpServletRequest request)", 79, TransactionConstant.TRANSACTION_SERVICE_ERROR_DETAIL_EXCEPTION, e.getMessage());
@@ -130,7 +131,6 @@ public class TransactionService implements IHistory {
         if( optionalTrx.isEmpty() ) return null;
         Transaction trx = optionalTrx.get();
         Hibernate.initialize(trx.getUser());
-        Hibernate.initialize(trx.getRefundRequest());
 
         return trx;
     }

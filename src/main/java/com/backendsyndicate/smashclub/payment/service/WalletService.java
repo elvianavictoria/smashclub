@@ -21,6 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -62,6 +65,7 @@ public class WalletService implements IWallet {
         }
 
         RespGetBalanceInfoDTO response = null;
+        LocalDateTime currentDate = LocalDateTime.now();
 
         try {
             Optional<Wallet> optionalWallet = walletRepo.findByUserId(userId);
@@ -71,6 +75,8 @@ public class WalletService implements IWallet {
 
             Wallet wallet = optionalWallet.get();
             response = modelMapper.map(wallet, RespGetBalanceInfoDTO.class);
+            Page<RespGetBalanceLogDTO> page = logWalletGet(userId, currentDate.minusDays(7), currentDate.plusDays(1), PageRequest.of(0, 100));
+            response.setWalletLog(page.getContent());
 
         } catch(Exception e) {
             Logging.handleException("Wallet Service", "getBalance(String userId, HttpServletRequest request)", 74, TransactionConstant.WALLET_SERVICE_ERROR_BALANCE_EXCEPTION, e.getMessage());
@@ -96,17 +102,10 @@ public class WalletService implements IWallet {
         Page page = null;
 
         try {
-            page = walletLogRepo.findByWallet_UserIdAndCreatedAtBetween(userId, startDate, endDate, pageable);
-            if( page.isEmpty() ) {
+            page = logWalletGet(userId, LocalDateTime.of(startDate, LocalTime.of(0, 0)), LocalDateTime.of(endDate, LocalTime.of(0, 0)), pageable);
+            if( page == null || page.isEmpty() ) {
                 return GlobalResponse.failed("Wallet log not found!", TransactionConstant.WALLET_SERVICE_ERROR_LOG_EMPTY, null, request);
             }
-
-            page = page.map(new Function<WalletLog, RespGetBalanceLogDTO>() {
-                @Override
-                public RespGetBalanceLogDTO apply(WalletLog log) {
-                    return mapLogToDTO(log);
-                }
-            });
         } catch(Exception e) {
             Logging.handleException("Wallet Service", "getBalanceLog(String userId, LocalDate startDate, LocalDate endDate, Pageable pageable,  HttpServletRequest request)", 97, TransactionConstant.WALLET_SERVICE_ERROR_LOG_EXCEPTION, e.getMessage());
             logService.writeErrorLog(TransactionConstant.WALLET_SERVICE_ERROR_LOG_EXCEPTION, "WalletService@getBalanceLog()", e.getMessage());
@@ -174,8 +173,16 @@ public class WalletService implements IWallet {
         try {
             Optional<Wallet> optionalWallet = walletRepo.findByUserId(userId);
             if( optionalWallet.isEmpty() ) {
-                Logging.handleException("WalletService", "updateBalance", 160, TransactionConstant.WALLET_SERVICE_ERROR_UPDATE_WALLET_NOT_FOUND, "Wallet not found!");
-                return false;
+                boolean createNew = createWallet(userId);
+
+                if (createNew) {
+                    optionalWallet = walletRepo.findByUserId(userId);
+                }
+
+                if( optionalWallet.isEmpty() ){
+                    Logging.handleException("WalletService", "updateBalance", 160, TransactionConstant.WALLET_SERVICE_ERROR_UPDATE_WALLET_NOT_FOUND, "Wallet not found!");
+                    return false;
+                }
             }
 
             wallet = optionalWallet.get();
@@ -184,7 +191,7 @@ public class WalletService implements IWallet {
             Logging.printConsole("Update balance to " + updatedBalance + "!");
             wallet.setUserBalance(updatedBalance);
 
-            logWalletUpdate(wallet, previousBalance);
+            logWalletUpdate(wallet, previousBalance, reqUpdateBalanceDTO.getRefId());
 
             response = new RespUpdateBalanceDTO();
             response.setPreviousBalance(previousBalance);
@@ -228,7 +235,23 @@ public class WalletService implements IWallet {
         return true;
     }
 
-    private void logWalletUpdate(Wallet wallet, BigDecimal previousBalance) {
+    private Page<RespGetBalanceLogDTO> logWalletGet(String userId, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) throws Exception {
+        Page<WalletLog> page = walletLogRepo.findByWallet_UserIdAndCreatedAtBetween(userId, startDate, endDate, pageable);
+        if( page.isEmpty() ) {
+            return null;
+        }
+
+        Page<RespGetBalanceLogDTO> response = page.map(new Function<WalletLog, RespGetBalanceLogDTO>() {
+            @Override
+            public RespGetBalanceLogDTO apply(WalletLog log) {
+                return mapLogToDTO(log);
+            }
+        });
+
+        return response;
+    }
+
+    private void logWalletUpdate(Wallet wallet, BigDecimal previousBalance, String referenceCode) {
         BigDecimal balanceDiff = wallet.getUserBalance().subtract(previousBalance);
 
         WalletLog log = new WalletLog();
@@ -236,6 +259,7 @@ public class WalletService implements IWallet {
         log.setCurrentBalance(wallet.getUserBalance());
         log.setUsageValue(balanceDiff.abs());
         log.setUsageType(balanceDiff.compareTo(BigDecimal.valueOf(0)) > 0);
+        log.setRefID(referenceCode);
         log.setWallet(wallet);
 
         walletLogRepo.save(log);
