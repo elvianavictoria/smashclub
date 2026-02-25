@@ -14,4 +14,5 @@ public class RespOrderSummaryDTO {
     private BigDecimal totalPrice;
     private byte status;
     private LocalDateTime orderDate;
+    private String orderItemImgLink;
 }

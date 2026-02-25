@@ -22,6 +22,9 @@ public class OrderItem {
     @Column(name = "ProductName")
     private String productName;
 
+    @Column(name = "Category")
+    private String category;
+
     @Column(name = "Quantity", nullable = false)
     private int quantity = 0;
 

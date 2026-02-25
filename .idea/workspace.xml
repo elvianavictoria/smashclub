@@ -4,11 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cd9e846d-d2b3-4db3-8c78-09651c2e3476" name="Changes" comment="">
+    <list default="true" id="cd9e846d-d2b3-4db3-8c78-09651c2e3476" name="Changes" comment="ECommerce Update">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/ecommerce/dto/response/RespCreateOrderDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/ecommerce/dto/response/RespCreateOrderDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/ecommerce/dto/response/RespOrderDetailDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/ecommerce/dto/response/RespOrderDetailDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/ecommerce/dto/response/RespOrderItemDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/ecommerce/dto/response/RespOrderItemDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/ecommerce/dto/response/RespOrderSummaryDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/ecommerce/dto/response/RespOrderSummaryDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/ecommerce/dto/response/RespProductListDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/ecommerce/model/Order.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/ecommerce/model/Order.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/ecommerce/model/OrderItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/ecommerce/model/OrderItem.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/ecommerce/service/OrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/ecommerce/service/OrderService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/payment/service/PaymentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/payment/service/PaymentService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/payment/service/TransactionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/payment/service/TransactionService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,7 +68,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Application.SmashclubApplication.executor": "Debug",
+    "Application.SmashclubApplication.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
@@ -73,7 +78,7 @@
     "TestNG.TestAdminAuthService.login.executor": "Debug",
     "TestNG.TestAdminPermissionController.executor": "Debug",
     "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "dece",
+    "git-widget-placeholder": "fiya",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/Michael/IdeaProjects/smashclub/src/main/resources/templates/mail/payment",
@@ -98,28 +103,6 @@
     </key>
   </component>
   <component name="RunManager" selected="Application.SmashclubApplication">
-    <configuration name="SmashclubApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.backendsyndicate.smashclub.SmashclubApplication" />
-      <module name="smashclub" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.backendsyndicate.smashclub.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="JetRunConfigurationType">
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
-      <option name="filePath" />
-      <method v="2" />
-    </configuration>
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -140,6 +123,39 @@
       <option name="MODULE_MODE" value="false" />
       <option name="REDIRECT_INPUT" value="false" />
       <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="Tox" factoryName="Tox">
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <method v="2" />
+    </configuration>
+    <configuration name="SmashclubApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.backendsyndicate.smashclub.SmashclubApplication" />
+      <module name="smashclub" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.backendsyndicate.smashclub.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="JetRunConfigurationType">
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <option name="filePath" />
       <method v="2" />
     </configuration>
     <configuration name="TestAdminAuthController" type="TestNG" temporary="true" nameIsGenerated="true">
@@ -193,17 +209,6 @@
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
-    </configuration>
-    <configuration default="true" type="Tox" factoryName="Tox">
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
