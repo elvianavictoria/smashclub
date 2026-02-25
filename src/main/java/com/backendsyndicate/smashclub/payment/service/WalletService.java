@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -64,7 +65,7 @@ public class WalletService implements IWallet {
         }
 
         RespGetBalanceInfoDTO response = null;
-        LocalDate currentDate = LocalDate.now();
+        LocalDateTime currentDate = LocalDateTime.now();
 
         try {
             Optional<Wallet> optionalWallet = walletRepo.findByUserId(userId);
@@ -74,7 +75,7 @@ public class WalletService implements IWallet {
 
             Wallet wallet = optionalWallet.get();
             response = modelMapper.map(wallet, RespGetBalanceInfoDTO.class);
-            Page<RespGetBalanceLogDTO> page = logWalletGet(userId, currentDate.minusDays(7), currentDate, PageRequest.of(0, 100));
+            Page<RespGetBalanceLogDTO> page = logWalletGet(userId, currentDate.minusDays(7), currentDate.plusDays(1), PageRequest.of(0, 100));
             response.setWalletLog(page.getContent());
 
         } catch(Exception e) {
@@ -101,7 +102,7 @@ public class WalletService implements IWallet {
         Page page = null;
 
         try {
-            page = logWalletGet(userId, startDate, endDate, pageable);
+            page = logWalletGet(userId, LocalDateTime.of(startDate, LocalTime.of(0, 0)), LocalDateTime.of(endDate, LocalTime.of(0, 0)), pageable);
             if( page == null || page.isEmpty() ) {
                 return GlobalResponse.failed("Wallet log not found!", TransactionConstant.WALLET_SERVICE_ERROR_LOG_EMPTY, null, request);
             }
@@ -190,7 +191,7 @@ public class WalletService implements IWallet {
             Logging.printConsole("Update balance to " + updatedBalance + "!");
             wallet.setUserBalance(updatedBalance);
 
-            logWalletUpdate(wallet, previousBalance);
+            logWalletUpdate(wallet, previousBalance, reqUpdateBalanceDTO.getRefId());
 
             response = new RespUpdateBalanceDTO();
             response.setPreviousBalance(previousBalance);
@@ -234,7 +235,7 @@ public class WalletService implements IWallet {
         return true;
     }
 
-    private Page<RespGetBalanceLogDTO> logWalletGet(String userId, LocalDate startDate, LocalDate endDate, Pageable pageable) throws Exception {
+    private Page<RespGetBalanceLogDTO> logWalletGet(String userId, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) throws Exception {
         Page<WalletLog> page = walletLogRepo.findByWallet_UserIdAndCreatedAtBetween(userId, startDate, endDate, pageable);
         if( page.isEmpty() ) {
             return null;
@@ -250,7 +251,7 @@ public class WalletService implements IWallet {
         return response;
     }
 
-    private void logWalletUpdate(Wallet wallet, BigDecimal previousBalance) {
+    private void logWalletUpdate(Wallet wallet, BigDecimal previousBalance, String referenceCode) {
         BigDecimal balanceDiff = wallet.getUserBalance().subtract(previousBalance);
 
         WalletLog log = new WalletLog();
@@ -258,6 +259,7 @@ public class WalletService implements IWallet {
         log.setCurrentBalance(wallet.getUserBalance());
         log.setUsageValue(balanceDiff.abs());
         log.setUsageType(balanceDiff.compareTo(BigDecimal.valueOf(0)) > 0);
+        log.setRefID(referenceCode);
         log.setWallet(wallet);
 
         walletLogRepo.save(log);
