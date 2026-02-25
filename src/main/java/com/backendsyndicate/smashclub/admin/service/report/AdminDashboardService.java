@@ -13,6 +13,7 @@ import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.payment.model.Transaction;
 import com.backendsyndicate.smashclub.payment.repo.TransactionRepo;
 import jakarta.servlet.http.HttpServletRequest;
+import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -61,7 +62,6 @@ public class AdminDashboardService {
             long courtCount = courtRepo.count();
             long coachCount = coachRepo.count();
             long trxCount = transactionRepo.count();
-            List<Map<String, Object>> recentTransactionCount = transactionRepo.findAllGroupByCreatedAtDaily(startDate, endDate);
             Page<Transaction> recentTransactions = transactionRepo.findAllByCreatedAtBetween(startDate, endDate, PageRequest.of(0, 5));
 
             List<Transaction> recentTrxList = recentTransactions.getContent();
@@ -69,9 +69,11 @@ public class AdminDashboardService {
             response.setCourtCount(courtCount);
             response.setCoachCount(coachCount);
             response.setTransactionCount(trxCount);
-//            response.setDailyTransactionCount();
             response.setDailyTransaction(recentTrxList.stream().map( trx -> {
+                Hibernate.initialize(trx.getUser());
+
                 ExtAdminTransactionDTO dto = modelMapper.map(trx, ExtAdminTransactionDTO.class);
+                dto.setFullName(trx.getUser().getFullName());
                 dto.setStatusDesc(TransactionConstant.getStatus(trx.getStatus()) );
                 dto.setStartTime(DatetimeFormatting.getDatetimeFormat(trx.getCreatedAt()));
                 return dto;

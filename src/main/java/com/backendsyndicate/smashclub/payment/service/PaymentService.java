@@ -237,7 +237,7 @@ public class PaymentService implements IPayment {
                         "fullName", trx.getUser().getFullName(),
                         "totalPrice", Util.formatCurrency(trx.getTotalPrice()),
                         "createdAt", DatetimeFormatting.getDatetimeFormat(trx.getCreatedAt()),
-                        "url", "https://localhost:5173/transaction/" + trx.getTransactionCode()
+                        "url", MainConfig.getAppFrontendUrl() + "/transaction/" + trx.getTransactionCode()
                 );
                 Logging.printConsole(mailObject.toString());
                 mailService.sendMail(TemplateService.TEMPLATE_PAYMENT_NOTIFY_PAID, trx.getUser().getEmail(), "Smashclub - Pembayaran Berhasil", mailObject);
@@ -357,6 +357,17 @@ public class PaymentService implements IPayment {
             response.setTotalPrice(trx.getTotalPrice());
             response.setTransactionType(trx.getTransactionType());
             response.setUser(modelMapper.map(trx.getUser(), RelTransactionUserDTO.class));
+
+            Logging.printConsole("Sending payment expired email!");
+            Map<String, Object> mailObject = Map.of(
+                    "transactionCode", trx.getTransactionCode(),
+                    "fullName", trx.getUser().getFullName(),
+                    "totalPrice", Util.formatCurrency(trx.getTotalPrice()),
+                    "createdAt", DatetimeFormatting.getDatetimeFormat(trx.getCreatedAt()),
+                    "url", MainConfig.getAppFrontendUrl() + "/transaction/" + trx.getTransactionCode()
+            );
+            Logging.printConsole(mailObject.toString());
+            mailService.sendMail(TemplateService.TEMPLATE_PAYMENT_NOTIFY_EXPIRED, trx.getUser().getEmail(), "Smashclub - Pembayaran Expired", mailObject);
         } catch(Exception e) {
             Logging.handleException("PaymentService", "expireTransaction(String transactionCode)", 147, TransactionConstant.PAYMENT_SERVICE_ERROR_EXPIRE_EXCEPTION, e.getMessage());
             logService.writeErrorLog(TransactionConstant.PAYMENT_SERVICE_ERROR_EXPIRE_EXCEPTION, "PaymentService@expireTransaction()", e.getMessage());

@@ -1,5 +1,6 @@
 package com.backendsyndicate.smashclub.admin.controller.report;
 
+import com.backendsyndicate.smashclub.admin.dto.request.ReqAdminBookingProcessDTO;
 import com.backendsyndicate.smashclub.admin.service.report.AdminBookingService;
 import com.backendsyndicate.smashclub.common.constant.PermissionConstant;
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,7 +45,7 @@ public class AdminBookingController {
 
     @PreAuthorize("hasAuthority('" + PermissionConstant.BOOKING_SALES_PROCESS_CODE + "')")
     @PostMapping("process/{bookingCode}")
-    public ResponseEntity<Object> bookingProcess(@PathVariable String bookingCode, @RequestBody int status, HttpServletRequest request) {
-        return adminBookingService.process(bookingCode, status, request);
+    public ResponseEntity<Object> bookingProcess(@PathVariable String bookingCode, @RequestBody ReqAdminBookingProcessDTO dto, HttpServletRequest request) {
+        return adminBookingService.process(bookingCode, dto.getStatus(), request);
     }
 }

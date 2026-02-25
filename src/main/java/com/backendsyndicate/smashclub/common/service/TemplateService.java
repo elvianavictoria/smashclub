@@ -16,6 +16,7 @@ public class TemplateService {
 
     public static final String TEMPLATE_PAYMENT_NOTIFY_PAID = "PAYMENT_NOTIFY_PAID";
     public static final String TEMPLATE_PAYMENT_NOTIFY_UNPAID = "PAYMENT_NOTIFY_UNPAID";
+    public static final String TEMPLATE_PAYMENT_NOTIFY_EXPIRED = "PAYMENT_NOTIFY_EXPIRED";
     public static final String TEMPLATE_REFUND_NOTIFY_APPROVED = "REFUND_NOTIFY_APPROVED";
     public static final String TEMPLATE_REFUND_NOTIFY_REJECTED = "REFUND_NOTIFY_REJECTED";
 
@@ -66,6 +67,9 @@ public class TemplateService {
             case TEMPLATE_PAYMENT_NOTIFY_PAID:
                 emailContent = paymentNotifyPaidContent(data);
                 break;
+            case TEMPLATE_PAYMENT_NOTIFY_EXPIRED:
+                emailContent = paymentNotifyExpiredContent(data);
+                break;
             case TEMPLATE_REFUND_NOTIFY_APPROVED:
                 emailContent = refundNotifyApprovedContent(data);
                 break;
@@ -109,6 +113,13 @@ public class TemplateService {
 
     private String paymentNotifyPaidContent(Map<String, Object> data) {
         String fileName = "mail/payment/notify-payment-paid";
+
+        Context context = createContext(data);
+        return this.templateEngine.process(fileName, context);
+    }
+
+    private String paymentNotifyExpiredContent(Map<String, Object> data) {
+        String fileName = "mail/payment/notify-payment-expired";
 
         Context context = createContext(data);
         return this.templateEngine.process(fileName, context);
