@@ -6,6 +6,7 @@ import com.backendsyndicate.smashclub.common.constant.TransactionConstant;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.common.constant.TransactionTypeConstant;
+import com.backendsyndicate.smashclub.common.util.Util;
 import com.backendsyndicate.smashclub.payment.core.IWallet;
 import com.backendsyndicate.smashclub.payment.dto.request.ReqUpdateBalanceDTO;
 import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransactionDTO;
@@ -131,9 +132,14 @@ public class WalletService implements IWallet {
         RespCreateTransactionDTO response = null;
 
         try {
-            response = paymentService.createTransaction(userId, balance, "", TransactionTypeConstant.WALLET_TOPUP);
+            response = paymentService.createTransaction(userId, balance, generateReferenceCode(), TransactionTypeConstant.WALLET_TOPUP);
+            if( response == null ) {
+                Logging.handleException("Wallet Service", "topupBalance(String userId, BigDecimal balance, HttpServletRequest request)", 137, TransactionConstant.WALLET_SERVICE_ERROR_TOPUP_TRANSACTION_FAILED, "Failed to request topup balance!");
+                return GlobalResponse.failed("Failed to request topup balance!", TransactionConstant.WALLET_SERVICE_ERROR_TOPUP_TRANSACTION_FAILED, null, request);
+            }
+
         } catch(Exception e) {
-            Logging.handleException("Wallet Service", "topupBalance(String userId, BigDecimal balance, HttpServletRequest request)", 125, TransactionConstant.WALLET_SERVICE_ERROR_TOPUP_EXCEPTION, e.getMessage());
+            Logging.handleException("Wallet Service", "topupBalance(String userId, BigDecimal balance, HttpServletRequest request)", 135, TransactionConstant.WALLET_SERVICE_ERROR_TOPUP_EXCEPTION, e.getMessage());
             logService.writeErrorLog(TransactionConstant.WALLET_SERVICE_ERROR_TOPUP_EXCEPTION, "WalletService@topupBalance()", e.getMessage());
             return GlobalResponse.failed("Failed to request topup balance!", TransactionConstant.WALLET_SERVICE_ERROR_TOPUP_EXCEPTION, null, request);
         }
@@ -238,5 +244,21 @@ public class WalletService implements IWallet {
     private RespGetBalanceLogDTO mapLogToDTO(WalletLog log) {
         RespGetBalanceLogDTO result = modelMapper.map(log, RespGetBalanceLogDTO.class);
         return result;
+    }
+
+    private String generateReferenceCode() {
+        LocalDate currentDt = LocalDate.now();
+        String strYear = "" + currentDt.getYear();
+        String strMonth = "0" + currentDt.getMonthValue();
+        String strDate = "0" + currentDt.getDayOfMonth();
+
+        String currentDtString = strYear.substring(2) + strMonth.substring(strMonth.length() - 2) + strDate.substring(strDate.length() - 2);
+
+        Long logCounter = walletLogRepo.countTodayLog();
+        if( logCounter == null ) logCounter = 0L;
+        logCounter += 1;
+        String strCounter = "00" + logCounter;
+
+        return "WLLT-" + currentDtString + "-" + strCounter.substring(strCounter.length() - 3);
     }
 }

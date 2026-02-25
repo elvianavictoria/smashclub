@@ -34,5 +34,7 @@ public interface OrderRepo extends JpaRepository<Order, Long> {
     List<Map<String, Object>> findAllGroupByOrderDateMonthly(LocalDateTime startDate, LocalDateTime endDate);
     // Order Filter by Date
     Page<Order> findAllByOrderDateBetween(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
+    Page<Order> findAllByOrderDateBetweenAndOrderCodeContainsIgnoreCase(LocalDateTime startDate, LocalDateTime endDate, String orderCode, Pageable pageable);
+    Optional<Order> findByOrderCode(String orderCode);
 
 }

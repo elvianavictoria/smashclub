@@ -34,8 +34,11 @@ public class Order {
     @Column(name = "OrderCode")
     private String orderCode = "";
 
-    @Column(name = "OrderDate", nullable = false)
+    @Column(name = "OrderDate", updatable = false, nullable = false)
     private LocalDateTime orderDate;
+
+    @Column(name = "UpdatedAt", insertable = false)
+    private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "UserId", foreignKey = @ForeignKey(name = "fk_order_to_user"), nullable = false)

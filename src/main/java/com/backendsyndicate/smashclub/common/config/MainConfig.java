@@ -20,6 +20,9 @@ public class MainConfig {
     private Environment env;
     private static int cacheLimit;
 
+    private static String appBackendUrl;
+    private static String appFrontendUrl;
+
     @Primary
     @Bean
     public DataSource getDataSource() {
@@ -40,5 +43,23 @@ public class MainConfig {
     @Value("${spring.request.cache.limit}")
     public void setCacheLimit(int cacheLimit) {
         this.cacheLimit = cacheLimit;
+    }
+
+    public static String getAppBackendUrl() {
+        return appBackendUrl;
+    }
+
+    @Value("${app.backend.url}")
+    public void setAppBackendUrl(String appBackendUrl) {
+        this.appBackendUrl = appBackendUrl;
+    }
+
+    public static String getAppFrontendUrl() {
+        return appFrontendUrl;
+    }
+
+    @Value("${app.frontend.url}")
+    public void setAppFrontendUrl(String appFrontendUrl) {
+        this.appFrontendUrl = appFrontendUrl;
     }
 }

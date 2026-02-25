@@ -13,9 +13,12 @@ import com.backendsyndicate.smashclub.ecommerce.repo.OrderItemRepo;
 import com.backendsyndicate.smashclub.ecommerce.repo.OrderRepo;
 import com.backendsyndicate.smashclub.ecommerce.repo.ProductVariantRepo;
 import com.backendsyndicate.smashclub.payment.dto.response.RespCreateTransactionDTO;
+import com.backendsyndicate.smashclub.payment.model.RefundRequest;
 import com.backendsyndicate.smashclub.payment.model.Transaction;
 import com.backendsyndicate.smashclub.payment.service.PaymentService;
+import com.backendsyndicate.smashclub.payment.service.TransactionService;
 import jakarta.transaction.Transactional;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -51,6 +54,9 @@ public class OrderService implements IOrder {
     private PaymentService paymentService;
 
     @Autowired
+    private TransactionService transactionService;
+
+    @Autowired
     private UserRepository userRepo;
 
     private String generateErrorCode(String methodNo, String errorNo) {
@@ -81,13 +87,14 @@ public class OrderService implements IOrder {
                 return null;
             }
 
-            BigDecimal totalPrice =
-                    cartItem.getVariant().getPrice()
-                            .multiply(BigDecimal.valueOf(cartItem.getQuantity()));
+            BigDecimal totalPrice = cartItem.getVariant().getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity()));
 
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);
+            orderItem.setProductName(cartItem.getVariant().getProduct().getProductName());
+            orderItem.setCategory(cartItem.getVariant().getProduct().getCategory());
             orderItem.setVariant(cartItem.getVariant());
+            orderItem.setQuantity(cartItem.getQuantity());
             orderItem.setOrderItemImgLink(cartItem.getVariant().getVariantImgLink());
             orderItem.setPriceAtPurchase(cartItem.getVariant().getPrice());
             orderItem.setTotalPrice(totalPrice);
@@ -110,11 +117,10 @@ public class OrderService implements IOrder {
                 Logging.handleException("OrderService", "buyNow(String userId, ReqBuyNowDTO request)", 127, generateErrorCode("02", "002"), "Transaction failed");
                 return null;
             }
-            Transaction transaction = paymentService.getTransaction(transactionDTO.getTransactionCode());
+            Transaction transaction = transactionService.getTransaction(transactionDTO.getTransactionCode());
             Logging.printConsole(transaction.toString());
             order.setTransactionId(transaction);
 
-        order.setOrderItem(orderItems);
         orderRepo.save(order);
 
         for (CartItem item : cart.getCartItems()) {
@@ -130,6 +136,7 @@ public class OrderService implements IOrder {
         response.setOrderCode(order.getOrderCode());
         response.setTransactionId(order.getTransactionId().getId());
         response.setStatus(order.getStatus());
+        response.setSubTotal(order.getSubTotal());
         response.setTotalPrice(order.getTotalPrice());
         response.setOrderDate(order.getOrderDate());
         return response;
@@ -168,6 +175,8 @@ public class OrderService implements IOrder {
 
         OrderItem orderItem = new OrderItem();
         orderItem.setOrder(order);
+        orderItem.setProductName(productVariant.getProduct().getProductName());
+        orderItem.setCategory(productVariant.getProduct().getCategory());
         orderItem.setVariant(productVariant);
         orderItem.setOrderItemImgLink(productVariant.getVariantImgLink());
         orderItem.setPriceAtPurchase(price);
@@ -176,9 +185,7 @@ public class OrderService implements IOrder {
 
         order.setSubTotal(total);
         order.setTotalPrice(total);
-        Logging.printConsole(order.getUser().getId());
-        Logging.printConsole(order.getTotalPrice().toString());
-        Logging.printConsole(order.getOrderCode());
+
         RespCreateTransactionDTO transactionDTO = paymentService.createTransaction(
                 order.getUser().getId(),
                 order.getTotalPrice(),
@@ -189,12 +196,13 @@ public class OrderService implements IOrder {
             Logging.handleException("OrderService", "buyNow(String userId, ReqBuyNowDTO request)", 200, generateErrorCode("02", "002"), "Transaction failed");
             return null;
         }
-        Transaction transaction = paymentService.getTransaction(transactionDTO.getTransactionCode());
-        Logging.printConsole(transaction.toString());
-        order.setTransactionId(transaction);
 
+        Transaction transaction = transactionService.getTransaction(transactionDTO.getTransactionCode());
+
+        order.setTransactionId(transaction);
         order = orderRepo.save(order);
         orderItemRepo.save(orderItem);
+
         productVariant.setStock(productVariant.getStock() - request.getQuantity());
         productVariantRepo.save(productVariant);
 
@@ -205,8 +213,10 @@ public class OrderService implements IOrder {
         response.setOrderDate(order.getOrderDate());
         response.setTransactionId(order.getTransactionId().getId());
         response.setStatus(order.getStatus());
+        response.setSubTotal(order.getSubTotal());
         response.setTotalPrice(order.getTotalPrice());
-        return response;}
+        return response;
+        }
         catch (Exception e) {
             Logging.handleException("OrderService", "buyNow(String userId, ReqBuyNowDTO request)", 220, generateErrorCode("02", "010"), e.getMessage());
             return null;
@@ -235,6 +245,7 @@ public class OrderService implements IOrder {
         }
 
         order.setStatus(newStatus);
+        order.setUpdatedAt(LocalDateTime.now());
         orderRepo.save(order);}
         catch (Exception ex){
             Logging.handleException("OrderService", "updateOrderStatus(Long orderId, byte newStatus)", 239, generateErrorCode("04", "010"), ex.getMessage());
@@ -256,6 +267,7 @@ public class OrderService implements IOrder {
 
         Order order = optOrder.get();
         order.setStatus((byte) OrderStatusConstant.ORDER_CANCELLED);
+        order.setUpdatedAt(LocalDateTime.now());
 
         List<OrderItem> orderItems = order.getOrderItem();
         for (OrderItem orderItem : orderItems) {
@@ -283,28 +295,44 @@ public class OrderService implements IOrder {
     public RespOrderDetailDTO getOrderDetail(Long orderId, String userId) {
         Order order = orderRepo.findByIdAndUserId(orderId, userId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
-        try{
-        List<RespOrderItemDTO> items = order.getOrderItem()
-                .stream()
-                .map(item -> RespOrderItemDTO.builder()
-                        .variantId(item.getVariant().getId())
-                        .variantName(item.getVariant().getVariantName())
-                        .quantity(item.getQuantity())
-                        .price(item.getPriceAtPurchase())
-                        .totalPrice(item.getTotalPrice())
-                        .orderItemImgLink(item.getVariant().getVariantImgLink())
-                        .build()
-                )
-                .toList();
+        try {
+            List<RespOrderItemDTO> items = order.getOrderItem()
+                    .stream()
+                    .map(item -> {
+                                Hibernate.initialize(item.getVariant());
+                                return RespOrderItemDTO.builder()
+                                        .variantId(item.getVariant().getId())
+                                        .category(item.getCategory())
+                                        .variantName(item.getVariant().getVariantName())
+                                        .productName(item.getVariant().getProduct().getProductName())
+                                        .orderItemImgLink(item.getOrderItemImgLink())
+                                        .quantity(item.getQuantity())
+                                        .price(item.getPriceAtPurchase())
+                                        .totalPrice(item.getTotalPrice())
+                                        .build();
+                            }
+                    )
+                    .toList();
 
-        return RespOrderDetailDTO.builder()
-                .orderId(order.getId())
-                .orderCode(order.getOrderCode())
-                .status(order.getStatus())
-                .orderDate(order.getOrderDate())
-                .totalPrice(order.getTotalPrice())
-                .items(items)
-                .build();}
+            RespOrderDetailDTO orderDetail = new RespOrderDetailDTO();
+            orderDetail.setOrderId(order.getId());
+            orderDetail.setOrderCode(order.getOrderCode());
+            orderDetail.setStatus(order.getStatus());
+            orderDetail.setOrderDate(order.getOrderDate());
+            orderDetail.setUpdatedAt(order.getUpdatedAt());
+            orderDetail.setSubtotal(order.getSubTotal());
+            orderDetail.setTotalPrice(order.getTotalPrice());
+            orderDetail.setItems(items);
+            Logging.printConsole(orderDetail.getSubtotal().toString());
+
+            RefundRequest refund = transactionService.getRefundRequestFromTransaction(order.getOrderCode());
+            if (refund != null) {
+                orderDetail.setRefundStatus(refund.getRefundStatus());
+                orderDetail.setRefundRequestDate(refund.getCreatedAt());
+                orderDetail.setRefundStatusUpdateDate(refund.getUpdatedAt());
+            }
+            return orderDetail;
+        }
         catch (Exception ex){
             Logging.handleException("OrderService", "getOrderDetail(Long orderId, String userId)", 304, generateErrorCode("05", "010"), ex.getMessage());
             return null;
@@ -335,6 +363,7 @@ public class OrderService implements IOrder {
                         .status(order.getStatus())
                         .orderDate(order.getOrderDate())
                         .totalPrice(order.getTotalPrice())
+                        .orderItemImgLink(order.getOrderItem().getFirst().getOrderItemImgLink())
                         .build()
         );} catch (Exception e) {
             Logging.handleException("OrderService", "getUserOrderHistory(String userId, int page, int size)", 335, generateErrorCode("06", "010"), e.getMessage());
@@ -346,10 +375,8 @@ public class OrderService implements IOrder {
         LocalDate today = LocalDate.now();
         String datePart = today.format(DATE_FORMATTER);
 
-        // Hitung jumlah booking yang sudah ada di hari ini
         Long countToday = orderRepo.countTodayOrder();
 
-        // Kalau null (misal belum ada booking), set ke 0
         long sequence = (countToday != null ? countToday : 0) + 1;
 
         String sequencePart = String.format("%04d", sequence);

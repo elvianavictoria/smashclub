@@ -14,6 +14,7 @@ public class RespCreateOrderDTO {
     private Long orderId;
     private String orderCode;
     private String userId;
+    private BigDecimal subTotal;
     private BigDecimal totalPrice;
     private byte status;
     private Long transactionId;

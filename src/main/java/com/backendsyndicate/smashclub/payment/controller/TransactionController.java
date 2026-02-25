@@ -69,7 +69,7 @@ public class TransactionController {
 
     @PostMapping("cancel-by-reference/{referenceCode}")
     public ResponseEntity<Object> transactionCancelByReference(@PathVariable String referenceCode, @RequestBody String refundReason, HttpServletRequest request) {
-        Transaction transaction = paymentService.getTransactionByReferenceCode(referenceCode);
+        Transaction transaction = transactionService.getTransactionByReferenceCode(referenceCode);
         if( transaction == null ) {
             return GlobalResponse.failed("Failed to cancel transaction!", "PYMTCBR01E001", null, request);
         }

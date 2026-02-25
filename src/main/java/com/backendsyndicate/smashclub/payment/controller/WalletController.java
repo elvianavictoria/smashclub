@@ -2,6 +2,7 @@ package com.backendsyndicate.smashclub.payment.controller;
 
 import com.backendsyndicate.smashclub.common.security.JwtService;
 import com.backendsyndicate.smashclub.payment.dto.request.ReqGetBalanceLogDTO;
+import com.backendsyndicate.smashclub.payment.dto.request.ReqTopupBalanceDTO;
 import com.backendsyndicate.smashclub.payment.service.WalletService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -40,10 +41,10 @@ public class WalletController {
     }
 
     @PostMapping("/balance/topup")
-    public ResponseEntity<Object> topupBalance(@RequestBody BigDecimal balance, HttpServletRequest request) {
+    public ResponseEntity<Object> topupBalance(@RequestBody ReqTopupBalanceDTO dto, HttpServletRequest request) {
         String accessToken = request.getHeader("Authorization");
         String userId = jwtService.extractUserId(accessToken.replaceAll("Bearer ", ""));
 
-        return walletService.topupBalance(userId, balance, request);
+        return walletService.topupBalance(userId, dto.getBalance(), request);
     }
 }

@@ -104,6 +104,8 @@ public class AdminRoleSeeder implements DataSeeder {
 
             return adminRoleRepo.save(x);
         });
+        adminRole.setMenuSet(menuSet);
+        adminRole.setPermissionSet(permissionSet);
 
         roles.put(id, adminRole);
     }

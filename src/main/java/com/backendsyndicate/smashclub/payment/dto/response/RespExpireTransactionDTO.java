@@ -14,5 +14,6 @@ public class RespExpireTransactionDTO {
     private String transactionCode;
     private int transactionType;
     private BigDecimal totalPrice;
+    private String referenceCode;
     private RelTransactionUserDTO user;
 }
