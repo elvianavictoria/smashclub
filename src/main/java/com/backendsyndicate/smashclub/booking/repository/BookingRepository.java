@@ -31,8 +31,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "WHERE b.CourtID = :courtId " +
             "AND b.BookingDate = :date " +
             "AND b.Status IN (1, 2) " +
-            "AND ((CAST(b.StartTime AS TIME) <= CAST(:endTime AS TIME) " +
-            "AND CAST(b.EndTime AS TIME) >= CAST(:startTime AS TIME)))",
+            "AND ((CAST(b.StartTime AS TIME) < CAST(:endTime AS TIME) " +
+            "AND CAST(b.EndTime AS TIME) > CAST(:startTime AS TIME)))",
             nativeQuery = true)
     List<Booking> findOverlappingBookings(
             @Param("courtId") Long courtId,
