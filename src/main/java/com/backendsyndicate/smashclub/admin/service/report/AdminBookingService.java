@@ -11,6 +11,7 @@ import com.backendsyndicate.smashclub.admin.dto.relation.RelAdminBookingEquipmen
 import com.backendsyndicate.smashclub.admin.dto.relation.RelAdminTransactionListDTO;
 import com.backendsyndicate.smashclub.admin.dto.response.*;
 import com.backendsyndicate.smashclub.admin.service.log.LogService;
+import com.backendsyndicate.smashclub.booking.dto.request.BookingStatusUpdateRequest;
 import com.backendsyndicate.smashclub.booking.dto.response.BookingResponse;
 import com.backendsyndicate.smashclub.booking.dto.response.CoachDetailResponse;
 import com.backendsyndicate.smashclub.booking.dto.response.EquipmentDetailResponse;
@@ -65,6 +66,8 @@ public class AdminBookingService implements IStatistic {
     private CoachDetailRepository coachDetailRepository;
     @Autowired
     private EquipmentDetailRepository equipmentDetailRepository;
+    @Autowired
+    private BookingHelper bookingHelper;
     @Autowired
     private LogService logService;
 
@@ -205,21 +208,14 @@ public class AdminBookingService implements IStatistic {
         }
 
         try {
-            Optional<Booking> opt = bookingRepo.findByBookingCode(bookingCode);
-            if( opt.isEmpty() ) {
-                return GlobalResponse.failed("Failed to process booking!", AdminConstant.ADMIN_BOOKING_SERVICE_PROCESS_NOT_FOUND, null, request);
+            BookingStatusUpdateRequest dto = new BookingStatusUpdateRequest();
+            dto.setStatus((byte) status);
+            boolean isUpdated = bookingHelper.updateBookingStatus(bookingCode, dto);
+            if( !isUpdated ) {
+                Logging.handleException("AdminBookingService", "process(String bookingCode, int status, HttpServletRequest request)", 206, AdminConstant.ADMIN_BOOKING_SERVICE_PROCESS_FAILED, "Failed to update booking status!");
+                return GlobalResponse.failed("Failed to process booking!", AdminConstant.ADMIN_BOOKING_SERVICE_PROCESS_FAILED, null, request);
             }
 
-            Booking booking = opt.get();
-            if( status == BookingConstant.BOOKING_CANCELLED && !BookingConstant.isBookingCancellable(booking.getStatus()) ) {
-                return GlobalResponse.failed("Failed to process booking!", AdminConstant.ADMIN_BOOKING_SERVICE_PROCESS_NOT_CANCELLABLE, null, request);
-            }
-
-            if( !BookingConstant.isBookingActive(booking.getStatus()) ) {
-                return GlobalResponse.failed("Failed to process booking!", AdminConstant.ADMIN_BOOKING_SERVICE_PROCESS_INACTIVE, null, request);
-            }
-
-            booking.setStatus((byte) status);
         } catch(Exception e) {
             Logging.handleException("AdminBookingService", "process(String bookingCode, int status, HttpServletRequest request)", 206, AdminConstant.ADMIN_BOOKING_SERVICE_PROCESS_EXCEPTION, e.getMessage());
             logService.writeErrorLog(AdminConstant.ADMIN_BOOKING_SERVICE_PROCESS_EXCEPTION, "AdminBookingService@process()", e.getMessage());

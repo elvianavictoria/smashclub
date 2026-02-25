@@ -313,9 +313,7 @@ public class AdminConstant {
     public static final String ADMIN_BOOKING_SERVICE_DETAIL_NOT_FOUND = "ADMBKG-03E002";
     public static final String ADMIN_BOOKING_SERVICE_DETAIL_EXCEPTION = "ADMBKG-03E010";
     public static final String ADMIN_BOOKING_SERVICE_PROCESS_CODE_REQUIRED = "ADMBKG-04E001";
-    public static final String ADMIN_BOOKING_SERVICE_PROCESS_NOT_FOUND = "ADMBKG-04E002";
-    public static final String ADMIN_BOOKING_SERVICE_PROCESS_NOT_CANCELLABLE = "ADMBKG-04E003";
-    public static final String ADMIN_BOOKING_SERVICE_PROCESS_INACTIVE = "ADMBKG-04E004";
+    public static final String ADMIN_BOOKING_SERVICE_PROCESS_FAILED = "ADMBKG-04E002";
     public static final String ADMIN_BOOKING_SERVICE_PROCESS_EXCEPTION = "ADMBKG-04E010";
 
     public static final String ADMIN_ORDER_SERVICE_STATISTIC_EXCEPTION = "ADMORD-01E010";
@@ -325,8 +323,9 @@ public class AdminConstant {
     public static final String ADMIN_ORDER_SERVICE_DETAIL_NOT_FOUND = "ADMORD-03E002";
     public static final String ADMIN_ORDER_SERVICE_DETAIL_EXCEPTION = "ADMORD-03E010";
     public static final String ADMIN_ORDER_SERVICE_PROCESS_CODE_REQUIRED = "ADMORD-04E001";
-    public static final String ADMIN_ORDER_SERVICE_PROCESS_NOT_FOUND = "ADMORD-04E002";
-    public static final String ADMIN_ORDER_SERVICE_PROCESS_NOT_CANCELLABLE = "ADMORD-04E003";
-    public static final String ADMIN_ORDER_SERVICE_PROCESS_INACTIVE = "ADMORD-04E004";
+    public static final String ADMIN_ORDER_SERVICE_PROCESS_FAILED = "ADMORD-04E002";
     public static final String ADMIN_ORDER_SERVICE_PROCESS_EXCEPTION = "ADMORD-04E010";
+
+    public static final String ADMIN_LOG_SERVICE_LIST_EMPTY = "ERRLG-01E001";
+    public static final String ADMIN_LOG_SERVICE_LIST_EXCEPTION = "ERRLG-01E010";
 }

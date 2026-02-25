@@ -3,6 +3,7 @@ package com.backendsyndicate.smashclub.payment.service;
 import com.backendsyndicate.smashclub.admin.service.log.LogService;
 import com.backendsyndicate.smashclub.auth.model.User;
 import com.backendsyndicate.smashclub.auth.repository.UserRepository;
+import com.backendsyndicate.smashclub.common.config.MainConfig;
 import com.backendsyndicate.smashclub.common.service.TemplateService;
 import com.backendsyndicate.smashclub.common.util.DatetimeFormatting;
 import com.backendsyndicate.smashclub.common.util.Logging;
@@ -60,6 +61,8 @@ public class PaymentService implements IPayment {
     @Autowired
     private UserRepository userRepo;
 
+    @Autowired
+    private TransactionService transactionService;
     @Autowired
     private LogService logService;
     @Autowired
@@ -136,13 +139,27 @@ public class PaymentService implements IPayment {
             logTransactionUpdate(trx, -1);
 
             // Create payment link
-            Transaction transaction = getTransaction(trx.getTransactionCode());
+            Transaction transaction = transactionService.getTransaction(trx.getTransactionCode());
             if( transaction == null ) {
                 Logging.handleException("PaymentService", "createTransaction", 141, TransactionConstant.PAYMENT_SERVICE_ERROR_CREATE_TRX_NOT_FOUND, "Failed to get created transaction!");
             } else {
                 XenditResponseDTO pgResponse = new XenditResponseDTO();
                 if(XenditConfig.getUseInvoice() == 'y') {
-                    pgResponse = xenditService.createPayment(trxCode, totalPrice, transaction.getUser().getEmail(), transaction.getTransactionLabel());
+                    String redirectUrl = MainConfig.getAppFrontendUrl();
+
+                    switch(transactionType) {
+                        case TransactionTypeConstant.COURT_BOOKING:
+                            redirectUrl += "/booking-history";
+                            break;
+                        case TransactionTypeConstant.ECOMMERCE_SHOPPING:
+                            redirectUrl += "/shop/orders";
+                            break;
+                        case TransactionTypeConstant.WALLET_TOPUP:
+                            redirectUrl += "/top-up/history";
+                            break;
+                    }
+
+                    pgResponse = xenditService.createPayment(trxCode, totalPrice, transaction.getUser().getEmail(), transaction.getTransactionLabel(), redirectUrl);
                     if( pgResponse.getInvoiceUrl() != null ) {
                         transaction.setPaymentLink(pgResponse.getInvoiceUrl());
                         // Write to payment log
@@ -205,7 +222,7 @@ public class PaymentService implements IPayment {
         RespPaymentTransactionDTO response = null;
 
         try {
-            trx = getTransaction(transactionCode);
+            trx = transactionService.getTransaction(transactionCode);
             if( trx == null ) {
                 Logging.handleException("PaymentService", "paymentTransaction(String transactionCode)", 177, TransactionConstant.PAYMENT_SERVICE_ERROR_PAYMENT_TRX_NOT_FOUND, "Transaction not found!");
                 return null;
@@ -222,7 +239,7 @@ public class PaymentService implements IPayment {
                         "fullName", trx.getUser().getFullName(),
                         "totalPrice", Util.formatCurrency(trx.getTotalPrice()),
                         "createdAt", DatetimeFormatting.getDatetimeFormat(trx.getCreatedAt()),
-                        "url", "https://localhost:5173/transaction/" + trx.getTransactionCode()
+                        "url", MainConfig.getAppFrontendUrl() + "/transaction/" + trx.getTransactionCode()
                 );
                 Logging.printConsole(mailObject.toString());
                 mailService.sendMail(TemplateService.TEMPLATE_PAYMENT_NOTIFY_PAID, trx.getUser().getEmail(), "Smashclub - Pembayaran Berhasil", mailObject);
@@ -261,7 +278,7 @@ public class PaymentService implements IPayment {
         RespCancelTransactionDTO response = null;
 
         try {
-            Transaction trx = getTransaction(transactionCode);
+            Transaction trx = transactionService.getTransaction(transactionCode);
             if( trx == null ) {
                 Logging.handleException("PaymentService", "cancelTransaction(String transactionCode, String refundReason)", 238, TransactionConstant.PAYMENT_SERVICE_ERROR_CANCEL_TRX_NOT_FOUND, "Transaction not found!");
                 return null;
@@ -322,7 +339,7 @@ public class PaymentService implements IPayment {
         RespExpireTransactionDTO response = null;
 
         try {
-            Transaction trx = getTransaction(transactionCode);
+            Transaction trx = transactionService.getTransaction(transactionCode);
             if( trx == null ) {
                 Logging.handleException("PaymentService", "expireTransaction(String transactionCode)", 152, TransactionConstant.PAYMENT_SERVICE_ERROR_EXPIRE_TRX_NOT_FOUND, "Transaction not found!");
                 return null;
@@ -342,6 +359,17 @@ public class PaymentService implements IPayment {
             response.setTotalPrice(trx.getTotalPrice());
             response.setTransactionType(trx.getTransactionType());
             response.setUser(modelMapper.map(trx.getUser(), RelTransactionUserDTO.class));
+
+            Logging.printConsole("Sending payment expired email!");
+            Map<String, Object> mailObject = Map.of(
+                    "transactionCode", trx.getTransactionCode(),
+                    "fullName", trx.getUser().getFullName(),
+                    "totalPrice", Util.formatCurrency(trx.getTotalPrice()),
+                    "createdAt", DatetimeFormatting.getDatetimeFormat(trx.getCreatedAt()),
+                    "url", MainConfig.getAppFrontendUrl() + "/transaction/" + trx.getTransactionCode()
+            );
+            Logging.printConsole(mailObject.toString());
+            mailService.sendMail(TemplateService.TEMPLATE_PAYMENT_NOTIFY_EXPIRED, trx.getUser().getEmail(), "Smashclub - Pembayaran Expired", mailObject);
         } catch(Exception e) {
             Logging.handleException("PaymentService", "expireTransaction(String transactionCode)", 147, TransactionConstant.PAYMENT_SERVICE_ERROR_EXPIRE_EXCEPTION, e.getMessage());
             logService.writeErrorLog(TransactionConstant.PAYMENT_SERVICE_ERROR_EXPIRE_EXCEPTION, "PaymentService@expireTransaction()", e.getMessage());
@@ -390,34 +418,6 @@ public class PaymentService implements IPayment {
         return true;
     }
 
-    /**
-     *
-     * @param transactionCode
-     * @return
-     */
-    public Transaction getTransaction(String transactionCode) {
-        Optional<Transaction> optionalTrx = transactionRepo.findByTransactionCode(transactionCode);
-        if( optionalTrx.isEmpty() ) return null;
-        Transaction trx = optionalTrx.get();
-        Hibernate.initialize(trx.getUser());
-
-        return trx;
-    }
-
-    /**
-     *
-     * @param referenceCode
-     * @return
-     */
-    public Transaction getTransactionByReferenceCode(String referenceCode) {
-        Optional<Transaction> optionalTrx = transactionRepo.findByReferenceCode(referenceCode);
-        if( optionalTrx.isEmpty() ) return null;
-        Transaction trx = optionalTrx.get();
-        Hibernate.initialize(trx.getUser());
-
-        return trx;
-    }
-
     private String generateTransactionCode() {
         LocalDate currentDt = LocalDate.now();
         String strYear = "" + currentDt.getYear();
@@ -458,7 +458,7 @@ public class PaymentService implements IPayment {
      * @return
      */
     public String getPaymentUrl(String referenceCode) {
-        Transaction transaction = getTransactionByReferenceCode(referenceCode);
+        Transaction transaction = transactionService.getTransactionByReferenceCode(referenceCode);
         if( transaction != null ) {
             return transaction.getPaymentLink();
         }

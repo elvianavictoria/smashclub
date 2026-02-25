@@ -10,6 +10,13 @@ public class OrderStatusConstant {
     public static final byte ORDER_READY_FOR_PICKUP = 3;
     public static final byte ORDER_COMPLETED = 4;
 
+    private static final Map<Byte, String> ORDER_STATUS_MAP = Map.of(
+            ORDER_CANCELLED, "Dibatalkan",
+            ORDER_PAYMENT_PENDING, "Menunggu Pembayaran",
+            ORDER_PROCESSING, "Diproses",
+            ORDER_READY_FOR_PICKUP, "Siap Diambil",
+            ORDER_COMPLETED, "Selesai");
+
     public static boolean isRefundAllowed(byte status) {
         return status > ORDER_PAYMENT_PENDING;
     }
@@ -38,5 +45,9 @@ public class OrderStatusConstant {
         return allowedTransitions
                 .getOrDefault(currentStatus, Set.of())
                 .contains(target);
+    }
+
+    public static String getStatusLabel(byte status) {
+        return ORDER_STATUS_MAP.getOrDefault(status, "Unknown");
     }
 }

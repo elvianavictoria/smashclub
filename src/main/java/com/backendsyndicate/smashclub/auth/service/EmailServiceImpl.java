@@ -73,7 +73,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendActivationEmail(String toEmail, String token) {
         try {
-            String activationLink = frontendUrl + "/verify?token=" + token + "verify_email";
+            String activationLink = frontendUrl + "/verify?token=" + token + "&type=verify_email";
             String subject = "Verifikasi Email - " + appName;
 //            String emailContent = buildActivationEmail(activationLink);
 //            sendEmail(toEmail, subject, emailContent);
@@ -128,7 +128,7 @@ public class EmailServiceImpl implements EmailService {
     @Async
     public void sendEmailChangeVerificationEmail(String newEmail, String token) {
         try {
-            String verificationLink = frontendUrl + "/verify?token=" + token + "email_change";
+            String verificationLink = frontendUrl + "/verify?token=" + token + "&type=email_change";
             String subject = "Verifikasi Perubahan Email - " + appName;
 //            String body = "<h3>Verifikasi Perubahan Email</h3>" +
 //                    "<p>Kami menerima permintaan untuk mengubah email akun Anda.</p>" +

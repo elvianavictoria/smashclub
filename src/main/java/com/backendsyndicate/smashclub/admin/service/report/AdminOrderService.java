@@ -8,12 +8,14 @@ import com.backendsyndicate.smashclub.admin.dto.response.RespAdminOrderListDTO;
 import com.backendsyndicate.smashclub.admin.dto.response.RespAdminOrderStatisticDTO;
 import com.backendsyndicate.smashclub.admin.service.log.LogService;
 import com.backendsyndicate.smashclub.common.constant.AdminConstant;
+import com.backendsyndicate.smashclub.common.constant.OrderStatusConstant;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.common.util.Util;
 import com.backendsyndicate.smashclub.ecommerce.model.Order;
 import com.backendsyndicate.smashclub.ecommerce.repo.OrderItemRepo;
 import com.backendsyndicate.smashclub.ecommerce.repo.OrderRepo;
+import com.backendsyndicate.smashclub.ecommerce.service.helper.OrderHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +41,8 @@ public class AdminOrderService implements IStatistic {
     private OrderRepo orderRepo;
     @Autowired
     private OrderItemRepo orderItemRepo;
+    @Autowired
+    private OrderHelper orderHelper;
     @Autowired
     private LogService logService;
 
@@ -96,24 +100,30 @@ public class AdminOrderService implements IStatistic {
 
     @Override
     public ResponseEntity<Object> list(int yearStart, int monthStart, String keyword, Pageable pageable, HttpServletRequest request) {
-        RespAdminOrderListDTO response = null;
+        Page<RespAdminOrderListDTO> response = null;
 
         try {
             LocalDateTime startMonth = LocalDateTime.of(LocalDate.of(yearStart, monthStart, 1), LocalTime.of(0, 0, 0));
             LocalDateTime endMonth = startMonth.plusMonths(1);
 
             Page<Order> orders = null;
-//            if( !keyword.isEmpty() ) {
-//                orders = orderRepo.findAllByOrderDateBetweenAndOrderCodeContainsIgnoreCase(startMonth, endMonth, keyword, pageable);
-//            } else {
+            if( !keyword.isEmpty() ) {
+                orders = orderRepo.findAllByOrderDateBetweenAndOrderCodeContainsIgnoreCase(startMonth, endMonth, keyword, pageable);
+            } else {
                 orders = orderRepo.findAllByOrderDateBetween(startMonth, endMonth, pageable);
-//            }
+            }
 
             if( orders.isEmpty() ) {
                 Logging.handleException("AdminOrderService", "list(int yearStart, int monthStart, String keyword, Pageable pageable, HttpServletRequest request)", 102, AdminConstant.ADMIN_ORDER_SERVICE_LIST_EMPTY, "Order list is empty");
                 return GlobalResponse.failed("Failed to get order list!", AdminConstant.ADMIN_ORDER_SERVICE_LIST_EMPTY, null, request);
             }
 
+            response = orders.map(new Function<Order, RespAdminOrderListDTO>() {
+                @Override
+                public RespAdminOrderListDTO apply(Order order) {
+                    return mapListToDTO(order);
+                }
+            });
             
         } catch(Exception e) {
             Logging.handleException("AdminOrderService", "list(LocalDate monthStart, HttpServletRequest request)", 83, AdminConstant.ADMIN_ORDER_SERVICE_LIST_EXCEPTION, e.getMessage());
@@ -132,8 +142,7 @@ public class AdminOrderService implements IStatistic {
         RespAdminOrderDetailDTO response = null;
 
         try {
-            Optional<Order> opt = null;
-//            Optional<Order> opt = orderRepo.findByOrderCode(orderCode);
+            Optional<Order> opt = orderRepo.findByOrderCode(orderCode);
             if( opt.isEmpty() ) {
                 return GlobalResponse.failed("Failed to get order detail!", AdminConstant.ADMIN_ORDER_SERVICE_DETAIL_NOT_FOUND, null, request);
             }
@@ -151,17 +160,27 @@ public class AdminOrderService implements IStatistic {
         return GlobalResponse.success("Successfully fetch order detail!", response, request);
     }
 
-//    private RelAdminOrderListDTO mapListToDTO(Order order) {
-//        RelAdminOrderListDTO result = modelMapper.map(order, RelAdminOrderListDTO.class);
-//        result.setStatusDesc(OrderConstant.getStatus(order.getStatus()));
-//
-//        if( order.getCreatedAt() != null ) {
-//            result.setCreatedAt(DatetimeFormatting.getDatetimeFormat(order.getCreatedAt()));
-//        }
-//        if( order.getUpdatedAt() != null ) {
-//            result.setUpdatedAt(DatetimeFormatting.getDatetimeFormat(order.getUpdatedAt()));
-//        }
-//
-//        return result;
-//    }
+    public ResponseEntity<Object> process(Long id, int status, HttpServletRequest request) {
+        if( id == null ) {
+            return GlobalResponse.failed("Failed to process order!", AdminConstant.ADMIN_ORDER_SERVICE_PROCESS_CODE_REQUIRED, null, request);
+        }
+
+        try {
+            orderHelper.updateOrderStatus(id, (byte) status);
+        } catch(Exception e) {
+            Logging.handleException("AdminOrderService", "process(String orderCode, int status, HttpServletRequest request)", 206, AdminConstant.ADMIN_ORDER_SERVICE_PROCESS_EXCEPTION, e.getMessage());
+            logService.writeErrorLog(AdminConstant.ADMIN_ORDER_SERVICE_PROCESS_EXCEPTION, "AdminOrderService@process()", e.getMessage());
+            return GlobalResponse.failed("Failed to process order!", AdminConstant.ADMIN_ORDER_SERVICE_PROCESS_EXCEPTION, null, request);
+        }
+
+        return GlobalResponse.success("Successfully process order!", null, request);
+    }
+
+    private RespAdminOrderListDTO mapListToDTO(Order order) {
+        RespAdminOrderListDTO result = modelMapper.map(order, RespAdminOrderListDTO.class);
+        result.setStatusDesc(OrderStatusConstant.getStatusLabel(order.getStatus()));
+        result.setCreatedAt(order.getOrderDate());
+
+        return result;
+    }
 }

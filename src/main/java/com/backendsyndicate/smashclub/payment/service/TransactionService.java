@@ -9,6 +9,7 @@ import com.backendsyndicate.smashclub.payment.core.IHistory;
 import com.backendsyndicate.smashclub.payment.dto.relation.RelTransactionRefundRequestDTO;
 import com.backendsyndicate.smashclub.payment.dto.response.RespTransactionDetailDTO;
 import com.backendsyndicate.smashclub.payment.dto.response.RespTransactionListDTO;
+import com.backendsyndicate.smashclub.payment.model.RefundRequest;
 import com.backendsyndicate.smashclub.payment.model.Transaction;
 import com.backendsyndicate.smashclub.payment.repo.TransactionRepo;
 import jakarta.servlet.http.HttpServletRequest;
@@ -117,5 +118,44 @@ public class TransactionService implements IHistory {
         response.setStatusDesc(TransactionConstant.getStatus(transaction.getStatus()));
         response.setTransactionTypeDesc(TransactionTypeConstant.getTransactionType(transaction.getTransactionType()));
         return response;
+    }
+
+    /**
+     *
+     * @param transactionCode
+     * @return
+     */
+    public Transaction getTransaction(String transactionCode) {
+        Optional<Transaction> optionalTrx = transactionRepo.findByTransactionCode(transactionCode);
+        if( optionalTrx.isEmpty() ) return null;
+        Transaction trx = optionalTrx.get();
+        Hibernate.initialize(trx.getUser());
+        Hibernate.initialize(trx.getRefundRequest());
+
+        return trx;
+    }
+
+    /**
+     *
+     * @param referenceCode
+     * @return
+     */
+    public Transaction getTransactionByReferenceCode(String referenceCode) {
+        Optional<Transaction> optionalTrx = transactionRepo.findByReferenceCode(referenceCode);
+        if( optionalTrx.isEmpty() ) return null;
+        Transaction trx = optionalTrx.get();
+        Hibernate.initialize(trx.getUser());
+
+        return trx;
+    }
+
+    public RefundRequest getRefundRequestFromTransaction(String referenceCode) {
+        Transaction transaction = getTransactionByReferenceCode(referenceCode);
+        Hibernate.initialize(transaction.getRefundRequest());
+        if( transaction.getRefundRequest().isEmpty() ) {
+            return null;
+        }
+
+        return transaction.getRefundRequest().getFirst();
     }
 }

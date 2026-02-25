@@ -1,11 +1,14 @@
 package com.backendsyndicate.smashclub.admin.controller.report;
 
+import com.backendsyndicate.smashclub.admin.dto.request.ReqAdminOrderProcessDTO;
 import com.backendsyndicate.smashclub.admin.service.report.AdminOrderService;
+import com.backendsyndicate.smashclub.common.constant.PermissionConstant;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,13 +17,13 @@ public class AdminOrderController {
     @Autowired
     private AdminOrderService adminOrderService;
 
-//    @PreAuthorize("hasAuthority('" + PermissionConstant.ORDER_READ_CODE + "')")
+//    @PreAuthorize("hasAuthority('" + PermissionConstant.PRODUCT_SALES_READ_CODE + "')")
     @GetMapping
     public ResponseEntity<Object> orderStatistic(@RequestParam int year, HttpServletRequest request) {
         return adminOrderService.statistic(year, request);
     }
 
-//    @PreAuthorize("hasAuthority('" + PermissionConstant.ORDER_READ_CODE + "')")
+//    @PreAuthorize("hasAuthority('" + PermissionConstant.PRODUCT_SALES_READ_CODE + "')")
     @GetMapping("list")
     public ResponseEntity<Object> orderDaily(
             @RequestParam int year,
@@ -34,15 +37,15 @@ public class AdminOrderController {
         return adminOrderService.list(year, month, keyword, pageable, request);
     }
 
-//    @PreAuthorize("hasAuthority('" + PermissionConstant.ORDER_DETAIL_CODE + "')")
+//    @PreAuthorize("hasAuthority('" + PermissionConstant.PRODUCT_SALES_DETAIL_CODE + "')")
     @GetMapping("detail/{orderCode}")
     public ResponseEntity<Object> orderDetail(@PathVariable String orderCode, HttpServletRequest request) {
         return adminOrderService.detail(orderCode, request);
     }
 
-    //    @PreAuthorize("hasAuthority('" + PermissionConstant.ORDER_PROCESS_CODE + "')")
-//    @PostMapping("process/{orderCode}")
-//    public ResponseEntity<Object> orderProcess(@PathVariable String orderCode, @RequestBody int status, HttpServletRequest request) {
-//        return adminOrderService.process(orderCode, status, request);
-//    }
+//    @PreAuthorize("hasAuthority('" + PermissionConstant.PRODUCT_SALES_PROCESS_CODE + "')")
+    @PostMapping("process/{id}")
+    public ResponseEntity<Object> orderProcess(@PathVariable long id, @RequestBody ReqAdminOrderProcessDTO dto, HttpServletRequest request) {
+        return adminOrderService.process(id, dto.getStatus(), request);
+    }
 }
