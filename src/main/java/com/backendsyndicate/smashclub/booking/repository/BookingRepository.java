@@ -19,8 +19,8 @@ import java.util.Optional;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
-    @Query(value = "SELECT COUNT(b) FROM Booking b WHERE cast(b.createdAt as string) LIKE CONCAT(CURRENT_DATE, '%')")
-    Long countTodayBooking();
+    @Query(value = "SELECT COUNT(b) FROM Booking b WHERE cast(b.createdAt as string) LIKE CONCAT(:today, '%')")
+    Long countTodayBooking(@Param("today") LocalDate today);
 
     Optional<Booking> findByBookingCode(String bookingCode);
 

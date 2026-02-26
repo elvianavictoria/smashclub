@@ -22,7 +22,7 @@ public class BookingCodeGenerator {
         String datePart = today.format(DATE_FORMATTER);
 
         // Hitung jumlah booking yang sudah ada di hari ini
-        Long countToday = bookingRepository.countTodayBooking();
+        Long countToday = bookingRepository.countTodayBooking(today);
 
         // Kalau null (misal belum ada booking), set ke 0
         long sequence = (countToday != null ? countToday : 0) + 1;
