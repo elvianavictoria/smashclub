@@ -375,7 +375,7 @@ public class OrderService implements IOrder {
         LocalDate today = LocalDate.now();
         String datePart = today.format(DATE_FORMATTER);
 
-        Long countToday = orderRepo.countTodayOrder();
+        Long countToday = orderRepo.countTodayOrder(today);
 
         long sequence = (countToday != null ? countToday : 0) + 1;
 
