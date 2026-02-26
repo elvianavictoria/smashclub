@@ -3,6 +3,7 @@ package com.backendsyndicate.smashclub.ecommerce.service;
 import com.backendsyndicate.smashclub.auth.repository.UserRepository;
 import com.backendsyndicate.smashclub.common.constant.OrderStatusConstant;
 import com.backendsyndicate.smashclub.common.constant.TransactionTypeConstant;
+import com.backendsyndicate.smashclub.common.util.DatetimeFormatting;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.ecommerce.core.IOrder;
 import com.backendsyndicate.smashclub.ecommerce.dto.request.ReqBuyNowDTO;
@@ -324,8 +325,8 @@ public class OrderService implements IOrder {
             RefundRequest refund = transactionService.getRefundRequestFromTransaction(order.getOrderCode());
             if (refund != null) {
                 orderDetail.setRefundStatus(refund.getRefundStatus());
-                orderDetail.setRefundRequestDate(refund.getCreatedAt());
-                orderDetail.setRefundStatusUpdateDate(refund.getUpdatedAt());
+                orderDetail.setRefundRequestDate(DatetimeFormatting.getDatetimeFormat(refund.getCreatedAt()));
+                orderDetail.setRefundStatusUpdateDate(DatetimeFormatting.getDatetimeFormat(refund.getUpdatedAt()));
             }
 
             String paymentLink = paymentService.getPaymentUrl(order.getOrderCode());
