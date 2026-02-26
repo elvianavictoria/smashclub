@@ -20,8 +20,8 @@ public class RespOrderDetailDTO {
     private LocalDateTime orderDate;
     private LocalDateTime updatedAt;
     private byte refundStatus;
-    private LocalDateTime refundRequestDate;
-    private LocalDateTime refundStatusUpdateDate;
+    private String refundRequestDate;
+    private String refundStatusUpdateDate;
     private String paymentLink;
     private List<RespOrderItemDTO> items;
 }
