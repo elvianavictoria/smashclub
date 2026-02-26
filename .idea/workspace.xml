@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cd9e846d-d2b3-4db3-8c78-09651c2e3476" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/admin/controller/report/AdminOrderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/admin/controller/report/AdminOrderController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/ecommerce/dto/response/RespOrderDetailDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/backendsyndicate/smashclub/ecommerce/dto/response/RespOrderDetailDTO.java" afterDir="false" />
-    </list>
+    <list default="true" id="cd9e846d-d2b3-4db3-8c78-09651c2e3476" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

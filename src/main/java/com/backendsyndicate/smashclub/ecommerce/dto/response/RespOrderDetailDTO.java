@@ -37,4 +37,16 @@ public class RespOrderDetailDTO {
             this.updatedAt = DatetimeFormatting.getDatetimeFormat(updatedAt);
         }
     }
+
+    public void setRefundRequestDate(LocalDateTime refundRequestDate) {
+        if( refundRequestDate != null ) {
+            this.refundRequestDate = DatetimeFormatting.getDatetimeFormat(refundRequestDate);
+        }
+    }
+
+    public void setRefundStatusUpdateDate(LocalDateTime refundStatusUpdateDate) {
+        if( refundStatusUpdateDate != null ) {
+            this.refundStatusUpdateDate = DatetimeFormatting.getDatetimeFormat(refundStatusUpdateDate);
+        }
+    }
 }

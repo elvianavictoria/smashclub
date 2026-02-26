@@ -325,8 +325,8 @@ public class OrderService implements IOrder {
             RefundRequest refund = transactionService.getRefundRequestFromTransaction(order.getOrderCode());
             if (refund != null) {
                 orderDetail.setRefundStatus(refund.getRefundStatus());
-                orderDetail.setRefundRequestDate(DatetimeFormatting.getDatetimeFormat(refund.getCreatedAt()));
-                orderDetail.setRefundStatusUpdateDate(DatetimeFormatting.getDatetimeFormat(refund.getUpdatedAt()));
+                orderDetail.setRefundRequestDate(refund.getCreatedAt());
+                orderDetail.setRefundStatusUpdateDate(refund.getUpdatedAt());
             }
 
             String paymentLink = paymentService.getPaymentUrl(order.getOrderCode());
