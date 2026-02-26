@@ -28,7 +28,7 @@ public interface OrderRepo extends JpaRepository<Order, Long> {
     @Query(value="SELECT COALESCE(AVG(o.totalPrice), 0) FROM Order o WHERE o.orderDate BETWEEN ?1 AND ?2")
     BigDecimal averageTotalPriceByOrderDate(LocalDateTime startDate, LocalDateTime endDate);
     @Query(value="SELECT FORMAT(o.orderDate, 'MMMM yyyy') AS month, " +
-            "COUNT(oi.quantity) AS totalSoldQuantity, SUM(o.totalPrice) AS totalOrderValue " +
+            "SUM(oi.quantity) AS totalSoldQuantity, SUM(o.totalPrice) AS totalOrderValue " +
             "FROM `Order` o JOIN OrderItem oi ON oi.order.id = o.id " +
             "WHERE o.orderDate BETWEEN ?1 AND ?2 GROUP BY FORMAT(o.orderDate, 'MMMM yyyy')")
     List<Map<String, Object>> findAllGroupByOrderDateMonthly(LocalDateTime startDate, LocalDateTime endDate);

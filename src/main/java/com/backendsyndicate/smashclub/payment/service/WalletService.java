@@ -76,7 +76,10 @@ public class WalletService implements IWallet {
             Wallet wallet = optionalWallet.get();
             response = modelMapper.map(wallet, RespGetBalanceInfoDTO.class);
             Page<RespGetBalanceLogDTO> page = logWalletGet(userId, currentDate.minusDays(7), currentDate.plusDays(1), PageRequest.of(0, 100));
-            response.setWalletLog(page.getContent());
+            if( page != null ) {
+                response.setWalletLog(page.getContent());
+            }
+
 
         } catch(Exception e) {
             Logging.handleException("Wallet Service", "getBalance(String userId, HttpServletRequest request)", 74, TransactionConstant.WALLET_SERVICE_ERROR_BALANCE_EXCEPTION, e.getMessage());
