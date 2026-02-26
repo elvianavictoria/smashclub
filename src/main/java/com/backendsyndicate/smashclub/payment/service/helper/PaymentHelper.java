@@ -52,7 +52,7 @@ public class PaymentHelper extends PaymentService {
                     ReqUpdateBalanceDTO updateDTO = new ReqUpdateBalanceDTO();
                     updateDTO.setValue(trx.getTotalPrice());
                     updateDTO.setAddition(true);
-                    updateDTO.setRefId(trx.getReferenceCode());
+                    updateDTO.setRefId(trx.getTransactionCode());
                     boolean isTopupSuccess = walletService.updateBalance(trx.getUser().getId(), updateDTO);
 
                     if( !isTopupSuccess ) {
