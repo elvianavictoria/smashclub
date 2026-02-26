@@ -2,6 +2,7 @@ package com.backendsyndicate.smashclub.external.service.storage;
 
 import com.backendsyndicate.smashclub.common.util.FileManipulator;
 import com.backendsyndicate.smashclub.common.util.Logging;
+import com.backendsyndicate.smashclub.common.util.Util;
 import com.backendsyndicate.smashclub.external.config.CloudinaryConfig;
 import com.backendsyndicate.smashclub.external.dto.CloudinaryResponseDTO;
 import com.backendsyndicate.smashclub.external.util.CloudinaryUtil;
@@ -46,6 +47,7 @@ public class CloudinaryService {
             Map<String, Object> options = this.baseOptions;
             options.put("asset_folder", folder);
             options.put("resource_type", "image");
+            options.put("public_id", Util.generateRandomString(10, false));
 
             File imageFile = FileManipulator.convertMultipartToFile(image);
 
@@ -68,6 +70,7 @@ public class CloudinaryService {
             Map<String, Object> options = this.baseOptions;
             options.put("asset_folder", folder);
             options.put("resource_type", "image");
+            options.put("public_id", Util.generateRandomString(10, false));
 
             Map uploadMap = cloudinaryClient.uploader().upload(image, options);
             result = new CloudinaryResponseDTO();
