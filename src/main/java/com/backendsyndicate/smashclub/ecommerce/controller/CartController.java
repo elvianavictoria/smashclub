@@ -6,6 +6,7 @@ import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.ecommerce.dto.request.ReqAddCartItemDTO;
 import com.backendsyndicate.smashclub.ecommerce.dto.request.ReqUpdateCartItemDTO;
 import com.backendsyndicate.smashclub.ecommerce.dto.response.RespCartDTO;
+import com.backendsyndicate.smashclub.ecommerce.model.Cart;
 import com.backendsyndicate.smashclub.ecommerce.service.CartService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -32,7 +33,7 @@ public class CartController {
             @RequestHeader("Authorization") String authorizationHeader,
             HttpServletRequest request) {
         String userId = extractUserIdFromToken(authorizationHeader);
-        RespCartDTO cart = cartService.getOrCreateActiveCart(userId);
+        RespCartDTO cart = cartService.getActiveCart(userId);
          return GlobalResponse.success("Cart retrieved", cart, request);
     }
 

@@ -7,6 +7,7 @@ import com.backendsyndicate.smashclub.ecommerce.core.ICart;
 import com.backendsyndicate.smashclub.ecommerce.dto.request.ReqAddCartItemDTO;
 import com.backendsyndicate.smashclub.ecommerce.dto.request.ReqUpdateCartItemDTO;
 import com.backendsyndicate.smashclub.ecommerce.dto.response.RespCartDTO;
+import com.backendsyndicate.smashclub.ecommerce.dto.response.RespCartItemDTO;
 import com.backendsyndicate.smashclub.ecommerce.model.Cart;
 import com.backendsyndicate.smashclub.ecommerce.model.CartItem;
 import com.backendsyndicate.smashclub.ecommerce.model.ProductVariant;
@@ -58,7 +59,8 @@ public class CartService implements ICart {
     public RespCartDTO getOrCreateActiveCart(String userId){
         assert userId != null;
         try {
-            Cart cart = cartRepo.findByUserIdAndStatus(userId, CartStatusConstant.CART_ACTIVE).orElseGet(()->{
+            Cart cart = cartRepo.findByUserIdAndStatus(userId, CartStatusConstant.CART_ACTIVE)
+                    .orElseGet(()->{
                 Cart newCart = new Cart();
                 newCart.setUser(userRepo.findById(userId).get());
                 newCart.setStatus((byte) CartStatusConstant.CART_ACTIVE);
@@ -177,6 +179,37 @@ public class CartService implements ICart {
         }
     }
 
+    /**
+     * Code: 06
+     * @param userId
+     * @return
+     */
+    public RespCartDTO getActiveCart(String userId) {
+        Cart cart = getActiveCartEntity(userId);
+        RespCartDTO response = new RespCartDTO();
+        try{
+        response.setUserId(userId);
+        response.setCartId(cart.getId());
+        response.setStatus(cart.getStatus());
+        response.setTotalPrice(cart.getTotalPrice());
+        response.setCreatedAt(cart.getCreatedAt());
+        ArrayList<RespCartItemDTO> cartItems = new ArrayList<>();
+        for (CartItem cartItem : cart.getCartItems()) {
+            cartItems.add(modelMapper.map(cartItem, RespCartItemDTO.class));
+        }
+        response.setItems(cartItems);
+        return response;}
+        catch(Exception e) {
+            Logging.handleException("CartService", "getActiveCart(String userId)", 203, generateErrorCode("06", "010"), e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Code: 07
+     * @param userId
+     * @return
+     */
     public Cart getActiveCartEntity(String userId) {
         return cartRepo.findByUserIdAndStatus(userId, CartStatusConstant.CART_ACTIVE)
                 .orElseThrow(() -> new RuntimeException("Active cart not found"));
