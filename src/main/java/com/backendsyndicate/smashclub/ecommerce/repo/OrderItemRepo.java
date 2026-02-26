@@ -23,6 +23,6 @@ public interface OrderItemRepo extends JpaRepository<OrderItem,Long> {
             "JOIN oi.variant pv " +
             "JOIN oi.variant.product p " +
             "WHERE o.orderDate BETWEEN :startDate AND :endDate GROUP BY p.category " +
-            "ORDER BY soldQuantity")
+            "ORDER BY soldQuantity DESC")
     List<Map<String, Object>> findAllGroupByProduct_Category(LocalDateTime startDate, LocalDateTime endDate);
 }

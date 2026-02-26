@@ -171,7 +171,7 @@ public class CartService implements ICart {
     @Override
     public void clearCart(String userId){
         Cart cart = getActiveCartEntity(userId);
-        try {cartItemRepo.deleteAllByCart_Id(cart.getId());
+        try {cartItemRepo.clearByCartId(cart.getId());
             cart.setTotalPrice(BigDecimal.ZERO);
             }
         catch (Exception e) {

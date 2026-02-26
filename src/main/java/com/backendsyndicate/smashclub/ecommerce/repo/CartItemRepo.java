@@ -2,6 +2,8 @@ package com.backendsyndicate.smashclub.ecommerce.repo;
 
 import com.backendsyndicate.smashclub.ecommerce.model.CartItem;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -12,5 +14,7 @@ public interface CartItemRepo extends JpaRepository<CartItem, Long> {
 
     Optional<CartItem> findByIdAndCart_Id(Long cartItemId, Long cartId);
 
-    void deleteAllByCart_Id(Long cartId);
+    @Modifying
+    @Query(value="DELETE CartItem c WHERE c.cart.id = :cartId")
+    void clearByCartId(Long cartId);
 }
