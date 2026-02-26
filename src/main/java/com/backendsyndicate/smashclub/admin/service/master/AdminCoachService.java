@@ -126,7 +126,10 @@ public class AdminCoachService implements ICRUD<Coach, Long>, IUpload<Coach, Lon
             coachDB.setCoachCode(coach.getCoachCode());
             coachDB.setCoachName(coach.getCoachName());
             coachDB.setPricePerHour(coach.getPricePerHour());
-            if( coach.getCoachImgLink() != null ) coachDB.setCoachImgLink(coach.getCoachImgLink());
+            if( coach.getCoachImgLink() != null ) {
+                cloudinaryService.deleteImage(coachDB.getCoachImgLink());
+                coachDB.setCoachImgLink(coach.getCoachImgLink());
+            }
             coachDB.setStatus(coach.getStatus());
         } catch(Exception e) {
             Logging.handleException("CoachService", "update(Long id, Coach coach, HttpServletRequest request)", 94, AdminConstant.ADMIN_COACH_SERVICE_UPDATE_EXCEPTION, e.getMessage());
@@ -149,6 +152,7 @@ public class AdminCoachService implements ICRUD<Coach, Long>, IUpload<Coach, Lon
                 return GlobalResponse.failed("Coach data not found!", AdminConstant.ADMIN_COACH_SERVICE_DELETE_NOT_FOUND, null, request);
             }
 
+            cloudinaryService.deleteImage(optionalCoach.get().getCoachImgLink());
             coachRepo.deleteById(id);
         } catch(Exception e) {
             Logging.handleException("CoachService", "delete(Long id, HttpServletRequest request)", 122, AdminConstant.ADMIN_COACH_SERVICE_DELETE_EXCEPTION, e.getMessage());

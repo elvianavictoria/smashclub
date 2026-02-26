@@ -132,7 +132,10 @@ public class AdminEquipmentService implements ICRUD<Equipment, Long>, IUpload<Eq
             equipmentDB.setDescription(equipment.getDescription());
             equipmentDB.setStock(equipment.getStock());
             equipmentDB.setType(equipment.getType());
-            if( equipment.getEquipmentImgLink() != null ) equipmentDB.setEquipmentImgLink(equipment.getEquipmentImgLink());
+            if( equipment.getEquipmentImgLink() != null ) {
+                cloudinaryService.deleteImage(equipmentDB.getEquipmentImgLink());
+                equipmentDB.setEquipmentImgLink(equipment.getEquipmentImgLink());
+            }
             equipmentDB.setStatus(equipment.getStatus());
         } catch(Exception e) {
             Logging.handleException("EquipmentService", "update(Long id, Equipment equipment, HttpServletRequest request)", 92, AdminConstant.ADMIN_EQUIPMENT_SERVICE_UPDATE_EXCEPTION, e.getMessage());
@@ -156,6 +159,7 @@ public class AdminEquipmentService implements ICRUD<Equipment, Long>, IUpload<Eq
                 return GlobalResponse.failed("Equipment data not found!", AdminConstant.ADMIN_EQUIPMENT_SERVICE_DELETE_NOT_FOUND, null, request);
             }
 
+            cloudinaryService.deleteImage(optionalEquipment.get().getEquipmentImgLink());
             equipmentRepo.deleteById(id);
         } catch(Exception e) {
             Logging.handleException("EquipmentService", "delete(Long id, HttpServletRequest request)", 110, AdminConstant.ADMIN_EQUIPMENT_SERVICE_DELETE_EXCEPTION, e.getMessage());
