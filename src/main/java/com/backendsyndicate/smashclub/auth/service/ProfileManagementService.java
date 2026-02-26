@@ -688,14 +688,9 @@ public class ProfileManagementService {
     // Helper method untuk hapus foto lama dari Cloudinary
     private void deleteOldProfilePicture(String imageUrl) {
         try {
-            // Extract public ID dari URL Cloudinary
-            // Format URL: https://res.cloudinary.com/.../v12345/folder/publicId.extension
-            String publicId = extractPublicIdFromUrl(imageUrl);
-            if (publicId != null) {
                 // Panggil method delete dari CloudinaryService (perlu ditambah di service teman)
-                // cloudinaryService.deleteImage(publicId);
-                log.info("Deleted old profile picture: {}", publicId);
-            }
+                cloudinaryService.deleteImage(imageUrl);
+                log.info("Deleted old profile picture: {}", imageUrl);
         } catch (Exception e) {
             log.warn("Failed to delete old profile picture: {}", e.getMessage());
             // Non-critical, lanjutkan proses
