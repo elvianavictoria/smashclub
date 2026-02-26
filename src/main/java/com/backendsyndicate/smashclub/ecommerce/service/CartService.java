@@ -15,7 +15,6 @@ import com.backendsyndicate.smashclub.ecommerce.repo.CartRepo;
 import com.backendsyndicate.smashclub.ecommerce.repo.ProductVariantRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.hpsf.Variant;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -89,7 +88,7 @@ public class CartService implements ICart {
         try {
             ProductVariant variant = productVariantRepo.findByIdAndSufficientStock(request.getVariantId(), request.getQuantity()).orElseThrow(() -> new RuntimeException("Variant not found!"));
 
-            CartItem cartItem = cartItemRepo.findByCartIdAndVariantId(cart.getId(), variant.getId())
+            CartItem cartItem = cartItemRepo.findByCart_IdAndVariant_Id(cart.getId(), variant.getId())
                     .orElse(new CartItem());
 
             cartItem.setCart(cart);
@@ -114,7 +113,7 @@ public class CartService implements ICart {
         Cart cart = getActiveCartEntity(userId);
 
         try {
-            CartItem cartItem = cartItemRepo.findByIdAndCartId(request.getCartItemId(), cart.getId()).orElseThrow(() -> new RuntimeException("Item not found!"));
+            CartItem cartItem = cartItemRepo.findByIdAndCart_Id(request.getCartItemId(), cart.getId()).orElseThrow(() -> new RuntimeException("Item not found!"));
             if (cartItem.getQuantity() + request.getQuantity() > cartItem.getVariant().getStock()){
                 Logging.handleException("CartService", "updateCartItem", 119, generateErrorCode("02", "001"), "Not enough stock!");
                 return null;
@@ -139,12 +138,12 @@ public class CartService implements ICart {
 
     /**
      * Code: 04
+     *
      * @param userId
      * @param cartItemId
-     * @return
      */
     @Override
-    public String deleteCartItem(String userId, Long cartItemId) {
+    public void deleteCartItem(String userId, Long cartItemId) {
         Cart cart = getActiveCartEntity(userId);
 
         try{
@@ -156,27 +155,25 @@ public class CartService implements ICart {
 
         cart.setTotalPrice(cart.getTotalPrice().subtract(item.getVariant().getPrice().multiply(BigDecimal.valueOf(item.getQuantity()))));
         cartItemRepo.delete(item);
-        return "Item removed";}
+        }
         catch (Exception e) {
             Logging.handleException("CartService", "deleteCartItem(String userId, Long cartItemId)", 161, generateErrorCode("04", "010"), e.getMessage());
-            return null;
         }
     }
 
     /**
      * Code: 05
+     *
      * @param userId
-     * @return
      */
     @Override
-    public String clearCart(String userId){
+    public void clearCart(String userId){
         Cart cart = getActiveCartEntity(userId);
-        try {cartItemRepo.deleteById(cart.getId());
+        try {cartItemRepo.deleteByCart_Id(cart.getId());
             cart.setTotalPrice(BigDecimal.ZERO);
-            return "Cart cleared";}
+            }
         catch (Exception e) {
             Logging.handleException("CartService", "clearCart(userId)", 178, generateErrorCode("05", "010"), e.getMessage());
-            return null;
         }
     }
 

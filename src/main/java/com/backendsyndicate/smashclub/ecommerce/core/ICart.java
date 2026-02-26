@@ -8,6 +8,6 @@ public interface ICart {
     public RespCartDTO getOrCreateActiveCart(String userId);
     public RespCartDTO addToCart(String userId, ReqAddCartItemDTO request);
     public RespCartDTO updateCartItem(String userId, ReqUpdateCartItemDTO request);
-    public String deleteCartItem(String userId, Long cartItemId);
-    public String clearCart(String userId);
+    void deleteCartItem(String userId, Long cartItemId);
+    void clearCart(String userId);
 }

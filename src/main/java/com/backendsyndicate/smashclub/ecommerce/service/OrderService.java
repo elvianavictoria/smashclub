@@ -92,10 +92,8 @@ public class OrderService implements IOrder {
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);
             orderItem.setProductName(cartItem.getVariant().getProduct().getProductName());
-            orderItem.setCategory(cartItem.getVariant().getProduct().getCategory());
             orderItem.setVariant(cartItem.getVariant());
             orderItem.setQuantity(cartItem.getQuantity());
-            orderItem.setOrderItemImgLink(cartItem.getVariant().getVariantImgLink());
             orderItem.setPriceAtPurchase(cartItem.getVariant().getPrice());
             orderItem.setTotalPrice(totalPrice);
 
@@ -176,9 +174,7 @@ public class OrderService implements IOrder {
         OrderItem orderItem = new OrderItem();
         orderItem.setOrder(order);
         orderItem.setProductName(productVariant.getProduct().getProductName());
-        orderItem.setCategory(productVariant.getProduct().getCategory());
         orderItem.setVariant(productVariant);
-        orderItem.setOrderItemImgLink(productVariant.getVariantImgLink());
         orderItem.setPriceAtPurchase(price);
         orderItem.setTotalPrice(total);
         orderItem.setQuantity(request.getQuantity());
@@ -212,6 +208,7 @@ public class OrderService implements IOrder {
         response.setOrderCode(order.getOrderCode());
         response.setOrderDate(order.getOrderDate());
         response.setTransactionId(order.getTransactionId().getId());
+        response.setPaymentLink(order.getTransactionId().getPaymentLink());
         response.setStatus(order.getStatus());
         response.setSubTotal(order.getSubTotal());
         response.setTotalPrice(order.getTotalPrice());
@@ -302,10 +299,9 @@ public class OrderService implements IOrder {
                                 Hibernate.initialize(item.getVariant());
                                 return RespOrderItemDTO.builder()
                                         .variantId(item.getVariant().getId())
-                                        .category(item.getCategory())
                                         .variantName(item.getVariant().getVariantName())
                                         .productName(item.getVariant().getProduct().getProductName())
-                                        .orderItemImgLink(item.getOrderItemImgLink())
+                                        .orderItemImgLink(item.getVariant().getVariantImgLink())
                                         .quantity(item.getQuantity())
                                         .price(item.getPriceAtPurchase())
                                         .totalPrice(item.getTotalPrice())
@@ -331,6 +327,12 @@ public class OrderService implements IOrder {
                 orderDetail.setRefundRequestDate(refund.getCreatedAt());
                 orderDetail.setRefundStatusUpdateDate(refund.getUpdatedAt());
             }
+
+            String paymentLink = paymentService.getPaymentUrl(order.getOrderCode());
+            if (paymentLink != null) {
+                orderDetail.setPaymentLink(paymentLink);
+            }
+
             return orderDetail;
         }
         catch (Exception ex){
@@ -363,7 +365,7 @@ public class OrderService implements IOrder {
                         .status(order.getStatus())
                         .orderDate(order.getOrderDate())
                         .totalPrice(order.getTotalPrice())
-                        .orderItemImgLink(order.getOrderItem().getFirst().getOrderItemImgLink())
+                        .orderItemImgLink(order.getOrderItem().getFirst().getVariant().getVariantImgLink())
                         .build()
         );} catch (Exception e) {
             Logging.handleException("OrderService", "getUserOrderHistory(String userId, int page, int size)", 369, generateErrorCode("06", "010"), e.getMessage());

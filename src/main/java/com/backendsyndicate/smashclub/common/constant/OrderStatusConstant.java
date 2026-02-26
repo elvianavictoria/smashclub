@@ -17,10 +17,6 @@ public class OrderStatusConstant {
             ORDER_READY_FOR_PICKUP, "Siap Diambil",
             ORDER_COMPLETED, "Selesai");
 
-    public static boolean isRefundAllowed(byte status) {
-        return status > ORDER_PAYMENT_PENDING;
-    }
-
     private static final Map<Byte, Set<Object>> allowedTransitions =
             Map.of(
                     OrderStatusConstant.ORDER_PAYMENT_PENDING,

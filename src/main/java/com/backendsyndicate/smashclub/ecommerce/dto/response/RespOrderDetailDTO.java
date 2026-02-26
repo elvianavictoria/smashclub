@@ -22,5 +22,6 @@ public class RespOrderDetailDTO {
     private byte refundStatus;
     private LocalDateTime refundRequestDate;
     private LocalDateTime refundStatusUpdateDate;
+    private String paymentLink;
     private List<RespOrderItemDTO> items;
 }

@@ -18,5 +18,6 @@ public class RespCreateOrderDTO {
     private BigDecimal totalPrice;
     private byte status;
     private Long transactionId;
+    private String paymentLink;
     private LocalDateTime orderDate;
 }
