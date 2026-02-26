@@ -19,7 +19,7 @@ public class OrderItem {
     @EqualsAndHashCode.Include
     private Long id;
 
-    @Column(name = "ProductName")
+    @Column(name = "ProductName", unique = true)
     private String productName;
 
     @Column(name = "Quantity", nullable = false)
