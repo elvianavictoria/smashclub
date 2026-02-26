@@ -31,7 +31,7 @@ public class Order {
     @Column(name = "Status", nullable = false)
     private byte status = 0;
 
-    @Column(name = "OrderCode")
+    @Column(name = "OrderCode", unique = true)
     private String orderCode = "";
 
     @Column(name = "OrderDate", updatable = false, nullable = false)
