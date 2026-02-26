@@ -9,9 +9,12 @@ import com.backendsyndicate.smashclub.common.util.ValidationError;
 import com.backendsyndicate.smashclub.common.handler.ResponseHandler;
 import com.backendsyndicate.smashclub.common.security.PasswordHasher;
 import com.backendsyndicate.smashclub.common.constant.AuthenticationConstant;
+import com.backendsyndicate.smashclub.ecommerce.service.CartService;
+import com.backendsyndicate.smashclub.payment.service.WalletService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -36,6 +39,11 @@ public class RegistrationService {
     private final EmailServiceImpl emailServiceImpl;
     private final ValidationService validationService;
     private final ResponseHandler responseHandler;
+
+    @Autowired
+    private WalletService walletService;
+    @Autowired
+    private CartService cartService;
 
     @Transactional
     public ResponseEntity<Object> register(RegisterRequest request, HttpServletRequest httpRequest) {
@@ -153,6 +161,9 @@ public class RegistrationService {
         user.setStatus(AuthenticationConstant.ACTIVE);
         user.setUpdatedDate(LocalDateTime.now());
         userRepository.save(user);
+
+        cartService.getOrCreateActiveCart(user.getId());
+        walletService.createWallet(user.getId());
 
         log.info("Email verified successfully - userId: {}, email: {}", user.getId(), user.getEmail());
 

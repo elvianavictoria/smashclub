@@ -21,10 +21,12 @@ public class TransactionConstant {
     public static final int REFUND_APPROVED = 1;
     public static final int REFUND_REJECTED = 2;
 
-    public static final String TRANSACTION_SERVICE_ERROR_LIST_EMPTY = "TRX-01E001";
+    public static final String TRANSACTION_SERVICE_ERROR_LIST_UNAUTHORIZED = "TRX-01E001";
+    public static final String TRANSACTION_SERVICE_ERROR_LIST_EMPTY = "TRX-01E002";
     public static final String TRANSACTION_SERVICE_ERROR_LIST_EXCEPTION = "TRX-01E010";
-    public static final String TRANSACTION_SERVICE_ERROR_DETAIL_CODE_REQUIRED = "TRX-02E001";
-    public static final String TRANSACTION_SERVICE_ERROR_DETAIL_NOT_FOUND = "TRX-02E002";
+    public static final String TRANSACTION_SERVICE_ERROR_DETAIL_UNAUTHORIZED = "TRX-02E001";
+    public static final String TRANSACTION_SERVICE_ERROR_DETAIL_CODE_REQUIRED = "TRX-02E002";
+    public static final String TRANSACTION_SERVICE_ERROR_DETAIL_NOT_FOUND = "TRX-02E003";
     public static final String TRANSACTION_SERVICE_ERROR_DETAIL_EXCEPTION = "TRX-02E010";
     public static final String TRANSACTION_HELPER_ERROR_DETAIL_EXCEPTION = "TRX-12E010";
 

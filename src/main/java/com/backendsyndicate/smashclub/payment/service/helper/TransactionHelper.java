@@ -23,12 +23,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
+@Transactional
 public class TransactionHelper extends TransactionService {
     @Autowired
     private LogService logService;
@@ -38,8 +42,8 @@ public class TransactionHelper extends TransactionService {
     private OrderHelper orderHelper;
 
     @Override
-    public ResponseEntity<Object> findByCode(String code, HttpServletRequest request) {
-        ResponseEntity<Object> response = super.findByCode(code, request);
+    public ResponseEntity<Object> findByCode(String customerId, String code, HttpServletRequest request) {
+        ResponseEntity<Object> response = super.findByCode(customerId, code, request);
 
         try {
             RespTransactionDetailDTO trx = Util.mapToModel(response.getBody(), RespTransactionDetailDTO.class);

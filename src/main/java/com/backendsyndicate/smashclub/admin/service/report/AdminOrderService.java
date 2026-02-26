@@ -17,6 +17,7 @@ import com.backendsyndicate.smashclub.ecommerce.repo.OrderItemRepo;
 import com.backendsyndicate.smashclub.ecommerce.repo.OrderRepo;
 import com.backendsyndicate.smashclub.ecommerce.service.helper.OrderHelper;
 import jakarta.servlet.http.HttpServletRequest;
+import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -149,8 +150,10 @@ public class AdminOrderService implements IStatistic {
 
             // Map trx to DTO
             Order order = opt.get();
+            Hibernate.initialize(order.getUser());
+            Hibernate.initialize(order.getOrderItem());
             response = modelMapper.map(order, RespAdminOrderDetailDTO.class);
-
+            response.setStatusDesc(OrderStatusConstant.getStatusLabel(order.getStatus()));
         } catch(Exception e) {
             Logging.handleException("AdminOrderService", "detail(String orderCode, HttpServletRequest request)", 109, AdminConstant.ADMIN_ORDER_SERVICE_DETAIL_EXCEPTION, e.getMessage());
             logService.writeErrorLog(AdminConstant.ADMIN_ORDER_SERVICE_DETAIL_EXCEPTION, "AdminOrderService@detail()", e.getMessage());

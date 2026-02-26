@@ -8,6 +8,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface IHistory {
-    public ResponseEntity<Object> findAll(Pageable pageable, LocalDate startDate, LocalDate endDate, HttpServletRequest request);
-    public ResponseEntity<Object> findByCode(String code, HttpServletRequest request);
+    public ResponseEntity<Object> findAll(String customerId, Pageable pageable, LocalDate startDate, LocalDate endDate, HttpServletRequest request);
+    public ResponseEntity<Object> findByCode(String customerId, String code, HttpServletRequest request);
 }

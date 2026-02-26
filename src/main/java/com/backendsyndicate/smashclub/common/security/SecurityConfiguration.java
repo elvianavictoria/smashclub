@@ -167,6 +167,11 @@ public class SecurityConfiguration {
                                 "/error"
                         ).permitAll()
 
+                        // Callbacks
+                        .requestMatchers(
+                                "/api/v1/callback/**"
+                        ).permitAll()
+
                         // ============ PROTECTED ENDPOINTS (PERLU LOGIN) ============
 
                         // AUTH MODULE - Endpoint yang butuh login
@@ -191,11 +196,7 @@ public class SecurityConfiguration {
                                 "/api/v1/booking/{bookingCode}/complete"
                         ).authenticated()
 
-                        // Callbacks
-                        .requestMatchers(
-                                "/api/v1/callback/**"
-                        ).permitAll()
-
+                        // WALLET SERVICE - Perlu login untuk akses SmashPay
                         .requestMatchers(
                                 "/api/v1/wallet/**"
                         ).authenticated()

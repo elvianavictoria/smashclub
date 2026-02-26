@@ -152,7 +152,7 @@ public class AdminAuthService implements IAuth {
         } catch(Exception e) {
             Logging.handleException("AuthService", "isAuthenticated(String accessToken, HttpServletRequest request)", 130, AdminConstant.ADMIN_AUTH_SERVICE_AUTHENTICATED_EXCEPTION, e.getMessage());
             logService.writeErrorLog(AdminConstant.ADMIN_AUTH_SERVICE_AUTHENTICATED_EXCEPTION, "AdminAuthService@isAuthenticated()", e.getMessage());
-            return GlobalResponse.unauthorized("Unauthenticated!", AdminConstant.ADMIN_AUTH_SERVICE_AUTHENTICATED_EXCEPTION, request);
+            return GlobalResponse.unauthorized("Unauthorized access!", AdminConstant.ADMIN_AUTH_SERVICE_AUTHENTICATED_EXCEPTION, request);
         }
 
         return GlobalResponse.success("This user is authenticated!", response, request);

@@ -1,5 +1,6 @@
 package com.backendsyndicate.smashclub.payment.controller;
 
+import com.backendsyndicate.smashclub.common.security.JwtService;
 import com.backendsyndicate.smashclub.common.util.GlobalResponse;
 import com.backendsyndicate.smashclub.common.util.Logging;
 import com.backendsyndicate.smashclub.payment.dto.request.ReqCreateTransactionDTO;
@@ -10,6 +11,7 @@ import com.backendsyndicate.smashclub.payment.dto.response.RespCancelTransaction
 import com.backendsyndicate.smashclub.payment.model.Transaction;
 import com.backendsyndicate.smashclub.payment.service.TransactionService;
 import com.backendsyndicate.smashclub.payment.service.helper.PaymentHelper;
+import com.backendsyndicate.smashclub.payment.service.helper.TransactionHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +31,9 @@ public class TransactionController {
     @Autowired
     private PaymentHelper paymentService;
     @Autowired
-    private TransactionService transactionService;
+    private TransactionHelper transactionService;
+    @Autowired
+    private JwtService jwtService;
 
     @GetMapping
     public ResponseEntity<Object> transactionList(
@@ -39,14 +43,18 @@ public class TransactionController {
             @RequestParam Integer size,
             HttpServletRequest request
     ) {
-        Logging.printConsole("Test Call Trx List!");
+        String accessToken = request.getHeader("Authorization");
+        String userId = jwtService.extractUserId(accessToken.replaceAll("Bearer ", ""));
         Pageable pageable = PageRequest.of(page, size, Sort.by("CreatedAt").descending());
-        return transactionService.findAll(pageable, startDate, endDate, request);
+        return transactionService.findAll(userId, pageable, startDate, endDate, request);
     }
 
     @GetMapping("/{transactionCode}")
     public ResponseEntity<Object> transactionDetail(@PathVariable String transactionCode, HttpServletRequest request) {
-        return transactionService.findByCode(transactionCode, request);
+        String accessToken = request.getHeader("Authorization");
+        String userId = jwtService.extractUserId(accessToken.replaceAll("Bearer ", ""));
+
+        return transactionService.findByCode(userId, transactionCode, request);
     }
 
     @PostMapping("/create")

@@ -432,7 +432,7 @@ public class PaymentService implements IPayment {
         String currentDtString = strYear.substring(2) + strMonth.substring(strMonth.length() - 2) + strDate.substring(strDate.length() - 2);
         String randomStr = Util.generateRandomString(4, true);
 
-        long trxCounter = transactionRepo.countTodayTransaction();
+        long trxCounter = transactionRepo.countTodayTransaction(LocalDate.now());
         trxCounter += 1;
         String strCounter = "00" + trxCounter;
 

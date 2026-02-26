@@ -51,11 +51,15 @@ public class TransactionService implements IHistory {
      * @return
      */
     @Override
-    public ResponseEntity<Object> findAll(Pageable pageable, LocalDate startDate, LocalDate endDate, HttpServletRequest request) {
+    public ResponseEntity<Object> findAll(String customerId, Pageable pageable, LocalDate startDate, LocalDate endDate, HttpServletRequest request) {
         Page page = null;
 
         try {
-            page = transactionRepo.findAllByCreatedAtBetween(startDate.atStartOfDay(), endDate.atStartOfDay(), pageable);
+            if( customerId.isEmpty() ) {
+                return GlobalResponse.unauthorized("Unauthorized access!", TransactionConstant.TRANSACTION_SERVICE_ERROR_LIST_UNAUTHORIZED, request);
+            }
+
+            page = transactionRepo.findAllByUser_IdAndCreatedAtBetween(customerId, startDate.atStartOfDay(), endDate.atStartOfDay(), pageable);
             if( page.isEmpty() ) {
                 return GlobalResponse.failed("Transaction data not found!", TransactionConstant.TRANSACTION_SERVICE_ERROR_LIST_EMPTY, null, request);
             }
@@ -83,8 +87,12 @@ public class TransactionService implements IHistory {
      * @return
      */
     @Override
-    public ResponseEntity<Object> findByCode(String code, HttpServletRequest request) {
+    public ResponseEntity<Object> findByCode(String customerId, String code, HttpServletRequest request) {
         RespTransactionDetailDTO response = null;
+
+        if( customerId.isEmpty() ) {
+            return GlobalResponse.unauthorized("Unauthorized access!", TransactionConstant.TRANSACTION_SERVICE_ERROR_DETAIL_UNAUTHORIZED, request);
+        }
 
         if( code == null ) {
             return GlobalResponse.failed("Transaction code is required!", TransactionConstant.TRANSACTION_SERVICE_ERROR_DETAIL_CODE_REQUIRED, null, request);

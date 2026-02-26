@@ -45,7 +45,7 @@ public class PaymentHelper extends PaymentService {
                     break;
                 case TransactionTypeConstant.ECOMMERCE_SHOPPING:
                     // Update order status
-                    orderService.updateOrderStatus(trx.getReferenceCode(), OrderStatusConstant.ORDER_READY_FOR_PICKUP);
+                    orderService.updateOrderStatus(trx.getReferenceCode(), OrderStatusConstant.ORDER_PROCESSING);
                     break;
                 case TransactionTypeConstant.WALLET_TOPUP:
                     // Update balance
