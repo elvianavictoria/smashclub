@@ -62,14 +62,14 @@ public class OrderController {
     }
 
     @PatchMapping("/{orderId}/update")
-    public ResponseEntity<Object> updateOrderStatus(@PathVariable Long orderId, @RequestParam byte status, HttpServletRequest request) {
-        orderService.updateOrderStatus(orderId, status);
+    public ResponseEntity<Object> updateOrderStatus(@PathVariable String orderCode, @RequestParam byte status, HttpServletRequest request) {
+        orderService.updateOrderStatus(orderCode, status);
         return GlobalResponse.success("Order status updated", null, request);
     }
 
     @PatchMapping("/{orderId}/cancel")
-    public ResponseEntity<Object> cancelOrder(@PathVariable Long orderId, @RequestHeader("Authorization") String authorizationHeader, HttpServletRequest request) {
-        orderService.cancelOrder(orderId);
+    public ResponseEntity<Object> cancelOrder(@PathVariable String orderCode, @RequestHeader("Authorization") String authorizationHeader, HttpServletRequest request) {
+        orderService.cancelOrder(orderCode);
         return GlobalResponse.success("Order cancelled", null, request);
     }
 

@@ -20,6 +20,8 @@ public class RespGetBalanceLogDTO {
     private String refID;
     private String createdAt;
 
+    private String label;
+
     public void setCreatedAt(LocalDateTime createdAt) {
         if( createdAt != null ) {
             this.createdAt = DatetimeFormatting.getDatetimeFormat(createdAt);

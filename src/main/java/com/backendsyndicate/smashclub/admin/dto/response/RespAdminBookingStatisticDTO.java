@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -14,6 +15,6 @@ import java.util.List;
 public class RespAdminBookingStatisticDTO {
     private int totalBookingCount = 0;
     private double averageBookingHours = 0.0;
-    private double occupancyRate = 0.0;
+    private BigDecimal occupancyRate = BigDecimal.ZERO;
     private List<ExtAdminBookingMonthlyDTO> monthlyBookingStatistic;
 }

@@ -12,4 +12,5 @@ import java.math.BigDecimal;
 public class ReqUpdateBalanceDTO {
     private boolean isAddition;
     private BigDecimal value;
+    private String refId = "";
 }

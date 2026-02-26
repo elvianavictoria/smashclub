@@ -45,7 +45,7 @@ public class AdminOrderController {
 
 //    @PreAuthorize("hasAuthority('" + PermissionConstant.PRODUCT_SALES_PROCESS_CODE + "')")
     @PostMapping("process/{id}")
-    public ResponseEntity<Object> orderProcess(@PathVariable long id, @RequestBody ReqAdminOrderProcessDTO dto, HttpServletRequest request) {
-        return adminOrderService.process(id, dto.getStatus(), request);
+    public ResponseEntity<Object> orderProcess(@PathVariable String orderCode, @RequestBody ReqAdminOrderProcessDTO dto, HttpServletRequest request) {
+        return adminOrderService.process(orderCode, dto.getStatus(), request);
     }
 }

@@ -45,13 +45,14 @@ public class PaymentHelper extends PaymentService {
                     break;
                 case TransactionTypeConstant.ECOMMERCE_SHOPPING:
                     // Update order status
-                    orderService.updateOrderStatus(Long.parseLong(trx.getReferenceCode()), OrderStatusConstant.ORDER_READY_FOR_PICKUP);
+                    orderService.updateOrderStatus(trx.getReferenceCode(), OrderStatusConstant.ORDER_READY_FOR_PICKUP);
                     break;
                 case TransactionTypeConstant.WALLET_TOPUP:
                     // Update balance
                     ReqUpdateBalanceDTO updateDTO = new ReqUpdateBalanceDTO();
                     updateDTO.setValue(trx.getTotalPrice());
                     updateDTO.setAddition(true);
+                    updateDTO.setRefId(trx.getTransactionCode());
                     boolean isTopupSuccess = walletService.updateBalance(trx.getUser().getId(), updateDTO);
 
                     if( !isTopupSuccess ) {
@@ -88,7 +89,7 @@ public class PaymentHelper extends PaymentService {
                     break;
                 case TransactionTypeConstant.ECOMMERCE_SHOPPING:
                     // Update order status
-                    orderService.cancelOrder(Long.parseLong(response.getReferenceCode()));
+                    orderService.cancelOrder(response.getReferenceCode());
                     break;
                 case TransactionTypeConstant.WALLET_TOPUP:
                     // Do nothing, since wallet is the refund container
@@ -119,7 +120,7 @@ public class PaymentHelper extends PaymentService {
                     break;
                 case TransactionTypeConstant.ECOMMERCE_SHOPPING:
                     // Update order status
-                    orderService.cancelOrder(Long.parseLong(response.getReferenceCode()));
+                    orderService.cancelOrder(response.getReferenceCode());
                     break;
                 case TransactionTypeConstant.WALLET_TOPUP:
                     // Do nothing, since wallet is the refund container

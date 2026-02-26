@@ -18,6 +18,6 @@ public class RespAdminBookingListDTO {
 
     private int totalBookingCount = 0;
     private double averageBookingHours = 0.0;
-    private double occupancyRate = 0.0;
+    private BigDecimal occupancyRate = BigDecimal.ZERO;
     private Page<ExtAdminBookingListDTO> bookings;
 }

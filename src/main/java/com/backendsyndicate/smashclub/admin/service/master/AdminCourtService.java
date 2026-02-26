@@ -129,7 +129,10 @@ public class AdminCourtService implements ICRUD<Court, Long>, IUpload<Court, Lon
             courtDB.setOpenTime(court.getOpenTime());
             courtDB.setCloseTime(court.getCloseTime());
             courtDB.setPricePerHour(court.getPricePerHour());
-            if( court.getCourtImgLink() != null ) courtDB.setCourtImgLink(court.getCourtImgLink());
+            if( court.getCourtImgLink() != null ) {
+                cloudinaryService.deleteImage(courtDB.getCourtImgLink());
+                courtDB.setCourtImgLink(court.getCourtImgLink());
+            }
             courtDB.setStatus(court.getStatus());
         } catch(Exception e) {
             Logging.handleException("AdminCourtService", "update(Long id, Court court, HttpServletRequest request)", 94, AdminConstant.ADMIN_COURT_SERVICE_UPDATE_EXCEPTION, e.getMessage());
@@ -152,6 +155,7 @@ public class AdminCourtService implements ICRUD<Court, Long>, IUpload<Court, Lon
                 return GlobalResponse.failed("Court data not found!", AdminConstant.ADMIN_COURT_SERVICE_DELETE_NOT_FOUND, null, request);
             }
 
+            cloudinaryService.deleteImage(optionalCourt.get().getCourtImgLink());
             courtRepo.deleteById(id);
         } catch(Exception e) {
             Logging.handleException("AdminCourtService", "delete(Long id, HttpServletRequest request)", 120, AdminConstant.ADMIN_COURT_SERVICE_DELETE_EXCEPTION, e.getMessage());

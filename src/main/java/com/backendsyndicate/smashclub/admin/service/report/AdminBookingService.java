@@ -90,16 +90,17 @@ public class AdminBookingService implements IStatistic {
 
         try {
             LocalDateTime startYear = LocalDateTime.of(LocalDate.of(yearStart, 1, 1), LocalTime.of(0, 0, 0));
-            LocalDateTime endYear = startYear.plusYears(1);
+            LocalDateTime endYear = startYear == LocalDateTime.of(LocalDate.of(2026, 1, 1), LocalTime.of(0, 0, 0)) ?LocalDateTime.now() : startYear.plusYears(1);
 
             int totalBookingCount = bookingRepo.countByCreatedAt(startYear, endYear);
             double averageHourCount = bookingRepo.averageBookingHourByCreatedAt(startYear, endYear);
-//            double occupancyRate = bookingRepo.occupancyRateByCreatedAt(startYear, endYear);
+            BigDecimal occupancyRate = bookingRepo.occupancyRateByCreatedAt(startYear, endYear);
             List<Map<String, Object>> monthlyBooking = bookingRepo.findAllGroupByCreatedAtMonthly(startYear, endYear);
 
             response = new RespAdminBookingStatisticDTO();
             response.setTotalBookingCount(totalBookingCount);
             response.setAverageBookingHours(averageHourCount);
+            response.setOccupancyRate(occupancyRate);
             response.setMonthlyBookingStatistic(monthlyBooking.stream().map( item -> {
                 return Util.mapToModel(item, ExtAdminBookingMonthlyDTO.class);
             } ).toList());
@@ -123,7 +124,7 @@ public class AdminBookingService implements IStatistic {
 
             int totalBookingCount = bookingRepo.countByCreatedAt(startMonth, endMonth);
             double averageHourCount = bookingRepo.averageBookingHourByCreatedAt(startMonth, endMonth);
-//            double occupancyRate = bookingRepo.occupancyRateByCreatedAt(startMonth, endMonth);
+            BigDecimal occupancyRate = bookingRepo.occupancyRateByCreatedAt(startMonth, endMonth);
             Page<Booking> bookings = null;
             if( !keyword.isEmpty() ) {
                 bookings = bookingRepo.findAllByCreatedAtBetweenAndBookingCodeContainsIgnoreCase(startMonth, endMonth, keyword, pageable);
@@ -139,6 +140,7 @@ public class AdminBookingService implements IStatistic {
             response = new RespAdminBookingListDTO();
             response.setTotalBookingCount(totalBookingCount);
             response.setAverageBookingHours(averageHourCount);
+            response.setOccupancyRate(occupancyRate);
             Page<ExtAdminBookingListDTO> listDTO = bookings.map(new Function<Booking, ExtAdminBookingListDTO>() {
                 @Override
                 public ExtAdminBookingListDTO apply(Booking booking) {

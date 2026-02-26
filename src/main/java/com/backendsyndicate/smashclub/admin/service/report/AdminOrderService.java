@@ -160,13 +160,13 @@ public class AdminOrderService implements IStatistic {
         return GlobalResponse.success("Successfully fetch order detail!", response, request);
     }
 
-    public ResponseEntity<Object> process(Long id, int status, HttpServletRequest request) {
-        if( id == null ) {
+    public ResponseEntity<Object> process(String orderCode, int status, HttpServletRequest request) {
+        if( orderCode == null ) {
             return GlobalResponse.failed("Failed to process order!", AdminConstant.ADMIN_ORDER_SERVICE_PROCESS_CODE_REQUIRED, null, request);
         }
 
         try {
-            orderHelper.updateOrderStatus(id, (byte) status);
+            orderHelper.updateOrderStatus(orderCode, (byte) status);
         } catch(Exception e) {
             Logging.handleException("AdminOrderService", "process(String orderCode, int status, HttpServletRequest request)", 206, AdminConstant.ADMIN_ORDER_SERVICE_PROCESS_EXCEPTION, e.getMessage());
             logService.writeErrorLog(AdminConstant.ADMIN_ORDER_SERVICE_PROCESS_EXCEPTION, "AdminOrderService@process()", e.getMessage());

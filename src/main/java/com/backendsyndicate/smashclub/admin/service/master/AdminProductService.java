@@ -137,7 +137,10 @@ public class AdminProductService implements ICRUD<Product, Long>, IUploadWithVar
             productDB.setProductName(product.getProductName());
             productDB.setProductDesc(product.getProductDesc());
             productDB.setCategory(product.getCategory());
-            if( product.getDefaultImgLink() != null ) productDB.setDefaultImgLink(product.getDefaultImgLink());
+            if( product.getDefaultImgLink() != null ) {
+                cloudinaryService.deleteImage(productDB.getDefaultImgLink());
+                productDB.setDefaultImgLink(product.getDefaultImgLink());
+            }
             productDB.setStatus(product.getStatus());
 
             if( !adminProductVariantService.save(id, product.getProductVariants()) ) {
@@ -165,6 +168,7 @@ public class AdminProductService implements ICRUD<Product, Long>, IUploadWithVar
             }
 
             if(adminProductVariantService.deleteByProductId(id)) {
+                cloudinaryService.deleteImage(optionalProduct.get().getDefaultImgLink());
                 productRepo.deleteById(id);
             }
         } catch(Exception e) {

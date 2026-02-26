@@ -7,6 +7,7 @@ import com.backendsyndicate.smashclub.ecommerce.model.Product;
 import com.backendsyndicate.smashclub.ecommerce.model.ProductVariant;
 import com.backendsyndicate.smashclub.ecommerce.repo.ProductRepo;
 import com.backendsyndicate.smashclub.ecommerce.repo.ProductVariantRepo;
+import com.backendsyndicate.smashclub.external.service.storage.CloudinaryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,8 @@ public class AdminProductVariantService {
     private ProductRepo productRepo;
     @Autowired
     private ProductVariantRepo productVariantRepo;
+    @Autowired
+    private CloudinaryService cloudinaryService;
     @Autowired
     private LogService logService;
 
@@ -56,7 +59,10 @@ public class AdminProductVariantService {
                     existingVariant.setVariantName(variantMappedById.get(existingVariant.getId()).getVariantName());
                     existingVariant.setPrice(variantMappedById.get(existingVariant.getId()).getPrice());
                     existingVariant.setStock(variantMappedById.get(existingVariant.getId()).getStock());
-                    if(variantMappedById.get(existingVariant.getId()).getVariantImgLink() != null) existingVariant.setVariantImgLink(variantMappedById.get(existingVariant.getId()).getVariantImgLink());
+                    if(variantMappedById.get(existingVariant.getId()).getVariantImgLink() != null) {
+                        cloudinaryService.deleteImage(existingVariant.getVariantImgLink());
+                        existingVariant.setVariantImgLink(variantMappedById.get(existingVariant.getId()).getVariantImgLink());
+                    }
                 } else {
                     Logging.printConsole("Deleting variant with ID: " + existingVariant.getId());
                     productVariantRepo.deleteById(existingVariant.getId());

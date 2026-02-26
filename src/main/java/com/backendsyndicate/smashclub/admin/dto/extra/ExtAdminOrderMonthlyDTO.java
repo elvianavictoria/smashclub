@@ -12,8 +12,6 @@ import java.math.BigDecimal;
 @Setter
 public class ExtAdminOrderMonthlyDTO {
     private String month = "";
-    private int totalCount = 0;
-    private double averageHour = 0.0;
-    private double occupancyRate = 0.0;
-    private BigDecimal totalPrice = BigDecimal.ZERO;
+    private int totalSoldQuantity = 0;
+    private BigDecimal totalOrderValue = BigDecimal.ZERO;
 }
