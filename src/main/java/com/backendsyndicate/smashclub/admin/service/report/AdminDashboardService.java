@@ -18,6 +18,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,7 +63,7 @@ public class AdminDashboardService {
             long courtCount = courtRepo.count();
             long coachCount = coachRepo.count();
             long trxCount = transactionRepo.count();
-            Page<Transaction> recentTransactions = transactionRepo.findAllByCreatedAtBetweenOrderByCreatedAt(startDate, endDate, PageRequest.of(0, 5));
+            Page<Transaction> recentTransactions = transactionRepo.findAllByCreatedAtBetween(startDate, endDate, PageRequest.of(0, 5, Sort.by("CreatedAt").descending()));
 
             List<Transaction> recentTrxList = recentTransactions.getContent();
 
