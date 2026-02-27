@@ -110,9 +110,9 @@ public class AdminSalesService implements IStatistic {
             BigDecimal averageTransaction = transactionRepo.averageTotalPriceByCreatedAt(startMonth, endMonth);
             Page<Transaction> transactions = null;
             if( !keyword.isEmpty() ) {
-                transactions = transactionRepo.findAllByCreatedAtBetweenAndTransactionCodeContainsIgnoreCase(startMonth, endMonth, keyword, pageable);
+                transactions = transactionRepo.findAllByCreatedAtBetweenAndTransactionCodeContainsIgnoreCaseOrderByCreatedAt(startMonth, endMonth, keyword, pageable);
             } else {
-                transactions = transactionRepo.findAllByCreatedAtBetween(startMonth, endMonth, pageable);
+                transactions = transactionRepo.findAllByCreatedAtBetweenOrderByCreatedAt(startMonth, endMonth, pageable);
             }
 
             if( transactions.isEmpty() ) {

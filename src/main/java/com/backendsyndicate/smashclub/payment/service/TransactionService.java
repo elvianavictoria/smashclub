@@ -59,7 +59,7 @@ public class TransactionService implements IHistory {
                 return GlobalResponse.unauthorized("Unauthorized access!", TransactionConstant.TRANSACTION_SERVICE_ERROR_LIST_UNAUTHORIZED, request);
             }
 
-            page = transactionRepo.findAllByUser_IdAndCreatedAtBetween(customerId, startDate.atStartOfDay(), endDate.atStartOfDay(), pageable);
+            page = transactionRepo.findAllByUser_IdAndCreatedAtBetweenOrderByCreatedAt(customerId, startDate.atStartOfDay(), endDate.atStartOfDay(), pageable);
             if( page.isEmpty() ) {
                 return GlobalResponse.failed("Transaction data not found!", TransactionConstant.TRANSACTION_SERVICE_ERROR_LIST_EMPTY, null, request);
             }

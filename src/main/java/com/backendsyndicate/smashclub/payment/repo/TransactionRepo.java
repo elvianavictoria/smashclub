@@ -19,9 +19,9 @@ public interface TransactionRepo extends JpaRepository<Transaction, Long> {
     Long countTodayTransaction(LocalDate date);
 
     // Transaction Filter by Date
-    Page<Transaction> findAllByUser_IdAndCreatedAtBetween(String userId, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
+    Page<Transaction> findAllByUser_IdAndCreatedAtBetweenOrderByCreatedAt(String userId, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
     // Transaction Filter by Date and Transaction Code
-    Page<Transaction> findAllByUser_IdAndCreatedAtBetweenAndTransactionCodeContainsIgnoreCase(String userId, LocalDateTime startDate, LocalDateTime endDate, String transactionCode, Pageable pageable);
+    Page<Transaction> findAllByUser_IdAndCreatedAtBetweenAndTransactionCodeContainsIgnoreCaseOrderByCreatedAt(String userId, LocalDateTime startDate, LocalDateTime endDate, String transactionCode, Pageable pageable);
     // Transaction Detail
     Optional<Transaction> findByTransactionCode(String transactionCode);
     // Get By Reference Code
@@ -35,7 +35,7 @@ public interface TransactionRepo extends JpaRepository<Transaction, Long> {
     @Query(value="SELECT FORMAT(t.createdAt, 'MMMM yyyy') AS month, COUNT(t) AS totalTransactionCount, SUM(t.totalPrice) AS totalTransactionValue, AVG(t.totalPrice) AS avgTransactionValue FROM Transaction t WHERE t.createdAt BETWEEN ?1 AND ?2 GROUP BY FORMAT(t.createdAt, 'MMMM yyyy')")
     List<Map<String, Object>> findAllGroupByCreatedAtMonthly(LocalDateTime startDate, LocalDateTime endDate);
     // Transaction Filter by Date
-    Page<Transaction> findAllByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
+    Page<Transaction> findAllByCreatedAtBetweenOrderByCreatedAt(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
     // Transaction Filter by Date and Transaction Code
-    Page<Transaction> findAllByCreatedAtBetweenAndTransactionCodeContainsIgnoreCase(LocalDateTime startDate, LocalDateTime endDate, String transactionCode, Pageable pageable);
+    Page<Transaction> findAllByCreatedAtBetweenAndTransactionCodeContainsIgnoreCaseOrderByCreatedAt(LocalDateTime startDate, LocalDateTime endDate, String transactionCode, Pageable pageable);
 }

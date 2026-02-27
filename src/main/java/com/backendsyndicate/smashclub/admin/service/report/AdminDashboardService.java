@@ -56,13 +56,13 @@ public class AdminDashboardService {
         RespAdminDashboardDTO response = new RespAdminDashboardDTO();
 
         try {
-            LocalDateTime endDate = LocalDateTime.of(LocalDate.now(), LocalTime.of(0, 0));
+            LocalDateTime endDate = LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(0, 0));
             LocalDateTime startDate = endDate.minusDays(7);
 
             long courtCount = courtRepo.count();
             long coachCount = coachRepo.count();
             long trxCount = transactionRepo.count();
-            Page<Transaction> recentTransactions = transactionRepo.findAllByCreatedAtBetween(startDate, endDate, PageRequest.of(0, 5));
+            Page<Transaction> recentTransactions = transactionRepo.findAllByCreatedAtBetweenOrderByCreatedAt(startDate, endDate, PageRequest.of(0, 5));
 
             List<Transaction> recentTrxList = recentTransactions.getContent();
 
