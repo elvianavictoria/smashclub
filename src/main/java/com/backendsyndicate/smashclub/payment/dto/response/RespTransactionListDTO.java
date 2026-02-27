@@ -21,6 +21,7 @@ public class RespTransactionListDTO {
     private String transactionTypeDesc;
     private byte status;
     private String statusDesc;
+    private String referenceCode;
     private RelTransactionUserDTO user;
     private byte isRefunded;
     private String createdAt;
